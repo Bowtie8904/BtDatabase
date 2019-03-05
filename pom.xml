@@ -30,5 +30,10 @@
         <artifactId>BtCommons</artifactId>
         <version>master-SNAPSHOT</version>
     </dependency>
+    <dependency>
+        <groupId>org.apache.derby</groupId>
+        <artifactId>derby</artifactId>
+        <version>10.14.2.0</version>
+    </dependency>
   </dependencies>
 </project>
