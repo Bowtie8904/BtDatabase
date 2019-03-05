@@ -1,7 +1,7 @@
 package bt.db.listener;
 
-import bt.db.DatabaseAccess;
 import bt.db.listener.evnt.UpdateEvent;
+import bt.runtime.evnt.Listener;
 
 /**
  * {@link DatabaseListener} extension to receive {@link UpdateEvent}s.
@@ -9,13 +9,6 @@ import bt.db.listener.evnt.UpdateEvent;
  * @author &#8904
  */
 @FunctionalInterface
-public interface UpdateListener extends DatabaseListener
+public interface UpdateListener extends Listener<UpdateEvent>
 {
-    /**
-     * Defines behavior when the {@link DatabaseAccess} implementations onUpdate method was called by an UPDATE trigger.
-     * 
-     * @param e
-     *            The fired event containing all relevant data sent by the trigger.
-     */
-    public void onUpdate(UpdateEvent e);
 }

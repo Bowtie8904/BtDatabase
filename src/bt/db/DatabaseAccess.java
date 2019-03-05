@@ -12,7 +12,6 @@ import java.util.Map.Entry;
 
 import bt.db.constants.SqlType;
 import bt.db.func.Sql;
-import bt.db.listener.DatabaseListener;
 import bt.db.statement.Alter;
 import bt.db.statement.Create;
 import bt.db.statement.clause.TableColumn;
@@ -26,6 +25,8 @@ import bt.db.statement.result.SqlResultSet;
 import bt.db.store.SqlEntry;
 import bt.runtime.InstanceKiller;
 import bt.runtime.Killable;
+import bt.runtime.evnt.Dispatcher;
+import bt.runtime.evnt.Listener;
 import bt.types.SimpleTripple;
 import bt.types.Tripple;
 import bt.utils.console.ConsoleRowList;
@@ -50,7 +51,8 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
 
     /** The connection to the database. */
     protected Connection connection;
-    protected List<DatabaseListener> listeners = new ArrayList<>();
+    // TODO protected List<DatabaseListener> listeners = new ArrayList<>();
+    protected Dispatcher triggerDispatcher;
     protected static Map<String, DatabaseAccess> instances = new HashMap<>();
     public static int defaultColumnWidth = -1;
     public static Logger log = new Logger("logs/database_log.log");
@@ -68,6 +70,7 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
     protected DatabaseAccess(String dbURL)
     {
         this.DB = dbURL;
+        this.triggerDispatcher = new Dispatcher();
         log.registerSource(this, getClass().getName());
         InstanceKiller.closeOnShutdown(this, 1);
     }
@@ -122,9 +125,9 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
         }
     }
 
-    protected List<DatabaseListener> getListeners()
+    protected Dispatcher getTriggerDispatcher()
     {
-        return listeners;
+        return this.triggerDispatcher;
     }
 
     /**
@@ -275,10 +278,11 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
 
     protected abstract void createDefaultProcedures();
 
-    public void registerListener(DatabaseListener listener)
+    public void registerListener(Class<T> type, Listener<T> listener)
     {
-        this.listeners.add(listener);
-        log.print(this, "Registered database listener of type: " + listener.getClass().getName());
+        this.triggerDispatcher.subscribeTo(type, listener);
+        log.print(this, "Registered database listener of type '" + listener.getClass().getName() + "' "
+                + "for '" + type.getClass().getName() + "'.");
     }
 
     public synchronized void execute(String sql)

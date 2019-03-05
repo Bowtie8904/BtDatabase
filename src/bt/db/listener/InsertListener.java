@@ -1,7 +1,7 @@
 package bt.db.listener;
 
-import bt.db.DatabaseAccess;
 import bt.db.listener.evnt.InsertEvent;
+import bt.runtime.evnt.Listener;
 
 /**
  * {@link DatabaseListener} extension to receive {@link InsertEvent}s.
@@ -9,13 +9,6 @@ import bt.db.listener.evnt.InsertEvent;
  * @author &#8904
  */
 @FunctionalInterface
-public interface InsertListener extends DatabaseListener
+public interface InsertListener extends Listener<InsertEvent>
 {
-    /**
-     * Defines behavior when the {@link DatabaseAccess} implementations onInsert method was called by an INSERT trigger.
-     * 
-     * @param e
-     *            The fired event containing all relevant data sent by the trigger.
-     */
-    public void onInsert(InsertEvent e);
 }
