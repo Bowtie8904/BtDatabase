@@ -51,7 +51,6 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
 
     /** The connection to the database. */
     protected Connection connection;
-    // TODO protected List<DatabaseListener> listeners = new ArrayList<>();
     protected Dispatcher triggerDispatcher;
     protected static Map<String, DatabaseAccess> instances = new HashMap<>();
     public static int defaultColumnWidth = -1;
@@ -282,7 +281,7 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
     {
         this.triggerDispatcher.subscribeTo(type, listener);
         log.print(this, "Registered database listener of type '" + listener.getClass().getName() + "' "
-                + "for '" + type.getClass().getName() + "'.");
+                + "for '" + type.getName() + "'.");
     }
 
     public synchronized void execute(String sql)
