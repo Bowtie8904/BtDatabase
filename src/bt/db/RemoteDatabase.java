@@ -70,6 +70,11 @@ public abstract class RemoteDatabase extends DatabaseAccess
                 .column("idRow", SqlType.LONG).add()
                 .column("insertTime", SqlType.TIMESTAMP).defaultValue(SqlValue.CURRENT_TIMESTAMP).add()
                 .createDefaultTriggers(false)
+                .onFail((statement, e) ->
+                {
+                    log.print(this, "Table " + statement.getName() + " already exists.");
+                    return 0;
+                })
                 .commit()
                 .execute();
 
@@ -79,6 +84,11 @@ public abstract class RemoteDatabase extends DatabaseAccess
                 .column("db_id", SqlType.VARCHAR).size(50).add()
                 .column("handleTime", SqlType.TIMESTAMP).defaultValue(SqlValue.CURRENT_TIMESTAMP).add()
                 .createDefaultTriggers(false)
+                .onFail((statement, e) ->
+                {
+                    log.print(this, "Table " + statement.getName() + " already exists.");
+                    return 0;
+                })
                 .commit()
                 .execute();
 
