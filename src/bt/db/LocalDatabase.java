@@ -185,7 +185,7 @@ public abstract class LocalDatabase extends DatabaseAccess
                 Method method = null;
                 try
                 {
-                    method = consumer.getClass().getMethod("receive", InsertEvent.class);
+                    method = consumer.getClass().getMethod("accept", InsertEvent.class);
                 }
                 catch (NoSuchMethodException | SecurityException e)
                 {
@@ -281,7 +281,7 @@ public abstract class LocalDatabase extends DatabaseAccess
                 Method method = null;
                 try
                 {
-                    method = consumer.getClass().getMethod("receive", UpdateEvent.class);
+                    method = consumer.getClass().getMethod("accept", UpdateEvent.class);
                 }
                 catch (NoSuchMethodException | SecurityException e)
                 {
@@ -377,7 +377,7 @@ public abstract class LocalDatabase extends DatabaseAccess
                 Method method = null;
                 try
                 {
-                    method = consumer.getClass().getMethod("receive", DeleteEvent.class);
+                    method = consumer.getClass().getMethod("accept", DeleteEvent.class);
                 }
                 catch (NoSuchMethodException | SecurityException e)
                 {
