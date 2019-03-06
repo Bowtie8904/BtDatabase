@@ -1,7 +1,6 @@
 package bt.db.listener;
 
-import java.util.function.Consumer;
-
+import bt.db.DatabaseAccess;
 import bt.db.listener.evnt.DeleteEvent;
 
 /**
@@ -10,6 +9,13 @@ import bt.db.listener.evnt.DeleteEvent;
  * @author &#8904
  */
 @FunctionalInterface
-public interface DeleteListener extends Consumer<DeleteEvent>
+public interface DeleteListener extends DatabaseListener
 {
+    /**
+     * Defines behavior when the {@link DatabaseAccess} implementations onDelete method was called by a DELETE trigger.
+     * 
+     * @param e
+     *            The fired event containing all relevant data sent by the trigger.
+     */
+    public void onDelete(DeleteEvent e);
 }

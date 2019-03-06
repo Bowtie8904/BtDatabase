@@ -7,9 +7,13 @@ import java.security.CodeSource;
 import java.sql.CallableStatement;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import bt.db.constants.SqlType;
+import bt.db.listener.DatabaseListener;
+import bt.db.listener.DeleteListener;
+import bt.db.listener.InsertListener;
+import bt.db.listener.UpdateListener;
 import bt.db.listener.anot.ListenOn;
 import bt.db.listener.evnt.DeleteEvent;
 import bt.db.listener.evnt.InsertEvent;
@@ -60,7 +64,7 @@ public abstract class LocalDatabase extends DatabaseAccess
                 .parameter("tableName", SqlType.VARCHAR).size(40)
                 .parameter("rowIdFieldName", SqlType.VARCHAR).size(40)
                 .parameter("newRowID", SqlType.LONG)
-                .call("bt.db.LocalDatabase.onInsert")
+                .call("bowt.db.LocalDatabase.onInsert")
                 .replace()
                 .onFail((s, e) ->
                 {
@@ -79,7 +83,7 @@ public abstract class LocalDatabase extends DatabaseAccess
                 .parameter("tableName", SqlType.VARCHAR).size(40)
                 .parameter("rowIdFieldName", SqlType.VARCHAR).size(40)
                 .parameter("oldRowID", SqlType.LONG)
-                .call("bt.db.LocalDatabase.onDelete")
+                .call("bowt.db.LocalDatabase.onDelete")
                 .replace()
                 .onFail((s, e) ->
                 {
@@ -98,7 +102,7 @@ public abstract class LocalDatabase extends DatabaseAccess
                 .parameter("tableName", SqlType.VARCHAR).size(40)
                 .parameter("rowIdFieldName", SqlType.VARCHAR).size(40)
                 .parameter("newRowID", SqlType.LONG)
-                .call("bt.db.LocalDatabase.onUpdate")
+                .call("bowt.db.LocalDatabase.onUpdate")
                 .replace()
                 .onFail((s, e) ->
                 {
@@ -177,15 +181,18 @@ public abstract class LocalDatabase extends DatabaseAccess
 
         if (instance != null)
         {
-            List<Consumer<InsertEvent>> insertListeners = instance.getTriggerDispatcher()
-                    .getSubscribers(InsertEvent.class);
+            List<DatabaseListener> insertListeners = (List<DatabaseListener>)instance.getListeners()
+                    .stream()
+                    .filter(l -> l instanceof InsertListener)
+                    .collect(Collectors.toList());
 
-            for (Consumer<InsertEvent> consumer : insertListeners)
+            for (DatabaseListener listener : insertListeners)
             {
+                InsertListener insertListener = (InsertListener)listener;
                 Method method = null;
                 try
                 {
-                    method = consumer.getClass().getMethod("accept", InsertEvent.class);
+                    method = insertListener.getClass().getMethod("onInsert", InsertEvent.class);
                 }
                 catch (NoSuchMethodException | SecurityException e)
                 {
@@ -197,7 +204,7 @@ public abstract class LocalDatabase extends DatabaseAccess
 
                 if (annotations.length == 0)
                 {
-                    consumer.accept(new InsertEvent(instance, table, idFieldName, id, data));
+                    insertListener.onInsert(new InsertEvent(instance, table, idFieldName, id, data));
                 }
                 else
                 {
@@ -205,7 +212,7 @@ public abstract class LocalDatabase extends DatabaseAccess
                     {
                         if (an != null && an.value().toUpperCase().equals(table.toUpperCase()))
                         {
-                            consumer.accept(new InsertEvent(instance, table, idFieldName, id, data));
+                            insertListener.onInsert(new InsertEvent(instance, table, idFieldName, id, data));
                             break;
                         }
                     }
@@ -273,15 +280,18 @@ public abstract class LocalDatabase extends DatabaseAccess
 
         if (instance != null)
         {
-            List<Consumer<UpdateEvent>> updateListeners = instance.getTriggerDispatcher()
-                    .getSubscribers(UpdateEvent.class);
+            List<DatabaseListener> updateListeners = (List<DatabaseListener>)instance.getListeners()
+                    .stream()
+                    .filter(l -> l instanceof UpdateListener)
+                    .collect(Collectors.toList());
 
-            for (Consumer<UpdateEvent> consumer : updateListeners)
+            for (DatabaseListener listener : updateListeners)
             {
+                UpdateListener updateListener = (UpdateListener)listener;
                 Method method = null;
                 try
                 {
-                    method = consumer.getClass().getMethod("accept", UpdateEvent.class);
+                    method = updateListener.getClass().getMethod("onUpdate", UpdateEvent.class);
                 }
                 catch (NoSuchMethodException | SecurityException e)
                 {
@@ -293,7 +303,7 @@ public abstract class LocalDatabase extends DatabaseAccess
 
                 if (annotations.length == 0)
                 {
-                    consumer.accept(new UpdateEvent(instance, table, idFieldName, id, data));
+                    updateListener.onUpdate(new UpdateEvent(instance, table, idFieldName, id, data));
                 }
                 else
                 {
@@ -301,7 +311,7 @@ public abstract class LocalDatabase extends DatabaseAccess
                     {
                         if (an != null && an.value().toUpperCase().equals(table.toUpperCase()))
                         {
-                            consumer.accept(new UpdateEvent(instance, table, idFieldName, id, data));
+                            updateListener.onUpdate(new UpdateEvent(instance, table, idFieldName, id, data));
                             break;
                         }
                     }
@@ -369,15 +379,18 @@ public abstract class LocalDatabase extends DatabaseAccess
 
         if (instance != null)
         {
-            List<Consumer<DeleteEvent>> deleteListeners = instance.getTriggerDispatcher()
-                    .getSubscribers(DeleteEvent.class);
+            List<DatabaseListener> deleteListeners = (List<DatabaseListener>)instance.getListeners()
+                    .stream()
+                    .filter(l -> l instanceof DeleteListener)
+                    .collect(Collectors.toList());
 
-            for (Consumer<DeleteEvent> consumer : deleteListeners)
+            for (DatabaseListener listener : deleteListeners)
             {
+                DeleteListener deleteListener = (DeleteListener)listener;
                 Method method = null;
                 try
                 {
-                    method = consumer.getClass().getMethod("accept", DeleteEvent.class);
+                    method = deleteListener.getClass().getMethod("onDelete", DeleteEvent.class);
                 }
                 catch (NoSuchMethodException | SecurityException e)
                 {
@@ -389,7 +402,7 @@ public abstract class LocalDatabase extends DatabaseAccess
 
                 if (annotations.length == 0)
                 {
-                    consumer.accept(new DeleteEvent(instance, table, idFieldName, id, data));
+                    deleteListener.onDelete(new DeleteEvent(instance, table, idFieldName, id, data));
                 }
                 else
                 {
@@ -397,7 +410,7 @@ public abstract class LocalDatabase extends DatabaseAccess
                     {
                         if (an != null && an.value().toUpperCase().equals(table.toUpperCase()))
                         {
-                            consumer.accept(new DeleteEvent(instance, table, idFieldName, id, data));
+                            deleteListener.onDelete(new DeleteEvent(instance, table, idFieldName, id, data));
                             break;
                         }
                     }

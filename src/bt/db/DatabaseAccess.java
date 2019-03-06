@@ -9,10 +9,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Consumer;
 
 import bt.db.constants.SqlType;
 import bt.db.func.Sql;
+import bt.db.listener.DatabaseListener;
 import bt.db.statement.Alter;
 import bt.db.statement.Create;
 import bt.db.statement.clause.TableColumn;
@@ -52,6 +52,7 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
     /** The connection to the database. */
     protected Connection connection;
     protected Dispatcher triggerDispatcher;
+    protected List<DatabaseListener> listeners = new ArrayList<>();
     protected static Map<String, DatabaseAccess> instances = new HashMap<>();
     public static int defaultColumnWidth = -1;
     public static Logger log = new Logger("logs/database_log.log");
@@ -127,6 +128,17 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
     protected Dispatcher getTriggerDispatcher()
     {
         return this.triggerDispatcher;
+    }
+
+    protected List<DatabaseListener> getListeners()
+    {
+        return listeners;
+    }
+
+    public void registerListener(DatabaseListener listener)
+    {
+        this.listeners.add(listener);
+        log.print(this, "Registered database listener of type: " + listener.getClass().getName());
     }
 
     /**
@@ -276,30 +288,6 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
     }
 
     protected abstract void createDefaultProcedures();
-
-    public void registerListener(Class<T> type, Consumer<T> consumer)
-    {
-        this.triggerDispatcher.subscribeTo(type, consumer);
-        log.print(this, "Registered database listener of type '" + consumer.getClass().getName() + "'.");
-    }
-
-    public void registerListener(Class<T> type, Runnable runnable)
-    {
-        this.triggerDispatcher.subscribeTo(type, runnable);
-        log.print(this, "Registered database listener of type '" + runnable.getClass().getName() + "'.");
-    }
-    
-    public void unregisterListener(Class<T> type, Consumer<T> consumer)
-    {
-        this.triggerDispatcher.unsubscribeFrom(type, consumer);
-        log.print(this, "Registered database listener of type '" + consumer.getClass().getName() + "'.");
-    }
-
-    public void unregisterListener(Class<T> type, Runnable runnable)
-    {
-        this.triggerDispatcher.unsubscribeFrom(type, runnable);
-        log.print(this, "Registered database listener of type '" + runnable.getClass().getName() + "'.");
-    }
 
     public synchronized void execute(String sql)
     {
