@@ -64,7 +64,7 @@ public abstract class LocalDatabase extends DatabaseAccess
                 .parameter("tableName", SqlType.VARCHAR).size(40)
                 .parameter("rowIdFieldName", SqlType.VARCHAR).size(40)
                 .parameter("newRowID", SqlType.LONG)
-                .call("bowt.db.LocalDatabase.onInsert")
+                .call(this.getClass().getName() + ".onInsert")
                 .replace()
                 .onFail((s, e) ->
                 {
@@ -83,7 +83,7 @@ public abstract class LocalDatabase extends DatabaseAccess
                 .parameter("tableName", SqlType.VARCHAR).size(40)
                 .parameter("rowIdFieldName", SqlType.VARCHAR).size(40)
                 .parameter("oldRowID", SqlType.LONG)
-                .call("bowt.db.LocalDatabase.onDelete")
+                .call(this.getClass().getName() + ".onDelete")
                 .replace()
                 .onFail((s, e) ->
                 {
@@ -102,7 +102,7 @@ public abstract class LocalDatabase extends DatabaseAccess
                 .parameter("tableName", SqlType.VARCHAR).size(40)
                 .parameter("rowIdFieldName", SqlType.VARCHAR).size(40)
                 .parameter("newRowID", SqlType.LONG)
-                .call("bowt.db.LocalDatabase.onUpdate")
+                .call(this.getClass().getName() + ".onUpdate")
                 .replace()
                 .onFail((s, e) ->
                 {
