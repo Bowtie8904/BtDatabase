@@ -7,13 +7,13 @@ import java.security.CodeSource;
 import java.sql.CallableStatement;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.function.Consumer;
 
 import bt.db.constants.SqlType;
 import bt.db.listener.anot.ListenOn;
 import bt.db.listener.evnt.DeleteEvent;
 import bt.db.listener.evnt.InsertEvent;
 import bt.db.listener.evnt.UpdateEvent;
-import bt.runtime.evnt.Listener;
 
 /**
  * A class which creates and keeps a connection to an embedded database.
@@ -177,15 +177,15 @@ public abstract class LocalDatabase extends DatabaseAccess
 
         if (instance != null)
         {
-            List<Listener<InsertEvent>> insertListeners = instance.getTriggerDispatcher()
+            List<Consumer<InsertEvent>> insertListeners = instance.getTriggerDispatcher()
                     .getSubscribers(InsertEvent.class);
 
-            for (Listener<InsertEvent> listener : insertListeners)
+            for (Consumer<InsertEvent> consumer : insertListeners)
             {
                 Method method = null;
                 try
                 {
-                    method = listener.getClass().getMethod("receive", InsertEvent.class);
+                    method = consumer.getClass().getMethod("receive", InsertEvent.class);
                 }
                 catch (NoSuchMethodException | SecurityException e)
                 {
@@ -197,7 +197,7 @@ public abstract class LocalDatabase extends DatabaseAccess
 
                 if (annotations.length == 0)
                 {
-                    listener.receive(new InsertEvent(instance, table, idFieldName, id, data));
+                    consumer.accept(new InsertEvent(instance, table, idFieldName, id, data));
                 }
                 else
                 {
@@ -205,7 +205,7 @@ public abstract class LocalDatabase extends DatabaseAccess
                     {
                         if (an != null && an.value().toUpperCase().equals(table.toUpperCase()))
                         {
-                            listener.receive(new InsertEvent(instance, table, idFieldName, id, data));
+                            consumer.accept(new InsertEvent(instance, table, idFieldName, id, data));
                             break;
                         }
                     }
@@ -273,15 +273,15 @@ public abstract class LocalDatabase extends DatabaseAccess
 
         if (instance != null)
         {
-            List<Listener<UpdateEvent>> updateListeners = instance.getTriggerDispatcher()
+            List<Consumer<UpdateEvent>> updateListeners = instance.getTriggerDispatcher()
                     .getSubscribers(UpdateEvent.class);
 
-            for (Listener<UpdateEvent> listener : updateListeners)
+            for (Consumer<UpdateEvent> consumer : updateListeners)
             {
                 Method method = null;
                 try
                 {
-                    method = listener.getClass().getMethod("receive", UpdateEvent.class);
+                    method = consumer.getClass().getMethod("receive", UpdateEvent.class);
                 }
                 catch (NoSuchMethodException | SecurityException e)
                 {
@@ -293,7 +293,7 @@ public abstract class LocalDatabase extends DatabaseAccess
 
                 if (annotations.length == 0)
                 {
-                    listener.receive(new UpdateEvent(instance, table, idFieldName, id, data));
+                    consumer.accept(new UpdateEvent(instance, table, idFieldName, id, data));
                 }
                 else
                 {
@@ -301,7 +301,7 @@ public abstract class LocalDatabase extends DatabaseAccess
                     {
                         if (an != null && an.value().toUpperCase().equals(table.toUpperCase()))
                         {
-                            listener.receive(new UpdateEvent(instance, table, idFieldName, id, data));
+                            consumer.accept(new UpdateEvent(instance, table, idFieldName, id, data));
                             break;
                         }
                     }
@@ -369,15 +369,15 @@ public abstract class LocalDatabase extends DatabaseAccess
 
         if (instance != null)
         {
-            List<Listener<DeleteEvent>> deleteListeners = instance.getTriggerDispatcher()
+            List<Consumer<DeleteEvent>> deleteListeners = instance.getTriggerDispatcher()
                     .getSubscribers(DeleteEvent.class);
 
-            for (Listener<DeleteEvent> listener : deleteListeners)
+            for (Consumer<DeleteEvent> consumer : deleteListeners)
             {
                 Method method = null;
                 try
                 {
-                    method = listener.getClass().getMethod("receive", DeleteEvent.class);
+                    method = consumer.getClass().getMethod("receive", DeleteEvent.class);
                 }
                 catch (NoSuchMethodException | SecurityException e)
                 {
@@ -389,7 +389,7 @@ public abstract class LocalDatabase extends DatabaseAccess
 
                 if (annotations.length == 0)
                 {
-                    listener.receive(new DeleteEvent(instance, table, idFieldName, id, data));
+                    consumer.accept(new DeleteEvent(instance, table, idFieldName, id, data));
                 }
                 else
                 {
@@ -397,7 +397,7 @@ public abstract class LocalDatabase extends DatabaseAccess
                     {
                         if (an != null && an.value().toUpperCase().equals(table.toUpperCase()))
                         {
-                            listener.receive(new DeleteEvent(instance, table, idFieldName, id, data));
+                            consumer.accept(new DeleteEvent(instance, table, idFieldName, id, data));
                             break;
                         }
                     }

@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import bt.db.constants.Generated;
 import bt.db.constants.SqlType;
@@ -16,7 +17,6 @@ import bt.db.listener.evnt.InsertEvent;
 import bt.db.listener.evnt.UpdateEvent;
 import bt.db.statement.result.SqlResult;
 import bt.db.statement.result.SqlResultSet;
-import bt.runtime.evnt.Listener;
 import bt.utils.thread.Threads;
 
 /**
@@ -229,14 +229,14 @@ public abstract class RemoteDatabase extends DatabaseAccess
 
     public synchronized void onInsert(String table, String idFieldName, long id, String... data)
     {
-        List<Listener<InsertEvent>> insertListeners = this.triggerDispatcher.getSubscribers(InsertEvent.class);
+        List<Consumer<InsertEvent>> insertListeners = this.triggerDispatcher.getSubscribers(InsertEvent.class);
 
-        for (Listener<InsertEvent> listener : insertListeners)
+        for (Consumer<InsertEvent> consumer : insertListeners)
         {
             Method method = null;
             try
             {
-                method = listener.getClass().getMethod("receive", InsertEvent.class);
+                method = consumer.getClass().getMethod("receive", InsertEvent.class);
             }
             catch (NoSuchMethodException | SecurityException e)
             {
@@ -248,7 +248,7 @@ public abstract class RemoteDatabase extends DatabaseAccess
 
             if (annotations.length == 0)
             {
-                listener.receive(new InsertEvent(this, table, idFieldName, id, data));
+                consumer.accept(new InsertEvent(this, table, idFieldName, id, data));
             }
             else
             {
@@ -256,7 +256,7 @@ public abstract class RemoteDatabase extends DatabaseAccess
                 {
                     if (an != null && an.value().toUpperCase().equals(table.toUpperCase()))
                     {
-                        listener.receive(new InsertEvent(this, table, idFieldName, id, data));
+                        consumer.accept(new InsertEvent(this, table, idFieldName, id, data));
                         break;
                     }
                 }
@@ -314,15 +314,15 @@ public abstract class RemoteDatabase extends DatabaseAccess
 
     public synchronized void onUpdate(String table, String idFieldName, long id, String... data)
     {
-        List<Listener<UpdateEvent>> updateListeners = this.triggerDispatcher.getSubscribers(UpdateEvent.class);
+        List<Consumer<UpdateEvent>> updateListeners = this.triggerDispatcher.getSubscribers(UpdateEvent.class);
 
-        for (Listener<UpdateEvent> listener : updateListeners)
+        for (Consumer<UpdateEvent> consumer : updateListeners)
         {
-            UpdateListener updateListener = (UpdateListener)listener;
+            UpdateListener updateListener = (UpdateListener)consumer;
             Method method = null;
             try
             {
-                method = listener.getClass().getMethod("receive", UpdateEvent.class);
+                method = consumer.getClass().getMethod("receive", UpdateEvent.class);
             }
             catch (NoSuchMethodException | SecurityException e)
             {
@@ -334,7 +334,7 @@ public abstract class RemoteDatabase extends DatabaseAccess
 
             if (annotations.length == 0)
             {
-                listener.receive(new UpdateEvent(this, table, idFieldName, id, data));
+                consumer.accept(new UpdateEvent(this, table, idFieldName, id, data));
             }
             else
             {
@@ -342,7 +342,7 @@ public abstract class RemoteDatabase extends DatabaseAccess
                 {
                     if (an != null && an.value().toUpperCase().equals(table.toUpperCase()))
                     {
-                        listener.receive(new UpdateEvent(this, table, idFieldName, id, data));
+                        consumer.accept(new UpdateEvent(this, table, idFieldName, id, data));
                         break;
                     }
                 }
@@ -400,15 +400,15 @@ public abstract class RemoteDatabase extends DatabaseAccess
 
     public synchronized void onDelete(String table, String idFieldName, long id, String... data)
     {
-        List<Listener<DeleteEvent>> deleteListeners = this.triggerDispatcher.getSubscribers(DeleteEvent.class);
+        List<Consumer<DeleteEvent>> deleteListeners = this.triggerDispatcher.getSubscribers(DeleteEvent.class);
 
-        for (Listener<DeleteEvent> listener : deleteListeners)
+        for (Consumer<DeleteEvent> consumer : deleteListeners)
         {
-            DeleteListener deleteListener = (DeleteListener)listener;
+            DeleteListener deleteListener = (DeleteListener)consumer;
             Method method = null;
             try
             {
-                method = listener.getClass().getMethod("receive", DeleteEvent.class);
+                method = consumer.getClass().getMethod("receive", DeleteEvent.class);
             }
             catch (NoSuchMethodException | SecurityException e)
             {
@@ -420,7 +420,7 @@ public abstract class RemoteDatabase extends DatabaseAccess
 
             if (annotations.length == 0)
             {
-                listener.receive(new DeleteEvent(this, table, idFieldName, id, data));
+                consumer.accept(new DeleteEvent(this, table, idFieldName, id, data));
             }
             else
             {
@@ -428,7 +428,7 @@ public abstract class RemoteDatabase extends DatabaseAccess
                 {
                     if (an != null && an.value().toUpperCase().equals(table.toUpperCase()))
                     {
-                        listener.receive(new DeleteEvent(this, table, idFieldName, id, data));
+                        consumer.accept(new DeleteEvent(this, table, idFieldName, id, data));
                         break;
                     }
                 }

@@ -6,8 +6,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import bt.runtime.evnt.Listener;
-
 /**
  * Defines the database table to listen on.
  * 

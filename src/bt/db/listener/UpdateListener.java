@@ -1,7 +1,8 @@
 package bt.db.listener;
 
+import java.util.function.Consumer;
+
 import bt.db.listener.evnt.UpdateEvent;
-import bt.runtime.evnt.Listener;
 
 /**
  * {@link DatabaseListener} extension to receive {@link UpdateEvent}s.
@@ -9,6 +10,6 @@ import bt.runtime.evnt.Listener;
  * @author &#8904
  */
 @FunctionalInterface
-public interface UpdateListener extends Listener<UpdateEvent>
+public interface UpdateListener extends Consumer<UpdateEvent>
 {
 }

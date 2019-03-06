@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 
 import bt.db.constants.SqlType;
 import bt.db.func.Sql;
@@ -26,7 +27,6 @@ import bt.db.store.SqlEntry;
 import bt.runtime.InstanceKiller;
 import bt.runtime.Killable;
 import bt.runtime.evnt.Dispatcher;
-import bt.runtime.evnt.Listener;
 import bt.types.SimpleTripple;
 import bt.types.Tripple;
 import bt.utils.console.ConsoleRowList;
@@ -277,11 +277,28 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
 
     protected abstract void createDefaultProcedures();
 
-    public void registerListener(Class<T> type, Listener<T> listener)
+    public void registerListener(Class<T> type, Consumer<T> consumer)
     {
-        this.triggerDispatcher.subscribeTo(type, listener);
-        log.print(this, "Registered database listener of type '" + listener.getClass().getName() + "' "
-                + "for '" + type.getName() + "'.");
+        this.triggerDispatcher.subscribeTo(type, consumer);
+        log.print(this, "Registered database listener of type '" + consumer.getClass().getName() + "'.");
+    }
+
+    public void registerListener(Class<T> type, Runnable runnable)
+    {
+        this.triggerDispatcher.subscribeTo(type, runnable);
+        log.print(this, "Registered database listener of type '" + runnable.getClass().getName() + "'.");
+    }
+    
+    public void unregisterListener(Class<T> type, Consumer<T> consumer)
+    {
+        this.triggerDispatcher.unsubscribeFrom(type, consumer);
+        log.print(this, "Registered database listener of type '" + consumer.getClass().getName() + "'.");
+    }
+
+    public void unregisterListener(Class<T> type, Runnable runnable)
+    {
+        this.triggerDispatcher.unsubscribeFrom(type, runnable);
+        log.print(this, "Registered database listener of type '" + runnable.getClass().getName() + "'.");
     }
 
     public synchronized void execute(String sql)

@@ -1,7 +1,8 @@
 package bt.db.listener;
 
+import java.util.function.Consumer;
+
 import bt.db.listener.evnt.DeleteEvent;
-import bt.runtime.evnt.Listener;
 
 /**
  * {@link DatabaseListener} extension to receive {@link DeleteEvent}s.
@@ -9,6 +10,6 @@ import bt.runtime.evnt.Listener;
  * @author &#8904
  */
 @FunctionalInterface
-public interface DeleteListener extends Listener<DeleteEvent>
+public interface DeleteListener extends Consumer<DeleteEvent>
 {
 }
