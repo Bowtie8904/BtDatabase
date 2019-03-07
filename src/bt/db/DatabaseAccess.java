@@ -85,6 +85,17 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
     /** A list of all registered {@link DatabaseListener}s that will be notified on their specififc triggers. */
     protected List<DatabaseListener> listeners = new ArrayList<>();
 
+    /**
+     * Gets the instance with the given ID.
+     * 
+     * @param id
+     *            The ID of the instance to return.
+     * @return The instance that was mapped to the given ID or null if no such instance was found.
+     */
+    protected static DatabaseAccess getInstance(String id)
+    {
+        return instances.get(id);
+    }
 
     /**
      * Creates a new instance.
@@ -136,16 +147,19 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
         log.print(this, "Setup database instance " + this.id);
     }
 
-    protected static DatabaseAccess getInstance(String id)
-    {
-        return instances.get(id);
-    }
-
+    /**
+     * Gets the runtime unique ID of this instance.
+     * 
+     * @return The String ID.
+     */
     public String getID()
     {
         return this.id;
     }
 
+    /**
+     * Checks whether this instance already has an ID assigned and requests a new one if it does not.
+     */
     protected void checkID()
     {
         if (this.id == null)
@@ -156,6 +170,11 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
 
     /**
      * Creates the database if it does not exist yet.
+     * 
+     * <p>
+     * This will simply attempt to create a connection to the database which will create it automatically, if it does
+     * not exist yet. This does only work with local databases.
+     * </p>
      */
     protected void createDatabase()
     {
@@ -169,15 +188,30 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
         }
     }
 
+    /**
+     * Gets a list containing all registered {@link DatabaseListener}s.
+     * 
+     * @return
+     */
     protected List<DatabaseListener> getListeners()
     {
         return listeners;
     }
 
+    /**
+     * Registeres the given listener to this database instance.
+     * 
+     * <p>
+     * 
+     * </p>
+     * 
+     * @param listener
+     */
     public void registerListener(DatabaseListener listener)
     {
         this.listeners.add(listener);
-        log.print(this, "Registered database listener of type: " + listener.getClass().getName());
+        log.print(this, "Registered database listener of type '" + listener.getClass().getName() + "' to instance "
+                + this.getID() + ".");
     }
 
     /**
