@@ -2,7 +2,9 @@ package bt.db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,27 +40,57 @@ import bt.utils.log.Logger;
  */
 public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killable
 {
+    /**
+     * The connection String for a default database located at a ./db folder.
+     * <p>
+     * <b>jdbc:derby:./db;create=true;useUnicode=true&characterEncoding=utf8&autoReconnect=true</b>
+     * </p>
+     */
     public static final String DEFAULT_LOCAL_DB = "jdbc:derby:./db;create=true;useUnicode=true&characterEncoding=utf8&autoReconnect=true";
+
+    /**
+     * The name of the comment table used for comments on table columns.
+     * <p>
+     * <b>column_comments</b>
+     * </p>
+     */
     public static final String COMMENT_TABLE = "column_comments";
+
+    /**
+     * The name of the properties table used to store database specififc key value pairs.
+     * <p>
+     * <b>sys_properties</b>
+     * </p>
+     */
     public static final String PROPERTIES_TABLE = "sys_properties";
 
-    /** The URL of the database. */
-    protected final String DB;
+    /**  */
+    protected static Map<String, DatabaseAccess> instances = new HashMap<>();
+    public static int defaultColumnWidth = -1;
+    public static Logger log = new Logger("logs/database_log.log");
 
+    /** The URL of the database. */
+    protected final String dbConnectionString;
+
+    /** The runtime unique ID of this database instance. Used to map this instance in {@link #instances}. */
     private String id;
 
     /** The connection to the database. */
     protected Connection connection;
+
+    /** A list of all registered {@link DatabaseListener}s that will be notified on their specififc triggers. */
     protected List<DatabaseListener> listeners = new ArrayList<>();
-    protected static Map<String, DatabaseAccess> instances = new HashMap<>();
-    public static int defaultColumnWidth = -1;
-    public static Logger log = new Logger("logs/database_log.log");
+
 
     /**
      * Creates a new instance.
      * 
      * <p>
-     * This sets the derby home, creates the database and calls {@link #createTables()}.
+     * This instance is added to the {@link InstanceKiller} with a priority of 1.
+     * </p>
+     * 
+     * <p>
+     * {@link #setup()} needs to be called to finish up the initialization.
      * </p>
      * 
      * @param dbURL
@@ -66,11 +98,26 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
      */
     protected DatabaseAccess(String dbURL)
     {
-        this.DB = dbURL;
+        this.dbConnectionString = dbURL;
         log.registerSource(this, getClass().getName());
         InstanceKiller.closeOnShutdown(this, 1);
     }
 
+    /**
+     * Sets the database up.
+     * 
+     * <p>
+     * The methods being called for the setup are (in order):
+     * <ul>
+     * <li>{@link #createDatabase()}</li>
+     * <li>{@link #createCommentTable()}</li>
+     * <li>{@link #createPropertiesTable()}</li>
+     * <li>{@link #checkID()}</li>
+     * <li>The instance is added to {@link #instances} with the unique id as key</li>
+     * <li>{@link #createDefaultProcedures()}</li>
+     * </ul>
+     * </p>
+     */
     protected void setup()
     {
         createDatabase();
@@ -106,9 +153,9 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
     /**
      * Creates the database if it does not exist yet.
      */
-    private void createDatabase()
+    protected void createDatabase()
     {
-        try (Connection connection = DriverManager.getConnection(this.DB))
+        try (Connection connection = DriverManager.getConnection(this.dbConnectionString))
         {
             log.print(this, "Loaded database.");
         }
@@ -142,7 +189,7 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
             {
                 try
                 {
-                    this.connection = DriverManager.getConnection(DB);
+                    this.connection = DriverManager.getConnection(dbConnectionString);
                     this.connection.setAutoCommit(false);
                 }
                 catch (SQLException e)
@@ -279,65 +326,29 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
 
     public int executeUpdate(String sql)
     {
-        var statement = update("");
-        statement.setFixedSql(sql);
-        return statement.execute();
+        try (Statement statement = getConnection().createStatement())
+        {
+            return statement.executeUpdate(sql);
+        }
+        catch (SQLException e)
+        {
+            log.print(this, e);
+            return -1;
+        }
     }
 
-    public int executeAlterTable(String sql)
+    public SqlResultSet executeQuery(String sql)
     {
-        var statement = alter().table("");
-        statement.setFixedSql(sql);
-        return statement.execute();
-    }
-
-    public int executeCreateProcedure(String sql)
-    {
-        var statement = create().procedure("");
-        statement.setFixedSql(sql);
-        return statement.execute();
-    }
-
-    public int executeCreateTable(String sql)
-    {
-        var statement = create().table("");
-        statement.setFixedSql(sql);
-        return statement.execute();
-    }
-
-    public int executeCreateTrigger(String sql)
-    {
-        var statement = create().trigger("");
-        statement.setFixedSql(sql);
-        return statement.execute();
-    }
-
-    public int executeDelete(String sql)
-    {
-        var statement = delete();
-        statement.setFixedSql(sql);
-        return statement.execute();
-    }
-
-    public int executeDrop(String sql)
-    {
-        var statement = drop();
-        statement.setFixedSql(sql);
-        return statement.execute();
-    }
-
-    public int executeInsert(String sql)
-    {
-        var statement = insert();
-        statement.setFixedSql(sql);
-        return statement.execute();
-    }
-
-    public SqlResultSet executeSelect(String sql)
-    {
-        var statement = select();
-        statement.setFixedSql(sql);
-        return statement.execute();
+        try (Statement statement = getConnection().createStatement(
+                ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY))
+        {
+            return new SqlResultSet(statement.executeQuery(sql));
+        }
+        catch (SQLException e)
+        {
+            log.print(this, e);
+            return null;
+        }
     }
 
     /**

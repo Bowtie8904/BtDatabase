@@ -2,7 +2,6 @@ package bt.db.statement.impl;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Types;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -283,19 +282,6 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     @Override
     public int execute(boolean printLogs)
     {
-        if (this.fixedSql)
-        {
-            try (Statement statement = this.db.getConnection().createStatement())
-            {
-                return statement.executeUpdate(this.fixedSqlString);
-            }
-            catch (SQLException e)
-            {
-                DatabaseAccess.log.print(e);
-                return -1;
-            }
-        }
-
         String sql = toString();
 
         if (this.setClauses.isEmpty())

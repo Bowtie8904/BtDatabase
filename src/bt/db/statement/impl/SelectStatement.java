@@ -4,7 +4,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLSyntaxErrorException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -600,21 +599,6 @@ public class SelectStatement extends SqlStatement<SelectStatement>
      */
     public SqlResultSet execute(boolean printLogs)
     {
-        if (this.fixedSql)
-        {
-            try (Statement statement = this.db.getConnection().createStatement())
-            {
-                var set = new SqlResultSet(statement.executeQuery(this.fixedSqlString));
-                set.setSql(this.fixedSqlString);
-                return set;
-            }
-            catch (SQLException e)
-            {
-                DatabaseAccess.log.print(e);
-                return null;
-            }
-        }
-
         String sql = toString();
         SqlResultSet result = null;
 
