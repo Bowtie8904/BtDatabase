@@ -200,7 +200,7 @@ public enum SqlType
      */
     public static String arrayToString(short... array)
     {
-        String strArray = "{ ";
+        String strArray = "( ";
 
         for (short value : array)
         {
@@ -212,7 +212,7 @@ public enum SqlType
             strArray = strArray.substring(0, strArray.length() - 2);
         }
 
-        strArray += " }";
+        strArray += " )";
 
         return strArray;
     }
