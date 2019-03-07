@@ -14,6 +14,9 @@ import java.util.Map.Entry;
 import bt.db.constants.SqlType;
 import bt.db.func.Sql;
 import bt.db.listener.DatabaseListener;
+import bt.db.listener.DeleteListener;
+import bt.db.listener.InsertListener;
+import bt.db.listener.UpdateListener;
 import bt.db.statement.Alter;
 import bt.db.statement.Create;
 import bt.db.statement.clause.TableColumn;
@@ -57,7 +60,7 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
     public static final String COMMENT_TABLE = "column_comments";
 
     /**
-     * The name of the properties table used to store database specififc key value pairs.
+     * The name of the properties table used to store database specific key value pairs.
      * <p>
      * <b>sys_properties</b>
      * </p>
@@ -199,27 +202,52 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
     }
 
     /**
-     * Registeres the given listener to this database instance.
-     * 
-     * <p>
-     * 
-     * </p>
+     * Registeres the given delete listener to this database instance.
      * 
      * @param listener
      */
-    public void registerListener(DatabaseListener listener)
+    public void registerListener(DeleteListener listener)
     {
         this.listeners.add(listener);
-        log.print(this, "Registered database listener of type '" + listener.getClass().getName() + "' to instance "
+        log.print(this,
+                "Registered database delete listener of type '" + listener.getClass().getName() + "' to instance "
+                + this.getID() + ".");
+    }
+
+    /**
+     * Registeres the given insert listener to this database instance.
+     * 
+     * @param listener
+     */
+    public void registerListener(InsertListener listener)
+    {
+        this.listeners.add(listener);
+        log.print(this,
+                "Registered database insert listener of type '" + listener.getClass().getName() + "' to instance "
+                + this.getID() + ".");
+    }
+
+    /**
+     * Registeres the given update listener to this database instance.
+     * 
+     * @param listener
+     */
+    public void registerListener(UpdateListener listener)
+    {
+        this.listeners.add(listener);
+        log.print(this,
+                "Registered database update listener of type '" + listener.getClass().getName() + "' to instance "
                 + this.getID() + ".");
     }
 
     /**
      * Gets a connection to the database.
      * 
+     * @param autocommit
+     *            Indicates whether the returned connection should use autocommit or not.
      * @return The connection.
      */
-    public Connection getConnection()
+    public Connection getConnection(boolean autocommit)
     {
         try
         {
@@ -228,7 +256,7 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
                 try
                 {
                     this.connection = DriverManager.getConnection(dbConnectionString);
-                    this.connection.setAutoCommit(false);
+                    this.connection.setAutoCommit(autocommit);
                 }
                 catch (SQLException e)
                 {
@@ -245,10 +273,24 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
     }
 
     /**
+     * Gets a connection to the database.
+     * 
+     * <p>
+     * The returned connection has auto commit turned off.
+     * </p>
+     * 
+     * @return The connection.
+     */
+    public Connection getConnection()
+    {
+        return getConnection(false);
+    }
+
+    /**
      * Closes the connection to the database if it exists.
      * 
      * <p>
-     * This will commit the current transaction.
+     * This will commit the current transaction if the connection is not in auto commit mode.
      * </p>
      */
     @Override
@@ -273,6 +315,14 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
         }
     }
 
+    /**
+     * Adds or updates the given property key with the given value.
+     * 
+     * @param key
+     *            The unique key of the property.
+     * @param value
+     *            The value of the property.
+     */
     public void setProperty(String key, String value)
     {
         insert().into(PROPERTIES_TABLE)
@@ -287,8 +337,20 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
                 .execute();
     }
 
+    /**
+     * Gets the property value for the given key from the {@link #PROPERTIES_TABLE}.
+     * 
+     * @param key
+     *            The key of the property to return.
+     * @return The value bound to the given key or null if the key was not found or null.
+     */
     public String getProperty(String key)
     {
+        if (key == null)
+        {
+            return null;
+        }
+
         SqlResultSet result = select(Sql.column("property_value").as("value"))
                 .from(PROPERTIES_TABLE)
                 .where("property_key").equals(key)
@@ -307,10 +369,8 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
     }
 
     /**
-     * Defines the tables that should be created.
+     * Creates the {@link #PROPERTIES_TABLE} if it does not exist yet.
      */
-    protected abstract void createTables();
-
     protected void createPropertiesTable()
     {
         int success = create().table(PROPERTIES_TABLE)
@@ -334,6 +394,9 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
         }
     }
 
+    /**
+     * Creates the {@link #COMMENT_TABLE} if it does not exist yet.
+     */
     protected void createCommentTable()
     {
         int success = create().table(COMMENT_TABLE)
@@ -360,8 +423,13 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
         }
     }
 
-    protected abstract void createDefaultProcedures();
-
+    /**
+     * Executes the given raw SQL String of a modify (update, insert, delete, alter, drop, ...) statement.
+     * 
+     * @param sql
+     *            The raw SQL String to execute.
+     * @return The return value of the statement execution. See {@link Statement#executeUpdate(String)}.
+     */
     public int executeUpdate(String sql)
     {
         try (Statement statement = getConnection().createStatement())
@@ -375,6 +443,13 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
         }
     }
 
+    /**
+     * Executes the given raw SQL String of a select statement.
+     * 
+     * @param sql
+     *            The raw SQL String to execute.
+     * @return The {@link SqlResultSet} resulting from the query or null if an error occured.
+     */
     public SqlResultSet executeQuery(String sql)
     {
         try (Statement statement = getConnection().createStatement(
@@ -391,52 +466,75 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
 
     /**
      * Rolls back the current transaction.
+     * 
+     * <p>
+     * This method has no effect on a connection that is in auto commit mode.
+     * </p>
      */
     public void rollback()
     {
-        if (this.connection != null)
+        try
         {
-            try
+            if (this.connection != null && !this.connection.getAutoCommit())
             {
                 this.connection.rollback();
                 log.print(this, "Rolled back transaction.");
             }
-            catch (SQLException e)
-            {
-                log.print(this, e);
-            }
+        }
+        catch (SQLException e)
+        {
+            log.print(this, e);
         }
     }
 
     /**
      * Commits the current transaction.
+     * 
+     * <p>
+     * This method has no effect on a connection that is in auto commit mode.
+     * </p>
      */
     public void commit()
     {
-        if (this.connection != null)
+        try
         {
-            try
+            if (this.connection != null && !this.connection.getAutoCommit())
             {
                 this.connection.commit();
                 log.print(this, "Committed transaction.");
             }
-            catch (SQLException e)
-            {
-                log.print(this, e);
-            }
+        }
+        catch (SQLException e)
+        {
+            log.print(this, e);
         }
     }
 
+    /**
+     * Creates a new {@link DropStatement}.
+     * 
+     * @return The statement.
+     */
     public DropStatement drop()
     {
         return new DropStatement(this);
     }
 
+    /**
+     * Creates a new {@link Create}statement.
+     * 
+     * @return The statement.
+     */
     public Create create()
     {
         return new Create(this);
     }
 
+    /**
+     * Creates a new {@link Alter}statement.
+     * 
+     * @return The statement.
+     */
     public Alter alter()
     {
         return new Alter(this);
@@ -452,6 +550,11 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
         return new SelectStatement(this);
     }
 
+    /**
+     * Creates a select statement which selects the toString() values of the given objects.
+     * 
+     * @return The statement.
+     */
     public SelectStatement select(Object... values)
     {
         String[] columns = new String[values.length];
@@ -506,16 +609,56 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
         return new UpdateStatement(this, table);
     }
 
-    public void persist(SqlEntry entry)
+    /**
+     * Persists the given object into the database by using the provided static methods of {@link SqlEntry} or by
+     * calling the persist method of SqlEntry implementations.
+     * 
+     * @param entry
+     */
+    public void persist(Object entry)
     {
-        entry.persist(this);
+        if (entry instanceof SqlEntry)
+        {
+            ((SqlEntry)entry).persist(this);
+        }
+        else
+        {
+            SqlEntry.persist(this, entry);
+        }
     }
 
-    public void init(SqlEntry entry)
+    /**
+     * Initializes the given object into the database by using the provided static methods of {@link SqlEntry} or by
+     * calling the init method of SqlEntry implementations.
+     * 
+     * @param entry
+     */
+    public void init(Object entry)
     {
-        entry.init(this);
+        if (entry instanceof SqlEntry)
+        {
+            ((SqlEntry)entry).init(this);
+        }
+        else
+        {
+            SqlEntry.init(this, entry);
+        }
     }
 
+    /**
+     * Formats a String table containing information about the columns of the table with the given name.
+     * 
+     * <p>
+     * The contained information are:
+     * <ul>
+     * <li>Column name</li>
+     * <li>Data type</li>
+     * <li>Comment</li>
+     * </ul>
+     * 
+     * @param table
+     * @return
+     */
     public String info(String table)
     {
         System.out.println("\nColumn information of table: " + table.toUpperCase());
@@ -569,4 +712,18 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
 
         return columnInfo;
     }
+
+    /**
+     * Defines the tables that should be created.
+     */
+    protected abstract void createTables();
+
+    /**
+     * Defines the default procedures used by this implementation.
+     * 
+     * <p>
+     * Those procedures should for example be the trigger procedures for insert, delete and update triggers.
+     * </p>
+     */
+    protected abstract void createDefaultProcedures();
 }
