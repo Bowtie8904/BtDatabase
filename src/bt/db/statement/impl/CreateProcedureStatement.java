@@ -115,6 +115,19 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
     @Override
     public int execute(boolean printLogs)
     {
+        if (this.fixedSql)
+        {
+            try (Statement statement = this.db.getConnection().createStatement())
+            {
+                return statement.executeUpdate(this.fixedSqlString);
+            }
+            catch (SQLException e)
+            {
+                DatabaseAccess.log.print(e);
+                return -1;
+            }
+        }
+
         String sql = toString();
 
         int result = Integer.MIN_VALUE;

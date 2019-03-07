@@ -3,7 +3,6 @@ package bt.db;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +25,6 @@ import bt.db.statement.result.SqlResultSet;
 import bt.db.store.SqlEntry;
 import bt.runtime.InstanceKiller;
 import bt.runtime.Killable;
-import bt.runtime.evnt.Dispatcher;
 import bt.types.SimpleTripple;
 import bt.types.Tripple;
 import bt.utils.console.ConsoleRowList;
@@ -51,7 +49,6 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
 
     /** The connection to the database. */
     protected Connection connection;
-    protected Dispatcher triggerDispatcher;
     protected List<DatabaseListener> listeners = new ArrayList<>();
     protected static Map<String, DatabaseAccess> instances = new HashMap<>();
     public static int defaultColumnWidth = -1;
@@ -70,7 +67,6 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
     protected DatabaseAccess(String dbURL)
     {
         this.DB = dbURL;
-        this.triggerDispatcher = new Dispatcher();
         log.registerSource(this, getClass().getName());
         InstanceKiller.closeOnShutdown(this, 1);
     }
@@ -101,12 +97,9 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
 
     protected void checkID()
     {
-        this.id = getProperty("instance_id");
-
         if (this.id == null)
         {
             this.id = StringID.uniqueID();
-            setProperty("instance_id", this.id);
         }
     }
 
@@ -123,11 +116,6 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
         {
             log.print(this, e);
         }
-    }
-
-    protected Dispatcher getTriggerDispatcher()
-    {
-        return this.triggerDispatcher;
     }
 
     protected List<DatabaseListener> getListeners()
@@ -289,74 +277,71 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
 
     protected abstract void createDefaultProcedures();
 
-    public synchronized void execute(String sql)
+    public int executeUpdate(String sql)
     {
-        if (sql.trim().toUpperCase().startsWith("SELECT"))
-        {
-            try (Statement statement = getConnection().createStatement())
-            {
-                SqlResultSet result = new SqlResultSet(statement.executeQuery(sql));
-                result.print();
-            }
-            catch (Exception e)
-            {
-                log.print(this, e);
-            }
-        }
-        else if (sql.trim().toUpperCase().startsWith("SET WIDTH"))
-        {
-            sql = sql.toUpperCase().replace("SET WIDTH", "").trim();
+        var statement = update("");
+        statement.setFixedSql(sql);
+        return statement.execute();
+    }
 
-            try
-            {
-                int number = Integer.parseInt(sql);
+    public int executeAlterTable(String sql)
+    {
+        var statement = alter().table("");
+        statement.setFixedSql(sql);
+        return statement.execute();
+    }
 
-                if (number >= 0)
-                {
-                    defaultColumnWidth = number;
-                    System.out.println("Changed default column width to " + defaultColumnWidth + ".");
-                }
-                else
-                {
-                    System.err.println("Failed to change default column width.");
-                }
-            }
-            catch (NumberFormatException e)
-            {
-                if (sql.equalsIgnoreCase("default"))
-                {
-                    defaultColumnWidth = -1;
-                    System.out.println("SqlResultSets will use their own default widths for columns.");
-                }
-                else
-                {
-                    System.err.println("Failed to change default column width.");
-                }
-            }
-        }
-        else if (sql.trim().toUpperCase().startsWith("INFO"))
-        {
-            String table = sql.substring(5, sql.length()).trim();
-            info(table);
-        }
-        else
-        {
-            try (Statement statement = getConnection().createStatement())
-            {
-                int result = statement.executeUpdate(sql);
-                System.out.println(result + " affected rows.");
-                commit();
-            }
-            catch (Exception e)
-            {
-                log.print(this, e);
-                rollback();
-            }
-        }
+    public int executeCreateProcedure(String sql)
+    {
+        var statement = create().procedure("");
+        statement.setFixedSql(sql);
+        return statement.execute();
+    }
+
+    public int executeCreateTable(String sql)
+    {
+        var statement = create().table("");
+        statement.setFixedSql(sql);
+        return statement.execute();
+    }
+
+    public int executeCreateTrigger(String sql)
+    {
+        var statement = create().trigger("");
+        statement.setFixedSql(sql);
+        return statement.execute();
+    }
+
+    public int executeDelete(String sql)
+    {
+        var statement = delete();
+        statement.setFixedSql(sql);
+        return statement.execute();
+    }
+
+    public int executeDrop(String sql)
+    {
+        var statement = drop();
+        statement.setFixedSql(sql);
+        return statement.execute();
+    }
+
+    public int executeInsert(String sql)
+    {
+        var statement = insert();
+        statement.setFixedSql(sql);
+        return statement.execute();
+    }
+
+    public SqlResultSet executeSelect(String sql)
+    {
+        var statement = select();
+        statement.setFixedSql(sql);
+        return statement.execute();
     }
 
     /**
-     * Rools back the current transaction.
+     * Rolls back the current transaction.
      */
     public void rollback()
     {
@@ -482,7 +467,7 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
         entry.init(this);
     }
 
-    public void info(String table)
+    public String info(String table)
     {
         System.out.println("\nColumn information of table: " + table.toUpperCase());
         List<Tripple<String, String, String>> columnInfo = columnInfo(table);
@@ -496,7 +481,7 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
                     column.getSecondValue() == null ? "" : column.getSecondValue());
         }
 
-        rows.print(System.out);
+        return rows.toString();
     }
 
     private List<Tripple<String, String, String>> columnInfo(String table)

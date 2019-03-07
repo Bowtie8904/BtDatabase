@@ -2,6 +2,7 @@ package bt.db.statement.impl;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.function.BiFunction;
 
 import bt.db.DatabaseAccess;
@@ -146,6 +147,19 @@ public class DropStatement extends SqlModifyStatement<DropStatement, DropStateme
     @Override
     public int execute(boolean printLogs)
     {
+        if (this.fixedSql)
+        {
+            try (Statement statement = this.db.getConnection().createStatement())
+            {
+                return statement.executeUpdate(this.fixedSqlString);
+            }
+            catch (SQLException e)
+            {
+                DatabaseAccess.log.print(e);
+                return -1;
+            }
+        }
+
         String sql = "DROP " + this.keyword + " " + this.name.toUpperCase();
 
         int result = Integer.MIN_VALUE;

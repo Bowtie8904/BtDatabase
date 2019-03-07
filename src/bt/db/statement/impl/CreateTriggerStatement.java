@@ -3,6 +3,7 @@ package bt.db.statement.impl;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.SQLSyntaxErrorException;
+import java.sql.Statement;
 
 import bt.db.DatabaseAccess;
 import bt.db.statement.clause.TriggerAction;
@@ -131,6 +132,19 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
     @Override
     public int execute(boolean printLogs)
     {
+        if (this.fixedSql)
+        {
+            try (Statement statement = this.db.getConnection().createStatement())
+            {
+                return statement.executeUpdate(this.fixedSqlString);
+            }
+            catch (SQLException e)
+            {
+                DatabaseAccess.log.print(e);
+                return -1;
+            }
+        }
+
         String sql = toString();
 
         int result = Integer.MIN_VALUE;

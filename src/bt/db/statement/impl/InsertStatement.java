@@ -5,6 +5,7 @@ import java.sql.Clob;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -398,6 +399,19 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
 
     private int executeStatement(boolean printLogs)
     {
+        if (this.fixedSql)
+        {
+            try (Statement statement = this.db.getConnection().createStatement())
+            {
+                return statement.executeUpdate(this.fixedSqlString);
+            }
+            catch (SQLException e)
+            {
+                DatabaseAccess.log.print(e);
+                return -1;
+            }
+        }
+
         String sql = toString();
 
         if (this.setClauses.isEmpty())

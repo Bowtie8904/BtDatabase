@@ -51,6 +51,18 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
     }
 
     /**
+     * Creates a new instance.
+     * 
+     * @param db
+     *            The database that should be used for the statement.
+     */
+    public SqlModifyStatement(DatabaseAccess db, String fixedSql)
+    {
+        super(db, fixedSql);
+        this.setClauses = new ArrayList<>();
+    }
+
+    /**
      * Adds a set clause to this statement.
      * 
      * @param set

@@ -38,6 +38,12 @@ public class SqlStatement<T extends SqlStatement>
 
     protected boolean prepared = true;
 
+    /** Indicates whether this statement uses a fixed SQL String or builds it itsself. */
+    protected boolean fixedSql;
+
+    /** The fixed SQL string or null if this statement builds its own sql. */
+    protected String fixedSqlString;
+
     /**
      * Creates a new instance.
      * 
@@ -51,6 +57,29 @@ public class SqlStatement<T extends SqlStatement>
         this.havingClauses = new ArrayList<>();
         this.tables = new String[] {};
         this.columns = new String[] {};
+    }
+
+    /**
+     * Creates a new instance.
+     * 
+     * @param db
+     *            The database that should be used for the statement.
+     */
+    public SqlStatement(DatabaseAccess db, String fixedSql)
+    {
+        this.db = db;
+        this.whereClauses = new ArrayList<>();
+        this.havingClauses = new ArrayList<>();
+        this.tables = new String[] {};
+        this.columns = new String[] {};
+        this.fixedSql = true;
+        this.fixedSqlString = fixedSql;
+    }
+
+    public void setFixedSql(String sql)
+    {
+        this.fixedSql = true;
+        this.fixedSqlString = sql;
     }
 
     /**
