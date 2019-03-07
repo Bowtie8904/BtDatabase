@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
 import bt.utils.console.ConsoleRowList;
 
@@ -402,7 +401,7 @@ public class SqlResultSet implements Iterable<SqlResult>
      */
     public SqlResultSet print(int... columnFormat)
     {
-        if (columnFormat == null && DatabaseAccess.defaultColumnWidth == -1)
+        if (columnFormat == null)
         {
             System.out.println(toString(this.defaultFormat));
         }
@@ -418,14 +417,7 @@ public class SqlResultSet implements Iterable<SqlResult>
      */
     public SqlResultSet print()
     {
-        if (DatabaseAccess.defaultColumnWidth == -1)
-        {
-            System.out.println(toString(this.defaultFormat));
-        }
-        else
-        {
-            System.out.println(toString(DatabaseAccess.defaultColumnWidth));
-        }
+        System.out.println(toString(this.defaultFormat));
         return this;
     }
 

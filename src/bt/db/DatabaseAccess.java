@@ -64,15 +64,19 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
      */
     public static final String PROPERTIES_TABLE = "sys_properties";
 
-    /**  */
+    /** The map of all currently active DatabaseAccess instances, mapped by their runtime unique ID. */
     protected static Map<String, DatabaseAccess> instances = new HashMap<>();
-    public static int defaultColumnWidth = -1;
+
+    /** The Logger for all database related logging. Writing to 'logs/database_log.log'. */
     public static Logger log = new Logger("logs/database_log.log");
 
     /** The URL of the database. */
     protected final String dbConnectionString;
 
-    /** The runtime unique ID of this database instance. Used to map this instance in {@link #instances}. */
+    /**
+     * The runtime unique ID of this database instance. Used to map this instance in {@link #instances}. This ID will
+     * change with every program execution and is only stored during runtime.
+     */
     private String id;
 
     /** The connection to the database. */
