@@ -6,11 +6,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import bt.db.listener.DatabaseListener;
+
 /**
  * Defines the database table to listen on.
  * 
  * <p>
- * This annotation needs to be added to the receive methods of the {@link Listener} implementation.
+ * This annotation needs to be added to the receive methods of the {@link DatabaseListener} implementation.
  * </p>
  * 
  * <p>
