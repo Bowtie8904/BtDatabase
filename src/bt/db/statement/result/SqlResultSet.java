@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
 import bt.utils.console.ConsoleRowList;
 
@@ -75,7 +76,7 @@ public class SqlResultSet implements Iterable<SqlResult>
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
+            DatabaseAccess.log.print(this, e);
         }
     }
 

@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.Time;
 import java.sql.Timestamp;
 
+import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
 import bt.db.func.SqlFunction;
 import bt.db.statement.SqlStatement;
@@ -150,7 +151,7 @@ public class ConditionalClause<T extends SqlStatement>
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            DatabaseAccess.log.print(this, e);
         }
 
         return this.value;
