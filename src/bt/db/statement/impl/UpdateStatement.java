@@ -45,6 +45,9 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
         return (UpdateStatement)super.commit();
     }
 
+    /**
+     * @see bt.db.statement.SqlModifyStatement#unprepared()
+     */
     @Override
     public UpdateStatement unprepared()
     {

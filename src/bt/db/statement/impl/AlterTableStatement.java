@@ -9,13 +9,22 @@ import bt.db.constants.SqlType;
 import bt.db.statement.clause.TableColumn;
 
 /**
+ * Represents an SQL alter statement which can be extended through method chaining.
+ * 
  * @author &#8904
- *
  */
 public class AlterTableStatement extends CreateStatement<AlterTableStatement, AlterTableStatement>
 {
     private TableColumn newColumn;
 
+    /**
+     * Creates a new instance.
+     * 
+     * @param db
+     *            The database that should be used for the statement.
+     * @param name
+     *            The name of the table that should be altered.
+     */
     public AlterTableStatement(DatabaseAccess db, String name)
     {
         super(db, name);

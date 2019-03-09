@@ -34,8 +34,10 @@ public class SqlStatement<T extends SqlStatement>
     /** All used having conditionals for this statement. */
     protected List<ConditionalClause<T>> havingClauses;
 
+    /** A defined function that is called if the statement execution fails for any reason. */
     protected BiFunction<T, SQLException, SqlResultSet> onFail;
 
+    /** Indicates whether this statement is treated like a prepared statement or not. */
     protected boolean prepared = true;
 
     /**
@@ -75,6 +77,14 @@ public class SqlStatement<T extends SqlStatement>
         this.havingClauses.add(having);
     }
 
+    /**
+     * Logs the given text to the logger instance of {@link DatabaseAccess} if shouldLog is true.
+     * 
+     * @param text
+     *            The text to log.
+     * @param shouldLog
+     *            true if it should be logged, false if it shouldn't be logged.
+     */
     protected void log(String text, boolean shouldLog)
     {
         if (shouldLog)
@@ -92,11 +102,26 @@ public class SqlStatement<T extends SqlStatement>
         }
     }
 
+    /**
+     * Indicates whether this statement is treated like a prepared statement or not.
+     * 
+     * <p>
+     * All statements will be treated as prepared ones unless their unprepared() method is called.
+     * </p>
+     * 
+     * @return true = prepared statement, false = unpreparted statement.
+     */
     public boolean isPrepared()
     {
         return this.prepared;
     }
 
+    /**
+     * Sets the {@link DatabseAccess} instance which should be used to execute this statement.
+     * 
+     * @param db
+     *            The database that should be used for the statement.
+     */
     public void setDatabase(DatabaseAccess db)
     {
         this.db = db;

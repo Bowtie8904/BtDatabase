@@ -572,6 +572,16 @@ public class SelectStatement extends SqlStatement<SelectStatement>
         return this;
     }
 
+    /**
+     * Indicates that this statement should not be executed as a prepared statement. Instead all set values will be
+     * directly inserted into the raw sql string.
+     * 
+     * <p>
+     * <b>Note that using this method makes the statement vulnerable for sql injections.</b>
+     * </p>
+     * 
+     * @return This instance for chaining.
+     */
     public SelectStatement unprepared()
     {
         this.prepared = false;
@@ -579,8 +589,8 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     }
 
     /**
-     * Executes the select and returns the resultset. If the original select did not return any rows, the defined
-     * onNoData function will be returned.
+     * Executes the select and returns the resultset. Depending on the number of rows returned, the defined onLessThan
+     * or onMoreThan might be executed.
      * 
      * @return The result.
      */
@@ -590,8 +600,8 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     }
 
     /**
-     * Executes the select and returns the resultset. If the original select did not return any rows, the defined
-     * onNoData function will be returned.
+     * Executes the select and returns the resultset. Depending on the number of rows returned, the defined onLessThan
+     * or onMoreThan might be executed.
      * 
      * @param printLogs
      *            true if information such as the full statement and paramaters should be printed.

@@ -10,7 +10,7 @@ import bt.db.DatabaseAccess;
 import bt.db.statement.clause.SetClause;
 
 /**
- * Base class for data modifying statements (insert, update, delete).
+ * Base class for data modifying statements (insert, update, delete, ...).
  * 
  * @author &#8904
  */
@@ -28,14 +28,22 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
     /** A list containing all used set clauses for insert and update statements. */
     protected List<SetClause<T>> setClauses;
 
+    /** A defined function that is called if the statement execution fails for any reason. */
     protected BiFunction<T, SQLException, Integer> onFail;
 
+    /** A defined function that is called if the number of affected rows is lower than {@link #lowerThreshhold}. */
     protected BiFunction<Integer, T, Integer> onLessThan;
 
+    /** A defined function that is called if the number of affected rows is higher than {@link #higherThreshhold}. */
     protected BiFunction<Integer, T, Integer> onMoreThan;
 
-    protected int lowerThreshhold, higherThreshhold;
+    /** The threshhold indicating whether {@link #onLessThan} should be executed. */
+    protected int lowerThreshhold;
 
+    /** The threshhold indicating whether {@link #onMoreThan} should be executed. */
+    protected int higherThreshhold;
+
+    /** Indicates whether the transaction should automatically be commited after the execution of this statement. */
     protected boolean shouldCommit;
 
     /**
@@ -64,7 +72,7 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
     /**
      * Makes this statement commit changes after SUCCESSFUL execution.
      * 
-     * @return
+     * @return This instance for chaining.
      */
     public SqlModifyStatement<T, K> commit()
     {
@@ -72,6 +80,16 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
         return this;
     }
 
+    /**
+     * Indicates that this statement should not be executed as a prepared statement. Instead all set values will be
+     * directly inserted into the raw sql string.
+     * 
+     * <p>
+     * <b>Note that using this method makes the statement vulnerable for sql injections.</b>
+     * </p>
+     * 
+     * @return This instance for chaining.
+     */
     public SqlModifyStatement<T, K> unprepared()
     {
         this.prepared = false;
