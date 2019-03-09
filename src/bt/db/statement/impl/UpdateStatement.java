@@ -271,6 +271,9 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     }
 
     /**
+     * Executes the built statement. Depending on the number of rows affected, the defined onLessThan or onMoreThan
+     * might be executed. If there is an error during this execution, the onFail function is called.
+     * 
      * @see bt.db.statement.SqlModifyStatement#execute()
      */
     @Override
@@ -280,6 +283,9 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     }
 
     /**
+     * Executes the built statement. Depending on the number of rows affected, the defined onLessThan or onMoreThan
+     * might be executed. If there is an error during this execution, the onFail function is called.
+     * 
      * @see bt.db.statement.SqlModifyStatement#execute(boolean)
      */
     @Override
@@ -360,7 +366,11 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     }
 
     /**
-     * Formats the full statement without instering values.
+     * Formats the full select statement.
+     * 
+     * <p>
+     * Depending on {@link #isPrepared()} values will either be inserted into the raw sql or replaced by ? placeholders.
+     * </p>
      * 
      * @see java.lang.Object#toString()
      */

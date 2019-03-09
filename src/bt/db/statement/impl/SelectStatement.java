@@ -462,7 +462,7 @@ public class SelectStatement extends SqlStatement<SelectStatement>
      * 
      * <p>
      * The first parameter (int) will be the number of rows returned, the second one is the SqlResultSet from the
-     * original select. The return value (SqlResultSet) will be returned by this instances { {@link #execute()}}.
+     * original select. The return value (SqlResultSet) will be returned by this instances {@link #execute()}.
      * </p>
      * 
      * @param lowerThreshhold
@@ -525,7 +525,7 @@ public class SelectStatement extends SqlStatement<SelectStatement>
      * 
      * <p>
      * The first parameter (int) will be the number of rows returned, the second one is the SqlResultSet from the
-     * original select. The return value (SqlResultSet) will be returned by this instances { {@link #execute()}}.
+     * original select. The return value (SqlResultSet) will be returned by this instances {@link #execute()}.
      * </p>
      * 
      * @param higherThreshhold
@@ -556,6 +556,14 @@ public class SelectStatement extends SqlStatement<SelectStatement>
         this.lastConditionalType = type;
     }
 
+    /**
+     * Defines a SelectStatement which will be executed and whichs SqlResultSet will be returned if there was an error
+     * during the execution of the original select.
+     * 
+     * @param onFail
+     *            The SelectStatement to execute instead.
+     * @return This instance for chaining.
+     */
     public SelectStatement onFail(SelectStatement onFail)
     {
         this.onFail = (statement, e) ->
@@ -566,6 +574,18 @@ public class SelectStatement extends SqlStatement<SelectStatement>
         return this;
     }
 
+    /**
+     * Defines a BiFunction that will be executed if there was an error during the execution of this statement.
+     * 
+     * <p>
+     * The first parameter (SelectStatement) will be this statement instance, the second one is the SqlReSQLExceptiont
+     * that caused the fail. The return value (SqlResultSet) will be returned by this instances {@link #execute()}.
+     * </p>
+     * 
+     * @param onFail
+     *            The BiFunction to execute.
+     * @return This instance for chaining.
+     */
     public SelectStatement onFail(BiFunction<SelectStatement, SQLException, SqlResultSet> onFail)
     {
         this.onFail = onFail;
@@ -601,7 +621,7 @@ public class SelectStatement extends SqlStatement<SelectStatement>
 
     /**
      * Executes the select and returns the resultset. Depending on the number of rows returned, the defined onLessThan
-     * or onMoreThan might be executed.
+     * or onMoreThan might be executed. If there is an error during this execution, the onFail function is called.
      * 
      * @param printLogs
      *            true if information such as the full statement and paramaters should be printed.
@@ -715,7 +735,11 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     }
 
     /**
-     * Formats the full select statement without instering values.
+     * Formats the full select statement.
+     * 
+     * <p>
+     * Depending on {@link #isPrepared()} values will either be inserted into the raw sql or replaced by ? placeholders.
+     * </p>
      * 
      * @see java.lang.Object#toString()
      */
