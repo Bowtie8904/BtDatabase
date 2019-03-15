@@ -120,7 +120,7 @@ public class DatabaseConfiguration
     @Override
     public String toString()
     {
-        String url = "jdbc:derby:";
+        String url = "jdbc:derby:;";
         String value;
         boolean hasAttributes = false;
 
