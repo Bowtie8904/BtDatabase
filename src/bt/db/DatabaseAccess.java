@@ -190,7 +190,7 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
         if (this.id == null)
         {
             this.id = StringID.uniqueID();
-            setProperty("insertID", this.id);
+            setProperty("instanceID", this.id);
         }
     }
 
