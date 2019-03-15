@@ -6,6 +6,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import bt.db.config.DatabaseConfiguration;
 import bt.db.constants.Generated;
 import bt.db.constants.SqlType;
 import bt.db.constants.SqlValue;
@@ -42,9 +43,6 @@ public abstract class RemoteDatabase extends DatabaseAccess
         this(DEFAULT_LOCAL_DB, 3000);
     }
 
-    /**
-     * @param dbURL
-     */
     protected RemoteDatabase(String dbURL)
     {
         this(dbURL, 3000);
@@ -58,6 +56,11 @@ public abstract class RemoteDatabase extends DatabaseAccess
         createTriggerTable();
         createTables();
         startTriggerCheck();
+    }
+
+    protected RemoteDatabase(DatabaseConfiguration configuration)
+    {
+        this(configuration.toString());
     }
 
     private void createTriggerTable()

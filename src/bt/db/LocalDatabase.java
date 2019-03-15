@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import bt.db.config.DatabaseConfiguration;
 import bt.db.constants.SqlType;
 import bt.db.listener.DatabaseListener;
 import bt.db.listener.DeleteListener;
@@ -29,17 +30,6 @@ public abstract class LocalDatabase extends DatabaseAccess
     /** The set derby home path. */
     protected static String derbyHome;
 
-    /**
-     * Creates a new instance.
-     * 
-     * <p>
-     * This sets the derby home, creates the database and calls {@link #createTables()}.
-     * </p>
-     * 
-     * <p>
-     * This will create the database in ./db
-     * </p>
-     */
     public LocalDatabase()
     {
         this(DEFAULT_LOCAL_DB);
@@ -53,6 +43,11 @@ public abstract class LocalDatabase extends DatabaseAccess
         setup();
         setProperty("derby_home", derbyHome);
         createTables();
+    }
+
+    protected LocalDatabase(DatabaseConfiguration configuration)
+    {
+        this(configuration.toString());
     }
 
     @Override

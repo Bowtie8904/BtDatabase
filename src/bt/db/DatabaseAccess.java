@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import bt.db.config.DatabaseConfiguration;
 import bt.db.constants.SqlType;
 import bt.db.func.Sql;
 import bt.db.listener.DatabaseListener;
@@ -119,6 +120,25 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
         this.dbConnectionString = dbURL;
         log.registerSource(this, getClass().getName());
         InstanceKiller.closeOnShutdown(this, 1);
+    }
+
+    /**
+     * Creates a new instance.
+     * 
+     * <p>
+     * This instance is added to the {@link InstanceKiller} with a priority of 1.
+     * </p>
+     * 
+     * <p>
+     * {@link #setup()} needs to be called to finish up the initialization.
+     * </p>
+     * 
+     * @param configuration
+     *            The configuration for this DB's connection.
+     */
+    protected DatabaseAccess(DatabaseConfiguration configuration)
+    {
+        this(configuration.toString());
     }
 
     /**
