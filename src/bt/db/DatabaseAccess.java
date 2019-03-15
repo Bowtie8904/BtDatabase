@@ -185,9 +185,12 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
      */
     protected void checkID()
     {
+        this.id = getProperty("instanceID");
+
         if (this.id == null)
         {
             this.id = StringID.uniqueID();
+            setProperty("insertID", this.id);
         }
     }
 
