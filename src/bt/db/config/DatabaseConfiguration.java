@@ -20,10 +20,6 @@ public class DatabaseConfiguration
     /**
      * Defines the path to the database.
      * 
-     * <p>
-     * //localhost:1527/mydb would also be a valid path to a database.
-     * </p>
-     * 
      * @param databasePath
      * @return This instance for chaining.
      */
