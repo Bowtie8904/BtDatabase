@@ -168,6 +168,7 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
         }
         createDefaultProcedures();
         log.print(this, "Setup database instance " + this.id);
+        log.print(this, "Using connection string: " + this.dbConnectionString);
     }
 
     /**
