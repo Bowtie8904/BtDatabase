@@ -42,7 +42,7 @@ import bt.utils.log.Logger;
  * 
  * @author &#8904
  */
-public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killable
+public abstract class DatabaseAccess implements Killable
 {
     /**
      * The connection String for a default database located at a ./db folder.
