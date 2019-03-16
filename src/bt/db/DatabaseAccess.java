@@ -225,42 +225,34 @@ public abstract class DatabaseAccess<T extends DatabaseAccess> implements Killab
     }
 
     /**
-     * Registeres the given delete listener to this database instance.
+     * Registeres the given listener to this database instance.
      * 
      * @param listener
      */
-    public void registerListener(DeleteListener listener)
+    public void registerListener(DatabaseListener listener)
     {
         this.listeners.add(listener);
-        log.print(this,
-                "Registered database delete listener of type '" + listener.getClass().getName() + "' to instance "
-                + this.getID() + ".");
-    }
 
-    /**
-     * Registeres the given insert listener to this database instance.
-     * 
-     * @param listener
-     */
-    public void registerListener(InsertListener listener)
-    {
-        this.listeners.add(listener);
-        log.print(this,
-                "Registered database insert listener of type '" + listener.getClass().getName() + "' to instance "
-                + this.getID() + ".");
-    }
+        if (listener instanceof DeleteListener)
+        {
+            log.print(this,
+                    "Registered database delete listener of type '" + listener.getClass().getName() + "' to instance "
+                            + this.getID() + ".");
+        }
 
-    /**
-     * Registeres the given update listener to this database instance.
-     * 
-     * @param listener
-     */
-    public void registerListener(UpdateListener listener)
-    {
-        this.listeners.add(listener);
-        log.print(this,
-                "Registered database update listener of type '" + listener.getClass().getName() + "' to instance "
-                + this.getID() + ".");
+        if (listener instanceof InsertListener)
+        {
+            log.print(this,
+                    "Registered database insert listener of type '" + listener.getClass().getName() + "' to instance "
+                            + this.getID() + ".");
+        }
+
+        if (listener instanceof UpdateListener)
+        {
+            log.print(this,
+                    "Registered database update listener of type '" + listener.getClass().getName() + "' to instance "
+                            + this.getID() + ".");
+        }
     }
 
     /**
