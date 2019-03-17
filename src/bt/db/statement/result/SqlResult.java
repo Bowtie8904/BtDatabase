@@ -336,6 +336,7 @@ public class SqlResult implements Iterable<Object>
     {
         var statement = new InsertStatement(null);
         statement.into(table);
+        statement.unprepared();
         String col;
 
         for (int i = 0; i < this.columnOrder.size(); i ++ )
