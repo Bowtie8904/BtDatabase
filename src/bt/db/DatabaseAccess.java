@@ -256,8 +256,10 @@ public abstract class DatabaseAccess implements Killable
      *            The runnable that should be called when the given event type is dispatched.
      * @param tables
      *            The tables for which the listener should be called.
+     * 
+     * @return The consumer that the given listener was wrapped in.
      */
-    public <T extends DatabaseChangeEvent> void registerListener(Class<T> listenFor, Runnable listener,
+    public <T extends DatabaseChangeEvent> Consumer<T> registerListener(Class<T> listenFor, Runnable listener,
             String... tables)
     {
         var cons = new Consumer<T>()
@@ -269,7 +271,7 @@ public abstract class DatabaseAccess implements Killable
             }
         };
 
-        registerListener(listenFor, cons, tables);
+        return registerListener(listenFor, cons, tables);
     }
 
     /**
@@ -301,8 +303,10 @@ public abstract class DatabaseAccess implements Killable
      *            The consumer method that should be called when the given event type is dispatched.
      * @param tables
      *            The tables for which the listener should be called.
+     * 
+     * @return The consumer that the given listener was wrapped in.
      */
-    public <T extends DatabaseChangeEvent> void registerListener(Class<T> listenFor, Consumer<T> listener,
+    public <T extends DatabaseChangeEvent> Consumer<T> registerListener(Class<T> listenFor, Consumer<T> listener,
             String... tables)
     {
         var cons = new Consumer<T>()
@@ -337,6 +341,8 @@ public abstract class DatabaseAccess implements Killable
                 "Registered database listener of type '" + listener.getClass().getName() + "' for '"
                         + listenFor.getName() + "' to instance "
                         + this.getID() + ".");
+
+        return cons;
     }
 
     /**
