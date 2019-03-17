@@ -40,6 +40,7 @@ import bt.runtime.evnt.Dispatcher;
 import bt.types.SimpleTripple;
 import bt.types.Tripple;
 import bt.utils.console.ConsoleRowList;
+import bt.utils.files.FileUtils;
 import bt.utils.id.StringID;
 import bt.utils.log.Logger;
 
@@ -641,8 +642,21 @@ public abstract class DatabaseAccess implements Killable
             log.print(this, e);
         }
     }
+    
+    public void importData(File importFile)
+    {
+        String[] lines = FileUtils.readLines(importFile);
+        int count = 0;
 
-    public void export(String table, File exportFile, String... excludeColumns)
+        for (String statement : lines)
+        {
+            count += executeUpdate(statement);
+        }
+
+        log.print(this, "Imported " + count + " rows from " + importFile.getAbsolutePath() + ".");
+    }
+
+    public void exportData(String table, File exportFile, String... excludeColumns)
     {
         SqlResultSet set = select()
                 .from(table)
