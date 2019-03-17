@@ -346,6 +346,21 @@ public abstract class DatabaseAccess implements Killable
     }
 
     /**
+     * Unregisters the given listener from the given event type.
+     * 
+     * <p>
+     * The listener will no longer be called on dispatched events of the given type.
+     * </p>
+     * 
+     * @param type
+     * @param listener
+     */
+    public <T extends DatabaseChangeEvent> void unregisterListener(Class<T> type, Consumer<T> listener)
+    {
+        this.triggerDispatcher.unsubscribeFrom(type, listener);
+    }
+
+    /**
      * Gets a connection to the database.
      * 
      * @param autocommit
