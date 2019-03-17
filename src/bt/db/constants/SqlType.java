@@ -56,6 +56,56 @@ public enum SqlType
     }
 
     /**
+     * Converts the given type name to a SqlType.
+     * 
+     * @param type
+     * @return
+     */
+    public static SqlType convert(String type)
+    {
+        SqlType sqlType = null;
+        switch (type.toUpperCase())
+        {
+        case "BOOLEAN":
+            sqlType = BOOLEAN;
+            break;
+        case "VARCHAR":
+            sqlType = VARCHAR;
+            break;
+        case "INTEGER":
+            sqlType = INTEGER;
+            break;
+        case "BIGINT":
+            sqlType = LONG;
+            break;
+        case "FLOAT":
+            sqlType = FLOAT;
+            break;
+        case "DOUBLE":
+            sqlType = DOUBLE;
+            break;
+        case "DATE":
+            sqlType = DATE;
+            break;
+        case "TIME":
+            sqlType = TIME;
+            break;
+        case "TIMESTAMP":
+            sqlType = TIMESTAMP;
+            break;
+        case "CLOB":
+            sqlType = CLOB;
+            break;
+        case "BLOB":
+            sqlType = BLOB;
+            break;
+        default:
+            sqlType = UNKNOWN;
+        }
+        return sqlType;
+    }
+
+    /**
      * Converts the int constant of {@link Types} to a known {@link SqlType}.
      * 
      * @param type
