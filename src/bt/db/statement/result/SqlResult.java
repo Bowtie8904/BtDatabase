@@ -362,7 +362,7 @@ public class SqlResult implements Iterable<Object>
             statement.set(col, this.objectResults.get(col), SqlType.convert(this.columnTypes.get(col)));
         }
 
-        return statement.toString() + ";";
+        return statement.toString();
     }
 
     /**
