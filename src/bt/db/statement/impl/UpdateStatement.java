@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import bt.db.DatabaseAccess;
@@ -131,6 +132,23 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     public UpdateStatement set(String column, Object value, SqlType sqlType)
     {
         SetClause<UpdateStatement> set = new SetClause<UpdateStatement>(this, column, value, sqlType);
+        addSetClause(set);
+        return this;
+    }
+
+    /**
+     * Uses the given supplier to retrieve a long value for the given column when this statement is prepared for
+     * execution.
+     * 
+     * @param column
+     *            The column whichs value should be set.
+     * @param idSupplier
+     *            The supplier that offers a long value for the given column.
+     * @return This instance for chaining.
+     */
+    public UpdateStatement set(String column, Supplier<Long> longSupplier)
+    {
+        SetClause<UpdateStatement> set = new SetClause<UpdateStatement>(this, column, longSupplier);
         addSetClause(set);
         return this;
     }

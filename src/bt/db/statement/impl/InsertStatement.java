@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
@@ -122,6 +123,23 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     public InsertStatement set(String column, Object value, SqlType sqlType)
     {
         SetClause<InsertStatement> set = new SetClause<InsertStatement>(this, column, value, sqlType);
+        addSetClause(set);
+        return this;
+    }
+
+    /**
+     * Uses the given supplier to retrieve a long value for the given column when this statement is prepared for
+     * execution.
+     * 
+     * @param column
+     *            The column whichs value should be set.
+     * @param idSupplier
+     *            The supplier that offers a long value for the given column.
+     * @return This instance for chaining.
+     */
+    public InsertStatement set(String column, Supplier<Long> longSupplier)
+    {
+        SetClause<InsertStatement> set = new SetClause<InsertStatement>(this, column, longSupplier);
         addSetClause(set);
         return this;
     }

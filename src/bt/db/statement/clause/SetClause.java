@@ -6,6 +6,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.function.Supplier;
 
 import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
@@ -29,6 +30,9 @@ public class SetClause<T extends SqlModifyStatement>
     /** The value for the column. */
     private Object value;
 
+    /** A suplier that is used to retrieve the long id when this clause is prepared for execution. */
+    private Supplier<Long> idSupplier;
+
     /** The statement that created this clause. */
     private T statement;
 
@@ -38,6 +42,14 @@ public class SetClause<T extends SqlModifyStatement>
         this.column = column;
         this.sqlValueType = type;
         this.value = value;
+    }
+
+    public SetClause(T statement, String column, Supplier<Long> idSupplier)
+    {
+        this.statement = statement;
+        this.column = column;
+        this.sqlValueType = SqlType.LONG;
+        this.idSupplier = idSupplier;
     }
 
     /**
@@ -55,6 +67,11 @@ public class SetClause<T extends SqlModifyStatement>
 
         try
         {
+            if (this.idSupplier != null)
+            {
+                this.value = this.idSupplier.get();
+            }
+
             if (this.value == null)
             {
                 statement.setNull(parameterIndex, this.sqlValueType.getIntType());
@@ -178,7 +195,6 @@ public class SetClause<T extends SqlModifyStatement>
         }
         else if (this.statement instanceof UpdateStatement)
         {
-
             return this.column + " = " + getStringValue();
         }
 
@@ -191,6 +207,11 @@ public class SetClause<T extends SqlModifyStatement>
 
         try
         {
+            if (this.idSupplier != null)
+            {
+                this.value = this.idSupplier.get();
+            }
+
             if (this.value == null)
             {
                 strValue = "null";
