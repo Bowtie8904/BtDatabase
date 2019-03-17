@@ -10,14 +10,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 
 import bt.db.config.DatabaseConfiguration;
 import bt.db.constants.SqlType;
 import bt.db.func.Sql;
-import bt.db.listener.DatabaseListener;
-import bt.db.listener.DeleteListener;
-import bt.db.listener.InsertListener;
-import bt.db.listener.UpdateListener;
+import bt.db.listener.evnt.DatabaseChangeEvent;
 import bt.db.statement.Alter;
 import bt.db.statement.Create;
 import bt.db.statement.clause.TableColumn;
@@ -31,6 +29,7 @@ import bt.db.statement.result.SqlResultSet;
 import bt.db.store.SqlEntry;
 import bt.runtime.InstanceKiller;
 import bt.runtime.Killable;
+import bt.runtime.evnt.Dispatcher;
 import bt.types.SimpleTripple;
 import bt.types.Tripple;
 import bt.utils.console.ConsoleRowList;
@@ -86,8 +85,7 @@ public abstract class DatabaseAccess implements Killable
     /** The connection to the database. */
     protected Connection connection;
 
-    /** A list of all registered {@link DatabaseListener}s that will be notified on their specififc triggers. */
-    protected List<DatabaseListener> listeners = new ArrayList<>();
+    protected Dispatcher triggerDispatcher;
 
     /**
      * Gets the instance with the given ID.
@@ -120,6 +118,7 @@ public abstract class DatabaseAccess implements Killable
         this.dbConnectionString = dbURL;
         log.registerSource(this, getClass().getName());
         InstanceKiller.closeOnShutdown(this, 1);
+        this.triggerDispatcher = new Dispatcher();
     }
 
     /**
@@ -215,45 +214,46 @@ public abstract class DatabaseAccess implements Killable
         }
     }
 
-    /**
-     * Gets a list containing all registered {@link DatabaseListener}s.
-     * 
-     * @return
-     */
-    protected List<DatabaseListener> getListeners()
+    public Dispatcher getTriggerDispatcher()
     {
-        return listeners;
+        return this.triggerDispatcher;
     }
 
-    /**
-     * Registeres the given listener to this database instance.
-     * 
-     * @param listener
-     */
-    public void registerListener(DatabaseListener listener)
+    public <T extends DatabaseChangeEvent> void registerListener(Class<T> listenFor, Consumer<T> listener,
+            String... tables)
     {
-        this.listeners.add(listener);
-
-        if (listener instanceof DeleteListener)
+        var cons = new Consumer<T>()
         {
-            log.print(this,
-                    "Registered database delete listener of type '" + listener.getClass().getName() + "' to instance "
-                            + this.getID() + ".");
-        }
+            @Override
+            public void accept(T event)
+            {
+                boolean dispatch = tables == null || tables.length == 0;
 
-        if (listener instanceof InsertListener)
-        {
-            log.print(this,
-                    "Registered database insert listener of type '" + listener.getClass().getName() + "' to instance "
-                            + this.getID() + ".");
-        }
+                if (!dispatch)
+                {
+                    for (String table : tables)
+                    {
+                        if (table.equalsIgnoreCase(event.getTable()))
+                        {
+                            dispatch = true;
+                            break;
+                        }
+                    }
+                }
 
-        if (listener instanceof UpdateListener)
-        {
-            log.print(this,
-                    "Registered database update listener of type '" + listener.getClass().getName() + "' to instance "
-                            + this.getID() + ".");
-        }
+                if (dispatch)
+                {
+                    listener.accept(event);
+                }
+            }
+        };
+
+        this.triggerDispatcher.subscribeTo(listenFor, cons);
+
+        log.print(this,
+                "Registered database listener of type '" + listener.getClass().getName() + "' for '"
+                        + listenFor.getName() + "' to instance "
+                        + this.getID() + ".");
     }
 
     /**

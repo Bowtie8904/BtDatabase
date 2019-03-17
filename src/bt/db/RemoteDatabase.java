@@ -1,20 +1,12 @@
 package bt.db;
 
-import java.lang.reflect.Method;
-import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import bt.db.config.DatabaseConfiguration;
 import bt.db.constants.Generated;
 import bt.db.constants.SqlType;
 import bt.db.constants.SqlValue;
-import bt.db.listener.DatabaseListener;
-import bt.db.listener.DeleteListener;
-import bt.db.listener.InsertListener;
-import bt.db.listener.UpdateListener;
-import bt.db.listener.anot.ListenOn;
 import bt.db.listener.evnt.DeleteEvent;
 import bt.db.listener.evnt.InsertEvent;
 import bt.db.listener.evnt.UpdateEvent;
@@ -224,43 +216,7 @@ public abstract class RemoteDatabase extends DatabaseAccess
 
     public synchronized void onInsert(String table, String idFieldName, long id, String... data)
     {
-        List<DatabaseListener> insertListeners = (List<DatabaseListener>)listeners
-                .stream()
-                .filter(l -> l instanceof InsertListener)
-                .collect(Collectors.toList());
-
-        for (DatabaseListener listener : insertListeners)
-        {
-            InsertListener insertListener = (InsertListener)listener;
-            Method method = null;
-            try
-            {
-                method = insertListener.getClass().getMethod("onInsert", InsertEvent.class);
-            }
-            catch (NoSuchMethodException | SecurityException e)
-            {
-                log.print(e);
-                return;
-            }
-
-            ListenOn[] annotations = method.getAnnotationsByType(ListenOn.class);
-
-            if (annotations.length == 0)
-            {
-                insertListener.onInsert(new InsertEvent(this, table, idFieldName, id, data));
-            }
-            else
-            {
-                for (ListenOn an : annotations)
-                {
-                    if (an != null && an.value().toUpperCase().equals(table.toUpperCase()))
-                    {
-                        insertListener.onInsert(new InsertEvent(this, table, idFieldName, id, data));
-                        break;
-                    }
-                }
-            }
-        }
+        this.triggerDispatcher.dispatch(new InsertEvent(this, table, idFieldName, id, data));
     }
 
     public synchronized void onUpdate(String table, String idFieldName, long id)
@@ -313,43 +269,7 @@ public abstract class RemoteDatabase extends DatabaseAccess
 
     public synchronized void onUpdate(String table, String idFieldName, long id, String... data)
     {
-        List<DatabaseListener> updateListeners = (List<DatabaseListener>)listeners
-                .stream()
-                .filter(l -> l instanceof UpdateListener)
-                .collect(Collectors.toList());
-
-        for (DatabaseListener listener : updateListeners)
-        {
-            UpdateListener updateListener = (UpdateListener)listener;
-            Method method = null;
-            try
-            {
-                method = updateListener.getClass().getMethod("onUpdate", UpdateEvent.class);
-            }
-            catch (NoSuchMethodException | SecurityException e)
-            {
-                log.print(e);
-                return;
-            }
-
-            ListenOn[] annotations = method.getAnnotationsByType(ListenOn.class);
-
-            if (annotations.length == 0)
-            {
-                updateListener.onUpdate(new UpdateEvent(this, table, idFieldName, id, data));
-            }
-            else
-            {
-                for (ListenOn an : annotations)
-                {
-                    if (an != null && an.value().toUpperCase().equals(table.toUpperCase()))
-                    {
-                        updateListener.onUpdate(new UpdateEvent(this, table, idFieldName, id, data));
-                        break;
-                    }
-                }
-            }
-        }
+        this.triggerDispatcher.dispatch(new UpdateEvent(this, table, idFieldName, id, data));
     }
 
     public synchronized void onDelete(String table, String idFieldName, long id)
@@ -402,42 +322,6 @@ public abstract class RemoteDatabase extends DatabaseAccess
 
     public synchronized void onDelete(String table, String idFieldName, long id, String... data)
     {
-        List<DatabaseListener> deleteListeners = (List<DatabaseListener>)listeners
-                .stream()
-                .filter(l -> l instanceof DeleteListener)
-                .collect(Collectors.toList());
-
-        for (DatabaseListener listener : deleteListeners)
-        {
-            DeleteListener deleteListener = (DeleteListener)listener;
-            Method method = null;
-            try
-            {
-                method = deleteListener.getClass().getMethod("onDelete", DeleteEvent.class);
-            }
-            catch (NoSuchMethodException | SecurityException e)
-            {
-                log.print(e);
-                return;
-            }
-
-            ListenOn[] annotations = method.getAnnotationsByType(ListenOn.class);
-
-            if (annotations.length == 0)
-            {
-                deleteListener.onDelete(new DeleteEvent(this, table, idFieldName, id, data));
-            }
-            else
-            {
-                for (ListenOn an : annotations)
-                {
-                    if (an != null && an.value().toUpperCase().equals(table.toUpperCase()))
-                    {
-                        deleteListener.onDelete(new DeleteEvent(this, table, idFieldName, id, data));
-                        break;
-                    }
-                }
-            }
-        }
+        this.triggerDispatcher.dispatch(new DeleteEvent(this, table, idFieldName, id, data));
     }
 }
