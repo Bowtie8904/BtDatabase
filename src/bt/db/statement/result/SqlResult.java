@@ -341,7 +341,7 @@ public class SqlResult implements Iterable<Object>
         for (int i = 0; i < this.columnOrder.size(); i ++ )
         {
             col = this.columnOrder.get(i);
-            statement.set(col, this.objectResults.get(col), SqlType.valueOf(this.columnTypes.get(col)));
+            statement.set(col, this.objectResults.get(col), SqlType.convert(this.columnTypes.get(col)));
         }
 
         return statement.toString();
