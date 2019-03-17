@@ -34,7 +34,7 @@ public class SqlResultSet implements Iterable<SqlResult>
      * Creates a new instance.
      * 
      * <p>
-     * {@link #parse(ResultSet)} needs to be called before this instacne is usable.
+     * {@link #parse(ResultSet)} needs to be called before this instance is usable.
      * </p>
      */
     public SqlResultSet(List<String> columnOrder)
@@ -380,6 +380,8 @@ public class SqlResultSet implements Iterable<SqlResult>
             {
                 result.putObject(name, set.getObject(name));
             }
+
+            result.setColumnTypes(this.valueTypes);
 
             results.add(result);
         }

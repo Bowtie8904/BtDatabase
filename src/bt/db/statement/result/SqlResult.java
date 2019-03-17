@@ -10,6 +10,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import bt.db.constants.SqlType;
+import bt.db.statement.impl.InsertStatement;
+
 /**
  * @author &#8904
  *
@@ -32,6 +35,7 @@ public class SqlResult implements Iterable<Object>
     private Map<String, Blob> blobResults = new HashMap<>();
     
     private List<String> columnOrder;
+    private Map<String, String> columnTypes;
 
     public SqlResult(List<String> columnOrder)
     {
@@ -318,9 +322,29 @@ public class SqlResult implements Iterable<Object>
         return values;
     }
 
+    protected void setColumnTypes(Map<String, String> types)
+    {
+        this.columnTypes = types;
+    }
+
     public List<String> getColumnNames()
     {
         return this.columnOrder;
+    }
+
+    public String export(String table)
+    {
+        var statement = new InsertStatement(null);
+        statement.into(table);
+        String col;
+
+        for (int i = 0; i < this.columnOrder.size(); i ++ )
+        {
+            col = this.columnOrder.get(i);
+            statement.set(col, this.objectResults.get(col), SqlType.valueOf(this.columnTypes.get(col)));
+        }
+
+        return statement.toString();
     }
 
     /**

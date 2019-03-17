@@ -1,5 +1,9 @@
 package bt.db;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -202,7 +206,7 @@ public abstract class DatabaseAccess implements Killable
      * 
      * <p>
      * This will simply attempt to create a connection to the database which will create it automatically, if it does
-     * not exist yet. This does only work with local databases.
+     * not exist yet and the option was set in the configuration. This does only work with local databases.
      * </p>
      */
     protected void createDatabase()
@@ -257,7 +261,8 @@ public abstract class DatabaseAccess implements Killable
      * @param tables
      *            The tables for which the listener should be called.
      * 
-     * @return The consumer that the given listener was wrapped in.
+     * @return The consumer that the given listener was wrapped in. This consumer can be used to unregister the given
+     *         listener.
      */
     public <T extends DatabaseChangeEvent> Consumer<T> registerListener(Class<T> listenFor, Runnable listener,
             String... tables)
@@ -304,7 +309,8 @@ public abstract class DatabaseAccess implements Killable
      * @param tables
      *            The tables for which the listener should be called.
      * 
-     * @return The consumer that the given listener was wrapped in.
+     * @return The consumer that the given listener was wrapped in. This consumer can be used to unregister the given
+     *         listener.
      */
     public <T extends DatabaseChangeEvent> Consumer<T> registerListener(Class<T> listenFor, Consumer<T> listener,
             String... tables)
@@ -631,6 +637,42 @@ public abstract class DatabaseAccess implements Killable
             }
         }
         catch (SQLException e)
+        {
+            log.print(this, e);
+        }
+    }
+
+    public void export(String table, File exportFile)
+    {
+        SqlResultSet set = select()
+                .from(table)
+                .onLessThan(1, (num, res) ->
+                {
+                    return res;
+                }).execute();
+
+        if (!exportFile.exists())
+        {
+            try
+            {
+                exportFile.getParentFile().mkdirs();
+                exportFile.createNewFile();
+            }
+            catch (Exception e)
+            {
+                log.print(this, e);
+                return;
+            }
+        }
+
+        try (PrintWriter writer = new PrintWriter(new FileWriter(exportFile)))
+        {
+            for (SqlResult row : set)
+            {
+                writer.println(row.export(table));
+            }
+        }
+        catch (IOException e)
         {
             log.print(this, e);
         }
