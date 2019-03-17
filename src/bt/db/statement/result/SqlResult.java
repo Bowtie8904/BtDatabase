@@ -332,20 +332,37 @@ public class SqlResult implements Iterable<Object>
         return this.columnOrder;
     }
 
-    public String export(String table)
+    public String export(String table, String[] excludeColumns)
     {
         var statement = new InsertStatement(null);
         statement.into(table);
         statement.unprepared();
         String col;
+        boolean add = true;
 
         for (int i = 0; i < this.columnOrder.size(); i ++ )
         {
             col = this.columnOrder.get(i);
+
+            for (String exCol : excludeColumns)
+            {
+                if (col.equalsIgnoreCase(exCol))
+                {
+                    add = false;
+                    break;
+                }
+            }
+
+            if (!add)
+            {
+                add = true;
+                continue;
+            }
+
             statement.set(col, this.objectResults.get(col), SqlType.convert(this.columnTypes.get(col)));
         }
 
-        return statement.toString();
+        return statement.toString() + ";";
     }
 
     /**

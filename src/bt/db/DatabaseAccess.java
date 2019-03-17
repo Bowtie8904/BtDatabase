@@ -642,7 +642,7 @@ public abstract class DatabaseAccess implements Killable
         }
     }
 
-    public void export(String table, File exportFile)
+    public void export(String table, File exportFile, String... excludeColumns)
     {
         SqlResultSet set = select()
                 .from(table)
@@ -669,8 +669,10 @@ public abstract class DatabaseAccess implements Killable
         {
             for (SqlResult row : set)
             {
-                writer.println(row.export(table));
+                writer.println(row.export(table, excludeColumns));
             }
+
+            log.print(this, "Exported " + set.size() + " rows to " + exportFile.getAbsolutePath() + ".");
         }
         catch (IOException e)
         {
