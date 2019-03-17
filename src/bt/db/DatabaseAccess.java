@@ -16,6 +16,9 @@ import bt.db.config.DatabaseConfiguration;
 import bt.db.constants.SqlType;
 import bt.db.func.Sql;
 import bt.db.listener.evnt.DatabaseChangeEvent;
+import bt.db.listener.evnt.DeleteEvent;
+import bt.db.listener.evnt.InsertEvent;
+import bt.db.listener.evnt.UpdateEvent;
 import bt.db.statement.Alter;
 import bt.db.statement.Create;
 import bt.db.statement.clause.TableColumn;
@@ -214,11 +217,91 @@ public abstract class DatabaseAccess implements Killable
         }
     }
 
-    public Dispatcher getTriggerDispatcher()
+    /**
+     * Gets the dispatcher instance whichs subscribers are the listeners for insert, delete and update triggers.
+     * 
+     * @return
+     */
+    protected Dispatcher getTriggerDispatcher()
     {
         return this.triggerDispatcher;
     }
 
+    /**
+     * Registers the given runnable as a listener for the given event type (only {@link InsertEvent},
+     * {@link DeleteEvent} and {@link UpdateEvent} are accepted.
+     * 
+     * <p>
+     * If no tables are specified, the given listener will be called every time the given event type is dispatched. If
+     * tables are specified the listener is only called for triggers that involve one of the given tables.
+     * </p>
+     * <br>
+     * <p>
+     * Example:<br>
+     * 
+     * <pre>
+     * // will be called for every dispatched InsertEvent
+     * registerListener(InsertEvent.class, myListener::onInsert);
+     * </pre>
+     * 
+     * <pre>
+     * // will be called only for inserts in the tables with the names 'myTable' or 'myTable2'
+     * registerListener(InsertEvent.class, myListener::onInsert, "myTable", "myTable2");
+     * </pre>
+     * </p>
+     * 
+     * @param listenFor
+     *            The event type to listen for.
+     * @param listener
+     *            The runnable that should be called when the given event type is dispatched.
+     * @param tables
+     *            The tables for which the listener should be called.
+     */
+    public <T extends DatabaseChangeEvent> void registerListener(Class<T> listenFor, Runnable listener,
+            String... tables)
+    {
+        var cons = new Consumer<T>()
+        {
+            @Override
+            public void accept(T event)
+            {
+                listener.run();
+            }
+        };
+
+        registerListener(listenFor, cons, tables);
+    }
+
+    /**
+     * Registers the given consumer as a listener for the given event type (only {@link InsertEvent},
+     * {@link DeleteEvent} and {@link UpdateEvent} are accepted.
+     * 
+     * <p>
+     * If no tables are specified, the given listener will be called every time the given event type is dispatched. If
+     * tables are specified the listener is only called for triggers that involve one of the given tables.
+     * </p>
+     * <br>
+     * <p>
+     * Example:<br>
+     * 
+     * <pre>
+     * // will be called for every dispatched InsertEvent
+     * registerListener(InsertEvent.class, myListener::onInsert);
+     * </pre>
+     * 
+     * <pre>
+     * // will be called only for inserts in the tables with the names 'myTable' or 'myTable2'
+     * registerListener(InsertEvent.class, myListener::onInsert, "myTable", "myTable2");
+     * </pre>
+     * </p>
+     * 
+     * @param listenFor
+     *            The event type to listen for.
+     * @param listener
+     *            The consumer method that should be called when the given event type is dispatched.
+     * @param tables
+     *            The tables for which the listener should be called.
+     */
     public <T extends DatabaseChangeEvent> void registerListener(Class<T> listenFor, Consumer<T> listener,
             String... tables)
     {
@@ -227,7 +310,7 @@ public abstract class DatabaseAccess implements Killable
             @Override
             public void accept(T event)
             {
-                boolean dispatch = tables == null || tables.length == 0;
+                boolean dispatch = tables == null || tables.length == 0; // no tables specified = always dispatch
 
                 if (!dispatch)
                 {
