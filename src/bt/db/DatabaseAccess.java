@@ -357,7 +357,13 @@ public abstract class DatabaseAccess implements Killable
      */
     public <T extends DatabaseChangeEvent> void unregisterListener(Class<T> type, Consumer<T> listener)
     {
-        this.triggerDispatcher.unsubscribeFrom(type, listener);
+        if (this.triggerDispatcher.unsubscribeFrom(type, listener))
+        {
+            log.print(this,
+                    "Unregistered database listener of type '" + listener.getClass().getName() + "' for '"
+                            + type.getName() + "' to instance "
+                            + this.getID() + ".");
+        }
     }
 
     /**

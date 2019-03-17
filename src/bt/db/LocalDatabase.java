@@ -168,7 +168,10 @@ public abstract class LocalDatabase extends DatabaseAccess
 
         if (instance != null)
         {
-            instance.getTriggerDispatcher().dispatch(new InsertEvent(instance, table, idFieldName, id, data));
+            int count = instance.getTriggerDispatcher()
+                    .dispatch(new InsertEvent(instance, table, idFieldName, id, data));
+
+            log.print(instance, "Dispatched insert event to " + count + " listeners.");
         }
     }
 
@@ -231,7 +234,10 @@ public abstract class LocalDatabase extends DatabaseAccess
 
         if (instance != null)
         {
-            instance.getTriggerDispatcher().dispatch(new UpdateEvent(instance, table, idFieldName, id, data));
+            int count = instance.getTriggerDispatcher()
+                    .dispatch(new UpdateEvent(instance, table, idFieldName, id, data));
+
+            log.print(instance, "Dispatched update event to " + count + " listeners.");
         }
     }
 
@@ -294,7 +300,10 @@ public abstract class LocalDatabase extends DatabaseAccess
 
         if (instance != null)
         {
-            instance.getTriggerDispatcher().dispatch(new DeleteEvent(instance, table, idFieldName, id, data));
+            int count = instance.getTriggerDispatcher()
+                    .dispatch(new DeleteEvent(instance, table, idFieldName, id, data));
+
+            log.print(instance, "Dispatched delete event to " + count + " listeners.");
         }
     }
 

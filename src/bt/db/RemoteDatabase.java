@@ -216,7 +216,9 @@ public abstract class RemoteDatabase extends DatabaseAccess
 
     public synchronized void onInsert(String table, String idFieldName, long id, String... data)
     {
-        this.triggerDispatcher.dispatch(new InsertEvent(this, table, idFieldName, id, data));
+        int count = this.triggerDispatcher.dispatch(new InsertEvent(this, table, idFieldName, id, data));
+
+        log.print(this, "Dispatched insert event to " + count + " listeners.");
     }
 
     public synchronized void onUpdate(String table, String idFieldName, long id)
@@ -269,7 +271,9 @@ public abstract class RemoteDatabase extends DatabaseAccess
 
     public synchronized void onUpdate(String table, String idFieldName, long id, String... data)
     {
-        this.triggerDispatcher.dispatch(new UpdateEvent(this, table, idFieldName, id, data));
+        int count = this.triggerDispatcher.dispatch(new UpdateEvent(this, table, idFieldName, id, data));
+
+        log.print(this, "Dispatched update event to " + count + " listeners.");
     }
 
     public synchronized void onDelete(String table, String idFieldName, long id)
@@ -322,6 +326,8 @@ public abstract class RemoteDatabase extends DatabaseAccess
 
     public synchronized void onDelete(String table, String idFieldName, long id, String... data)
     {
-        this.triggerDispatcher.dispatch(new DeleteEvent(this, table, idFieldName, id, data));
+        int count = this.triggerDispatcher.dispatch(new DeleteEvent(this, table, idFieldName, id, data));
+
+        log.print(this, "Dispatched delete event to " + count + " listeners.");
     }
 }
