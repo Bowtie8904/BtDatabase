@@ -695,6 +695,32 @@ public abstract class DatabaseAccess implements Killable
     }
 
     /**
+     * Exports the data of all user tables. (This includes tables that were created by this library)
+     * 
+     * <p>
+     * The columns with the name DEFAULT_ID will always be excluded.
+     * </p>
+     */
+    public void exportData()
+    {
+        SqlResultSet set = select("tablename")
+                .from("systables")
+                .where("tabletype").equals("T")
+                .onLessThan(1, (num, res) ->
+                {
+                    return res;
+                }).execute();
+
+        String tableName;
+
+        for (SqlResult table : set)
+        {
+            tableName = table.getString("tableName");
+            exportData(tableName, new File("./" + tableName + ".sql"), "DEFAULT_ID");
+        }
+    }
+
+    /**
      * Creates a new {@link DropStatement}.
      * 
      * @return The statement.
