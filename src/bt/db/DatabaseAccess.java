@@ -713,7 +713,7 @@ public abstract class DatabaseAccess implements Killable
         for (SqlResult table : set)
         {
             tableName = table.getString("tableName");
-            exportData(tableName, new File("/DATA_EXPORT/" + tableName + ".sql"), excludeColumns);
+            exportData(tableName, new File("./DATA_EXPORT/" + tableName + ".sql"), excludeColumns);
         }
     }
 
