@@ -94,6 +94,7 @@ public abstract class DatabaseAccess implements Killable
     /** The connection to the database. */
     protected Connection connection;
 
+    /** The dispatcher used to distribute insert, update and delete trigger events to the corresponding listeners. */
     protected Dispatcher triggerDispatcher;
 
     /**
@@ -191,6 +192,10 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Checks whether this instance already has an ID assigned and requests a new one if it does not.
+     * 
+     * <p>
+     * The assigned id will be saved to the {@link #PROPERTIES_TABLE} with the key 'instanceID'.
+     * </p>
      */
     protected void checkID()
     {
@@ -644,6 +649,21 @@ public abstract class DatabaseAccess implements Killable
         }
     }
     
+    /**
+     * Imports all data formatted as insert statements inside the given file.
+     * 
+     * <p>
+     * There can only be one statement in each line and a statement can not exceed over multiple lines.
+     * </p>
+     * 
+     * <p>
+     * All lines in the file will be read and are expected to be DML statements. Invalid SQL and inserts that violate
+     * unique constraints will be skipped.
+     * </p>
+     * 
+     * @param importFile
+     *            The file from where to import.
+     */
     public void importData(File importFile)
     {
         String[] lines = FileUtils.readLines(importFile);
@@ -657,6 +677,24 @@ public abstract class DatabaseAccess implements Killable
         log.print(this, "Imported " + count + " rows from " + importFile.getAbsolutePath() + ".");
     }
 
+    /**
+     * Exports all entries in the given table.
+     * 
+     * <p>
+     * The entries are exported as insert statements and saved to the given file. The insert statements will include all
+     * columns of the given table except the ones that are passed in excludeColumns (case insensitive).
+     * </p>
+     * 
+     * @param table
+     *            The name of the table whichs data should be exported.
+     * @param exportFile
+     *            The file to save the insert statements to. If the file does not exist it will be created.
+     * @param excludeColumns
+     *            An array of column names which should not be included in the exported insert statements. Keep in mind
+     *            that all tables created by this library will have an id column 'DEFAULT_ID' unless a fitting id column
+     *            was explicitly added. These columns will be 'generated always as identity' meaning that values can't
+     *            be manually added or changed, which means they can't be used in insert statements.
+     */
     public void exportData(String table, File exportFile, String... excludeColumns)
     {
         SqlResultSet set = select()
@@ -696,7 +734,19 @@ public abstract class DatabaseAccess implements Killable
     }
 
     /**
-     * Exports the data of all user tables.
+     * Exports all entries from all user table.
+     * 
+     * <p>
+     * The entries are exported as insert statements and saved to separate files in <i>./EXPORT_DATA</i> (Will be
+     * created if it does not exist). The files will have the name '<i>NAME_OF_TABLE.sql</i>' The insert statements will
+     * include all columns of the respective table except the ones that are passed in excludeColumns (case insensitive).
+     * </p>
+     * 
+     * @param excludeColumns
+     *            An array of column names which should not be included in the exported insert statements. Keep in mind
+     *            that all tables created by this library will have an id column 'DEFAULT_ID' unless a fitting id column
+     *            was explicitly added. These columns will be 'generated always as identity' meaning that values can't
+     *            be manually added or changed, which means they can't be used in insert statements.
      */
     public void exportData(String... excludeColumns)
     {
@@ -868,7 +918,6 @@ public abstract class DatabaseAccess implements Killable
      */
     public String info(String table)
     {
-        System.out.println("\nColumn information of table: " + table.toUpperCase());
         List<Tripple<String, String, String>> columnInfo = columnInfo(table);
 
         ConsoleRowList rows = new ConsoleRowList(20, 18, TableColumn.COMMENT_SIZE + 2);
@@ -922,6 +971,10 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Defines the tables that should be created.
+     * 
+     * <p>
+     * This is called by the {@link #setup()} of the implementation.
+     * </p>
      */
     protected abstract void createTables();
 
