@@ -696,11 +696,7 @@ public abstract class DatabaseAccess implements Killable
     }
 
     /**
-     * Exports the data of all user tables. (This includes tables that were created by this library)
-     * 
-     * <p>
-     * The columns with the name DEFAULT_ID will always be excluded.
-     * </p>
+     * Exports the data of all user tables.
      */
     public void exportData(String... excludeColumns)
     {
@@ -717,7 +713,7 @@ public abstract class DatabaseAccess implements Killable
         for (SqlResult table : set)
         {
             tableName = table.getString("tableName");
-            exportData(tableName, new File("./" + tableName + ".sql"), excludeColumns);
+            exportData(tableName, new File("/DATA_EXPORT/" + tableName + ".sql"), excludeColumns);
         }
     }
 
