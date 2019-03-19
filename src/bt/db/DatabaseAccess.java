@@ -18,6 +18,7 @@ import java.util.function.Consumer;
 
 import bt.db.config.DatabaseConfiguration;
 import bt.db.constants.SqlType;
+import bt.db.constants.SqlValue;
 import bt.db.func.Sql;
 import bt.db.listener.evnt.DatabaseChangeEvent;
 import bt.db.listener.evnt.DeleteEvent;
@@ -704,7 +705,7 @@ public abstract class DatabaseAccess implements Killable
     public void exportData()
     {
         SqlResultSet set = select("tablename")
-                .from("systables")
+                .from(SqlValue.SYSTABLE)
                 .where("tabletype").equals("T")
                 .onLessThan(1, (num, res) ->
                 {
