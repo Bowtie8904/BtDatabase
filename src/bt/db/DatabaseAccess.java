@@ -702,7 +702,7 @@ public abstract class DatabaseAccess implements Killable
      * The columns with the name DEFAULT_ID will always be excluded.
      * </p>
      */
-    public void exportData()
+    public void exportData(String... excludeColumns)
     {
         SqlResultSet set = select("tablename")
                 .from(SqlValue.SYSTABLE)
@@ -717,7 +717,7 @@ public abstract class DatabaseAccess implements Killable
         for (SqlResult table : set)
         {
             tableName = table.getString("tableName");
-            exportData(tableName, new File("./" + tableName + ".sql"), "DEFAULT_ID");
+            exportData(tableName, new File("./" + tableName + ".sql"), excludeColumns);
         }
     }
 
