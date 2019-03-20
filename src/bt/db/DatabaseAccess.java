@@ -127,7 +127,7 @@ public abstract class DatabaseAccess implements Killable
     {
         this.dbConnectionString = dbURL;
         log.registerSource(this, getClass().getName());
-        InstanceKiller.closeOnShutdown(this, 1);
+        InstanceKiller.killOnShutdown(this, 1);
         this.triggerDispatcher = new Dispatcher();
     }
 
