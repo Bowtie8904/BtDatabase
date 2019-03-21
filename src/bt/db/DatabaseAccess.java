@@ -40,7 +40,8 @@ import bt.runtime.Killable;
 import bt.runtime.evnt.Dispatcher;
 import bt.types.SimpleTripple;
 import bt.types.Tripple;
-import bt.utils.console.ConsoleRowList;
+import bt.utils.collections.array.Array;
+import bt.utils.console.ConsoleTable;
 import bt.utils.files.FileUtils;
 import bt.utils.id.StringID;
 import bt.utils.log.Logger;
@@ -920,8 +921,8 @@ public abstract class DatabaseAccess implements Killable
     {
         List<Tripple<String, String, String>> columnInfo = columnInfo(table);
 
-        ConsoleRowList rows = new ConsoleRowList(20, 18, TableColumn.COMMENT_SIZE + 2);
-        rows.addTitle(true, "Column", "Type", "Comment");
+        ConsoleTable rows = new ConsoleTable(20, 18, TableColumn.COMMENT_SIZE + 2);
+        rows.setTitle(true, Array.of("Column", "Type", "Comment"));
 
         for (Tripple<String, String, String> column : columnInfo)
         {

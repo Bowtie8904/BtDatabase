@@ -14,7 +14,7 @@ import java.util.Map.Entry;
 
 import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
-import bt.utils.console.ConsoleRowList;
+import bt.utils.console.ConsoleTable;
 
 /**
  * Wraps the values from the given ResultSet to make them more accessible and serializable.
@@ -438,7 +438,7 @@ public class SqlResultSet implements Iterable<SqlResult>
      */
     public String toString(int... columnFormat)
     {
-        ConsoleRowList consoleRows;
+        ConsoleTable consoleRows;
 
         if (columnFormat.length == 1)
         {
@@ -449,14 +449,14 @@ public class SqlResultSet implements Iterable<SqlResult>
                 format[i] = columnFormat[0];
             }
 
-            consoleRows = new ConsoleRowList(format);
+            consoleRows = new ConsoleTable(format);
         }
         else
         {
-            consoleRows = new ConsoleRowList(columnFormat);
+            consoleRows = new ConsoleTable(columnFormat);
         }
 
-        consoleRows.addTitle(true, this.colOrder.toArray(new String[] {}));
+        consoleRows.setTitle(true, this.colOrder.toArray(new Object[] {}));
 
         for (SqlResult result : this.results)
         {
