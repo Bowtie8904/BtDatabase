@@ -61,29 +61,30 @@ public class SqlStatement<T extends SqlStatement>
      * @param where
      *            The clause.
      */
-    protected void addWhereClause(ConditionalClause<T> where)
+    public void addWhereClause(ConditionalClause<T> where)
     {
-        if (where.getBetweenClause() != null)
-        {
-            // adding twice so that both values of the BETWEEN clause will be prepared correctly
-            this.whereClauses.add(where.getBetweenClause());
-            this.whereClauses.add(where.getBetweenClause());
-        }
-        else
-        {
-            this.whereClauses.add(where);
-        }
+        this.whereClauses.add(where);
+    }
+
+    public List<ConditionalClause<T>> getWhereClauses()
+    {
+        return this.havingClauses;
     }
 
     /**
      * Adds a having conditional clause to this statement.
      * 
-     * @param where
+     * @param having
      *            The clause.
      */
-    protected void addHavingClause(ConditionalClause<T> having)
+    public void addHavingClause(ConditionalClause<T> having)
     {
         this.havingClauses.add(having);
+    }
+
+    public List<ConditionalClause<T>> getHavingClauses()
+    {
+        return this.havingClauses;
     }
 
     /**

@@ -2072,6 +2072,20 @@ public class ConditionalClause<T extends SqlStatement>
                 valueType1,
                 valueType2);
 
+        if (this.statement.getHavingClauses().remove(this))
+        {
+            // adding twice so that both values of the BETWEEN clause will be prepared correctly
+            this.statement.addHavingClause(this.betweenClause);
+            this.statement.addHavingClause(this.betweenClause);
+        }
+
+        if (this.statement.getWhereClauses().remove(this))
+        {
+            // adding twice so that both values of the BETWEEN clause will be prepared correctly
+            this.statement.addWhereClause(this.betweenClause);
+            this.statement.addWhereClause(this.betweenClause);
+        }
+
         return this.statement;
     }
 }
