@@ -105,11 +105,11 @@ public class BetweenConditionalClause<T extends SqlStatement> extends Conditiona
         if (this.valueType2 == ValueType.DATE || this.valueType2 == ValueType.TIME
                 || this.valueType2 == ValueType.TIMESTAMP)
         {
-            clause += AND + " '" + this.value2 + "'";
+            clause += " " + AND + " '" + this.value2 + "'";
         }
         else
         {
-            clause += AND + " " + this.value2;
+            clause += " " + AND + " " + this.value2;
         }
 
         return clause;
