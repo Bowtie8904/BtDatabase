@@ -17,8 +17,6 @@ import bt.db.statement.clause.ConditionalClause;
  */
 public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteStatement>
 {
-    private boolean prepared = true;
-
     /**
      * Creates a new instance.
      * 
