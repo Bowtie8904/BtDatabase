@@ -56,8 +56,61 @@ public class ConditionalClause<T extends SqlStatement>
         COLUMN,
         FUNCTION,
         ARRAY,
-        SUBSELECT
+        SUBSELECT;
+
+        public static ValueType getType(Object value)
+        {
+            if (value instanceof Byte)
+            {
+                return BYTE;
+            }
+            else if (value instanceof Short)
+            {
+                return SHORT;
+            }
+            else if (value instanceof Integer)
+            {
+                return INTEGER;
+            }
+            else if (value instanceof Long)
+            {
+                return LONG;
+            }
+            else if (value instanceof Double)
+            {
+                return DOUBLE;
+            }
+            else if (value instanceof Float)
+            {
+                return FLOAT;
+            }
+            else if (value instanceof Boolean)
+            {
+                return BOOLEAN;
+            }
+            else if (value instanceof String)
+            {
+                return STRING;
+            }
+            else if (value instanceof Date)
+            {
+                return DATE;
+            }
+            else if (value instanceof Time)
+            {
+                return TIME;
+            }
+            else if (value instanceof Timestamp)
+            {
+                return TIMESTAMP;
+            }
+
+            return null;
+        }
     }
+
+    /** The last parameter index that was passed to the {@link #prepareValue(PreparedStatement, int)} method. */
+    protected int lastParameterIndex;
 
     /** The type of the value that is used. */
     protected ValueType valueType;
@@ -76,6 +129,9 @@ public class ConditionalClause<T extends SqlStatement>
 
     /** The statement that created this conditional. */
     protected T statement;
+
+    /** The {@link BetweenConditionalClause} if this instance uses the between keyword. */
+    protected BetweenConditionalClause<T> betweenClause;
 
     /**
      * Indicates whether this conditional uses a value (right side) which could be inserted with a prepared statement.
@@ -154,7 +210,19 @@ public class ConditionalClause<T extends SqlStatement>
             DatabaseAccess.log.print(this, e);
         }
 
+        this.lastParameterIndex = parameterIndex;
+
         return this.value;
+    }
+
+    /**
+     * Gets the {@link BetweenConditionalClause} this instance uses if it is a between condition.
+     * 
+     * @return
+     */
+    public BetweenConditionalClause getBetweenClause()
+    {
+        return this.betweenClause;
     }
 
     /**
@@ -1953,6 +2021,57 @@ public class ConditionalClause<T extends SqlStatement>
         this.operator = LESS_EQUALS;
         this.usesValue = false;
         this.value = value.toString();
+        return this.statement;
+    }
+
+    /**
+     * Adds the given between condition to this conditional statement.
+     * 
+     * <p>
+     * This conditional will then check whether the value in the set column is between (inclusive) the given values.
+     * </p>
+     * 
+     * <p>
+     * Valid value types are:
+     * <ul>
+     * <li>int</li>
+     * <li>long</li>
+     * <li>byte</li>
+     * <li>short</li>
+     * <li>double</li>
+     * <li>float</li>
+     * <li>{@link Date}</li>
+     * <li>{@link Time}</li>
+     * <li>{@link Timestamp}</li>
+     * </ul>
+     * </p>
+     * 
+     * @param value1
+     *            The lower bounds (inclusive).
+     * @param value2
+     *            The upper bounds (inclusive).
+     * @return The statement that created this conditional.
+     */
+    public T between(Object value1, Object value2)
+    {
+        this.operator = BETWEEN;
+        this.usesValue = true;
+
+        ValueType valueType1 = ValueType.getType(value1);
+        ValueType valueType2 = ValueType.getType(value1);
+
+        if (valueType1 == null || valueType2 == null)
+        {
+            throw new IllegalArgumentException("One or more argument types are not suitable for a BETWEEN clause.");
+        }
+
+        this.betweenClause = new BetweenConditionalClause(this.statement,
+                this.column,
+                value1.toString(),
+                value2.toString(),
+                valueType1,
+                valueType2);
+
         return this.statement;
     }
 }

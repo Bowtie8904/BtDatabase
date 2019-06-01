@@ -63,7 +63,16 @@ public class SqlStatement<T extends SqlStatement>
      */
     protected void addWhereClause(ConditionalClause<T> where)
     {
-        this.whereClauses.add(where);
+        if (where.getBetweenClause() != null)
+        {
+            // adding twice so that both values of the BETWEEN clause will be prepared correctly
+            this.whereClauses.add(where.getBetweenClause());
+            this.whereClauses.add(where.getBetweenClause());
+        }
+        else
+        {
+            this.whereClauses.add(where);
+        }
     }
 
     /**
