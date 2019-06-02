@@ -38,7 +38,7 @@
 
   #### Create a new database
   ##### Database configuration
-  The class ´DatabaseConfiguration´ allows you to create the perfect connection String for your desired database.
+  The class `DatabaseConfiguration` allows you to create the perfect connection String for your desired database.
   A simple configuration would look like this
   ```Java
   DatabaseConfiguration config = new DatabaseConfiguration()
@@ -49,7 +49,7 @@
                                                             .autoReconnect();
   ```
   What it does:
-  - sets the path of the database to the folder ´db´ within your projects folder
+  - sets the path of the database to the folder `db` within your projects folder
   - attempts to create the database if it does not exist yet
   - enables the database to use unicode
   - sets the character encoding to UTF-8
