@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bt.db.DatabaseAccess;
-import bt.db.LocalDatabase;
+import bt.db.EmbeddedDatabase;
 import bt.db.RemoteDatabase;
 import bt.db.constants.Generated;
 import bt.db.constants.SqlType;
@@ -63,7 +63,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
 
     private void createTriggers(boolean printLogs)
     {
-        if (db instanceof LocalDatabase)
+        if (db instanceof EmbeddedDatabase)
         {
             db.create().trigger(this.name + "_t_delete")
                     .after("delete")

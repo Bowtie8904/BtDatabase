@@ -17,17 +17,17 @@ import bt.db.listener.evnt.UpdateEvent;
  * 
  * @author &#8904
  */
-public abstract class LocalDatabase extends DatabaseAccess
+public abstract class EmbeddedDatabase extends DatabaseAccess
 {
     /** The set derby home path. */
     protected static String derbyHome;
 
-    public LocalDatabase()
+    public EmbeddedDatabase()
     {
         this(DEFAULT_LOCAL_DB);
     }
 
-    public LocalDatabase(String dbURL)
+    public EmbeddedDatabase(String dbURL)
     {
         super(dbURL);
         setDerbyHome();
@@ -37,7 +37,7 @@ public abstract class LocalDatabase extends DatabaseAccess
         createTables();
     }
 
-    protected LocalDatabase(DatabaseConfiguration configuration)
+    protected EmbeddedDatabase(DatabaseConfiguration configuration)
     {
         this(configuration.toString());
     }
