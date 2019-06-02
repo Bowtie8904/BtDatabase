@@ -243,9 +243,20 @@ db.select("test_text", "test_long)
 
   #### Join
   
-  **Inner join**
+  **Inner/natural join**
   
+  To create an inner or natural join simply call `join` on the select statement.
+  For an inner join specify an `on` or `using` clause (explained below), for a natural join just call `natural()`.
   
+  ```Java
+  db.select().from("testtable")
+                  .join("testtable2).using("test_text")
+                  .execute(true);
+                  
+   db.select().from("testtable")
+                  .join("testtable2).natural()
+                  .execute(true);                
+  ```
   
   **Left join**
   
