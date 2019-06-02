@@ -13,11 +13,11 @@
 
 ## How to get started
 
-  #### Requirements
+  ### Requirements
   - Java 11+
 
 
-  #### Add BtDatabase via Maven
+  ### Add BtDatabase via Maven
   To add this library to your project via Maven simply add the follosing lines to your pom.xml file.
 
   ```xml
@@ -36,8 +36,8 @@
     </dependencies>
   ``` 
 
-  #### Create a new database
-  ##### Database configuration
+  ### Create a new database
+  #### Database configuration
   The class `DatabaseConfiguration` allows you to create the perfect connection String for your desired database.
   A simple configuration would look like this
   ```Java
@@ -48,7 +48,7 @@
                                                             .characterEncoding("utf8") // 4
                                                             .autoReconnect(); // 5
   ```
-  What it does:
+  **What it does:**
   1. sets the path of the database to the folder `db` within your projects folder
   2. attempts to create the database if it does not exist yet
   3. enables the database to use unicode
@@ -56,5 +56,5 @@
   5. attempts to automatically reconnect to the database if needed
   
   
-  ##### DatabaseAccess class
+  #### DatabaseAccess class
   `DatabaseAccess` is the root class for all databse classes. If you want to implement an entirely new system on how to handle the database access, then you should extend this class. This is only recommended if you really know what is going on inside the library. For most cases it will be sufficient to extend `EmbeddedDatabase` as it already implements a fully functioning trigger system.
