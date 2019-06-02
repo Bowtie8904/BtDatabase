@@ -57,4 +57,4 @@
   
   
   ##### DatabaseAccess class
-  `DatabaseAccess` is the root class for all
+  `DatabaseAccess` is the root class for all databse classes. If you want to implement an entirely new system on how to handle the database access, then you should extend this class. This is only recommended if you really know what is going on inside the library. For most cases it will be sufficient to extend `EmbeddedDatabase` as it already implements a fully functioning trigger system.
