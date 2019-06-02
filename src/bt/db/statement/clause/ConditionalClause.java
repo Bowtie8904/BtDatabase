@@ -2067,6 +2067,7 @@ public class ConditionalClause<T extends SqlStatement>
 
         this.betweenClause = new BetweenConditionalClause(this.statement,
                 this.column,
+                this.keyword,
                 value1.toString(),
                 value2.toString(),
                 valueType1,
