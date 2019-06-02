@@ -54,3 +54,7 @@
   3. enables the database to use unicode
   4. sets the character encoding to UTF-8
   5. attempts to automatically reconnect to the database if needed
+  
+  
+  ##### DatabaseAccess class
+  `DatabaseAccess` is the root class for all
