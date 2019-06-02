@@ -6,6 +6,9 @@
 ### Contents
 - [How to get started](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#how-to-get-started)
   - [Requirements](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#requirements)
+  - [Add BtDatabase via Maven](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#add-btdatabase-via-maven)
+  - [Create a new database](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#create-a-new-database)
+    - [Database configuration](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#database-configuration)
 
 
 ## How to get started
@@ -32,3 +35,6 @@ To add this library to your project via Maven simply add the follosing lines to 
     </dependency>
   </dependencies>
 ``` 
+
+#### Create a new database
+##### Database configuration
