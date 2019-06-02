@@ -61,7 +61,7 @@
   
   
   #### DatabaseAccess class
-  `DatabaseAccess` is the root class for all databse classes. If you want to implement an entirely new system on how to handle the database access, then you should extend this class. This is only recommended if you really know what is going on inside the library. For most cases it will be sufficient to extend `EmbeddedDatabase` or `RemoteDatabase` as they already implement a fully functioning trigger system.
+  `DatabaseAccess` is the root class for all database classes. If you want to implement an entirely new system on how to handle the database access, then you should extend this class. This is only recommended if you really know what is going on inside the library. For most cases it will be sufficient to extend `EmbeddedDatabase` or `RemoteDatabase` as they already implement a fully functioning trigger system.
 
 
   **EmbeddedDatabase or RemoteDatabase?**
@@ -102,4 +102,59 @@ public class Database extends LocalDatabase
 ```
 See [this]() for more information on how to create tables.
 
-So now that we have the [configuration](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#database-configuration) and the [Database implementation](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#databaseaccess-class)
+So now that we have the [configuration](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#database-configuration) and the [Database implementation](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#databaseaccess-class) we can combine the two and create our first database.
+
+```Java
+DatabaseConfiguration config = new DatabaseConfiguration()
+                                                            .path("./db") 
+                                                            .create() 
+                                                            .useUnicode() 
+                                                            .characterEncoding("utf8") 
+                                                            .autoReconnect(); 
+Database db = new Database(config);
+```
+Calling the constructor will start the setup process of the database.
+Once that is done, the database is fully functional and accessible.
+
+
+#### Create tables
+To create a new table simply call `create()` on your `DatabaseAccess` implementation.
+
+The simplest creation statement would look like this:
+```Java
+db.create().table("testtable")
+                .execute(true);
+```
+- call `create()`
+- specify that you want to create a table and what the name should be
+- call `execute`, passing `true` makes the statement print logs during execution
+
+The `testtable` will have only one column, the `default_id` which is created automatically and contains a unique key for each entry. 
+Of course tables can be more complex than that.
+
+**Adding columns**
+
+Custom column can be added like this:
+```Java
+db.create().table("testtable")
+                .column("test_text", SqlType.VARCHAR).size(50).add()
+                .column("test_long", SqlType.LONG).add()
+                .execute(true);
+```
+- specify the name of the column
+- specify the type of the column
+- columns of type VARCHAR will need a specified size
+- call `add` to finish the column configuration
+
+
+**Default values**
+
+Default values can be added to a column like this:
+```Java
+db.create().table("testtable")
+                .column("test_text", SqlType.VARCHAR).size(50).add()
+                .column("test_long", SqlType.LONG).add()
+                .column("test_bool", SqlType.BOOLEAN).defaultValue(false).add()
+                .column("test_time", SqlType.TIME).defaultValue(SqlValue.CURRENT_TIME).add()
+                .execute(true);
+```
