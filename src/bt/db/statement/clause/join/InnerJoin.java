@@ -16,6 +16,8 @@ public class InnerJoin extends JoinClause<InnerJoin>
     /** Indicates whether this join uses the USING or the ON syntax. true = using, false = on. */
     private boolean using;
 
+    private boolean natural;
+
     /**
      * Creates a new instance and calls the super constructor to initialize fields.
      * 
@@ -49,6 +51,18 @@ public class InnerJoin extends JoinClause<InnerJoin>
     }
 
     /**
+     * Defines that this join should be treated as a natural join clause, meaning no specific columns are set and the
+     * tables are joined around columns with the same name instead.
+     * 
+     * @return
+     */
+    public SelectStatement natural()
+    {
+        this.natural = true;
+        return this.statement;
+    }
+
+    /**
      * Returns the String representing this join clause.
      * 
      * @see java.lang.Object#toString()
@@ -70,6 +84,10 @@ public class InnerJoin extends JoinClause<InnerJoin>
             sql = sql.substring(0, sql.length() - 2);
 
             sql += ")";
+        }
+        else if (this.natural)
+        {
+            sql = "NATURAL JOIN " + this.table2;
         }
         else
         {
@@ -104,6 +122,10 @@ public class InnerJoin extends JoinClause<InnerJoin>
             sql = sql.substring(0, sql.length() - 2);
 
             sql += ")";
+        }
+        else if (this.natural)
+        {
+            sql = "NATURAL JOIN " + this.table2;
         }
         else
         {
