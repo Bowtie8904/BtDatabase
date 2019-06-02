@@ -21,13 +21,19 @@
       - [Primary keys](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#primary-keys)
       - [Autoincrement identities](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#autoincrement-identities)
       - [Column comments](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#column-comments)
-  - [Create triggers](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#create-triggers)  
   - [Select](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#select)
-  - [Insert](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#insert)
+    - [Join](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#join)
+    - [Order by](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#order-by)
   - [Update](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#update)
   - [Delete](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#Delete)
+  - [Where](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#where)
+  - [On more than](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#on-more-than)
+  - [On less than](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#on-less-than)
+  - [Insert](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#insert)
   - [Drop](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#drop)
   - [Alter](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#alter)
+  - [On fail](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#on-fail)
+- [Trigger events](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#trigger-events)  
 
 
 ## How to get started
@@ -215,13 +221,11 @@ db.create().table("testtable")
 By default the values will be autoincremented by 1, but you can override that value with your own desired incrementation by calling `autoIncrement`.
 
 
-#### Column comments
-
-
-### Create triggers
-
-
 ### Select
+
+  #### Join
+  
+  #### Order by
 
 
 ### Insert
@@ -233,7 +237,22 @@ By default the values will be autoincremented by 1, but you can override that va
 ### Delete
 
 
+### Where
+
+
+### On more than
+
+
+### On less than
+
+
 ### Drop
 
 
 ### Alter
+
+
+### On fail
+
+
+## Trigger events
