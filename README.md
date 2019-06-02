@@ -10,6 +10,9 @@
   - [Create a new database](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#create-a-new-database)
     - [Database configuration](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#database-configuration)
     - [DatabaseAccess class](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#databaseaccess-class)
+  - [Create tables](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#create-tables)
+    - [Adding columns](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#adding-columns)
+    - [Default values](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#default-values)
 
 
 ## How to get started
@@ -100,7 +103,7 @@ public class Database extends LocalDatabase
     }
 }
 ```
-See [this]() for more information on how to create tables.
+See [this](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#create-tables) for more information on how to create tables.
 
 So now that we have the [configuration](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#database-configuration) and the [Database implementation](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#databaseaccess-class) we can combine the two and create our first database.
 
@@ -117,7 +120,7 @@ Calling the constructor will start the setup process of the database.
 Once that is done, the database is fully functional and accessible.
 
 
-#### Create tables
+### Create tables
 To create a new table simply call `create()` on your `DatabaseAccess` implementation.
 
 The simplest creation statement would look like this:
@@ -132,7 +135,7 @@ db.create().table("testtable")
 The `testtable` will have only one column, the `default_id` which is created automatically and contains a unique key for each entry. 
 Of course tables can be more complex than that.
 
-**Adding columns**
+#### Adding columns
 
 Custom column can be added like this:
 ```Java
@@ -147,7 +150,7 @@ db.create().table("testtable")
 - call `add` to finish the column configuration
 
 
-**Default values**
+#### Default values
 
 Default values can be added to a column like this:
 ```Java
