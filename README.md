@@ -13,28 +13,28 @@
 
 ## How to get started
 
-#### Requirements
-- Java 11+
+  #### Requirements
+  - Java 11+
 
 
-#### Add BtDatabase via Maven
-To add this library to your project via Maven simply add the follosing lines to your pom.xml file.
+  #### Add BtDatabase via Maven
+  To add this library to your project via Maven simply add the follosing lines to your pom.xml file.
 
-```xml
-<repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-    </repositories>
-  <dependencies>
-    <dependency>
-        <groupId>com.github.Bowtie8904</groupId>
-        <artifactId>BtDatabase</artifactId>
-        <version>1.0</version>
-    </dependency>
-  </dependencies>
-``` 
+  ```xml
+  <repositories>
+          <repository>
+              <id>jitpack.io</id>
+              <url>https://jitpack.io</url>
+          </repository>
+      </repositories>
+    <dependencies>
+      <dependency>
+          <groupId>com.github.Bowtie8904</groupId>
+          <artifactId>BtDatabase</artifactId>
+          <version>1.0</version>
+      </dependency>
+    </dependencies>
+  ``` 
 
-#### Create a new database
-##### Database configuration
+  #### Create a new database
+    ##### Database configuration
