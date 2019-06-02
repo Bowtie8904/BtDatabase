@@ -243,6 +243,19 @@ db.select("test_text", "test_long)
 
   #### Join
   
+  **Inner join**
+  
+  
+  
+  **Left join**
+  
+  **Right join**
+  
+  **On clause**
+  
+  **Using clause**
+  
+  
   #### Order by
 
 
