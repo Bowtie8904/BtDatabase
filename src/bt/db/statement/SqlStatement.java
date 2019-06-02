@@ -68,7 +68,7 @@ public class SqlStatement<T extends SqlStatement>
 
     public List<ConditionalClause<T>> getWhereClauses()
     {
-        return this.havingClauses;
+        return this.whereClauses;
     }
 
     /**
