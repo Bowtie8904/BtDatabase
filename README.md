@@ -60,7 +60,48 @@
   #### DatabaseAccess class
   `DatabaseAccess` is the root class for all databse classes. If you want to implement an entirely new system on how to handle the database access, then you should extend this class. This is only recommended if you really know what is going on inside the library. For most cases it will be sufficient to extend `EmbeddedDatabase` or `RemoteDatabase` as they already implement a fully functioning trigger system.
 
+
   **EmbeddedDatabase or RemoteDatabase?**
   
-  The main difference between thew two implementations is way how they handle triggers. The `EmbeddedDatabase` class will install the jar file of your programm to the database, so that triggers will call the internal methods directly. The `RemoteDatabase` will work with a trigger table where new trigger messages are added and read from on a set interval. 
+  The main difference between thew two implementations is way how they handle triggers. The `EmbeddedDatabase` class will install the jar file of your program to the database, so that triggers will call the internal methods directly. The `RemoteDatabase` will work with a trigger table where new trigger messages are added and read from on a set interval. 
   If you can, always go for an `EmbeddedDatabase` implementation as triggers will be reported much faster which can increase your programs performance based on trigger usage.
+
+Since there is no difference in extending one or the other, further examples will always use an `EmbeddedDatabase`.
+
+
+**Extending the root classes**
+
+All three classes (`DatabaseAccess`, `EmbeddedDatabase` and `RemoteDatabase`) are abstract.
+
+When extending `EmbeddedDatabase` you will need to implement the abstract method `createTables`. Inside that method you should put all code that creates a tables of the database if they don't exist yet.
+
+An example would look like this:
+```Java
+public class Database extends LocalDatabase
+{
+    public Database(DatabaseConfiguration config)
+    {
+        super(config);
+    }
+
+    /**
+     * @see bowt.db.DatabaseAccess#createTables()
+     */
+    @Override
+    protected void createTables()
+    {
+        create().table("testtable")
+                .column("test_id", SqlType.LONG).primaryKey().add()
+                .column("test_text", SqlType.VARCHAR).size(50).add()
+                .onFail((statement, e) ->
+                {
+                    System.out.println("Table " + statement.getName() + " already exists.");
+                    return 0;
+                })
+                .execute(true);
+
+        commit();
+    }
+}
+```
+See [this]() for more information on how to create tables.
