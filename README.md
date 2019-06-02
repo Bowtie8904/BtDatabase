@@ -102,4 +102,4 @@ public class Database extends LocalDatabase
 ```
 See [this]() for more information on how to create tables.
 
-So now that 
+So now that we have the [configuration](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#database-configuration) and the [Database implementation](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#databaseaccess-class)
