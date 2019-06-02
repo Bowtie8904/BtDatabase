@@ -363,7 +363,7 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
         {
             log.print(this, e);
         }
-        return "X:\\Workspace\\Utilities\\target\\Utilities-1.jar";
+        return null;
     }
 
     private void addJarToDerby()
