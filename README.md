@@ -42,15 +42,15 @@
   A simple configuration would look like this
   ```Java
   DatabaseConfiguration config = new DatabaseConfiguration()
-                                                            .path("./db") 
-                                                            .create()
-                                                            .useUnicode()
-                                                            .characterEncoding("utf8")
-                                                            .autoReconnect();
+                                                            .path("./db") // 1
+                                                            .create() // 2
+                                                            .useUnicode() // 3
+                                                            .characterEncoding("utf8") // 4
+                                                            .autoReconnect(); // 5
   ```
   What it does:
-  - sets the path of the database to the folder `db` within your projects folder
-  - attempts to create the database if it does not exist yet
-  - enables the database to use unicode
-  - sets the character encoding to UTF-8
-  - attempts to automatically reconnect to the database if needed
+  1 sets the path of the database to the folder `db` within your projects folder
+  2 attempts to create the database if it does not exist yet
+  3 enables the database to use unicode
+  4 sets the character encoding to UTF-8
+  5 attempts to automatically reconnect to the database if needed
