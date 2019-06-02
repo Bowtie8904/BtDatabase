@@ -12,9 +12,17 @@
     - [DatabaseAccess class](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#databaseaccess-class)
     - [EmbeddedDatabase or RemoteDatabase?](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#embeddeddatabase-or-remotedatabase)
     - [Extending the root classes](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#extending-the-root-classes)
+- [Statements](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#statements)    
   - [Create tables](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#create-tables)
     - [Adding columns](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#adding-columns)
     - [Default values](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#default-values)
+  - [Create triggers](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#create-triggers)  
+  - [Select](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#select)
+  - [Insert](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#insert)
+  - [Update](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#update)
+  - [Delete](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#Delete)
+  - [Drop](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#drop)
+  - [Alter](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#alter)
 
 
 ## How to get started
@@ -119,6 +127,7 @@ Database db = new Database(config);
 Calling the constructor will start the setup process of the database.
 Once that is done, the database is fully functional and accessible.
 
+## Statements
 
 ### Create tables
 To create a new table simply call `create()` on your `DatabaseAccess` implementation.
@@ -202,3 +211,24 @@ By default the values will be autoincremented by 1, but you can override that va
 
 
 #### Column comments
+
+
+### Create triggers
+
+
+### Select
+
+
+### Insert
+
+
+### Update
+
+
+### Delete
+
+
+### Drop
+
+
+### Alter
