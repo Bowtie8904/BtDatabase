@@ -12,9 +12,28 @@
     - [DatabaseAccess class](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#databaseaccess-class)
     - [EmbeddedDatabase or RemoteDatabase?](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#embeddeddatabase-or-remotedatabase)
     - [Extending the root classes](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#extending-the-root-classes)
+- [Statements](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#statements)    
   - [Create tables](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#create-tables)
     - [Adding columns](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#adding-columns)
-    - [Default values](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#default-values)
+      - [Default values](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#default-values)
+      - [Unique](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#unique)
+      - [Not null](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#not-null)
+      - [Primary keys](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#primary-keys)
+      - [Autoincrement identities](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#autoincrement-identities)
+      - [Column comments](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#column-comments)
+  - [Select](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#select)
+    - [Join](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#join)
+    - [Order by](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#order-by)
+  - [Update](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#update)
+  - [Delete](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#Delete)
+  - [Where](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#where)
+  - [On more than](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#on-more-than)
+  - [On less than](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#on-less-than)
+  - [Insert](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#insert)
+  - [Drop](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#drop)
+  - [Alter](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#alter)
+  - [On fail](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#on-fail)
+- [Trigger events](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#trigger-events)  
 
 
 ## How to get started
@@ -70,7 +89,7 @@
 
 
   #### EmbeddedDatabase or RemoteDatabase?
-  The main difference between the two implementations is way how they handle triggers. The `EmbeddedDatabase` class will install the jar file of your program to the database, so that triggers will call the internal methods directly. The `RemoteDatabase` will work with a trigger table where new trigger messages are added and read from on a set interval. 
+  The main difference between the two implementations is how they handle [triggers](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#trigger-events). The `EmbeddedDatabase` class will install the jar file of your program to the database, so that triggers will call the internal methods directly. The `RemoteDatabase` will work with a trigger table where new trigger messages are added and read from on a set interval. 
   If you can, always go for an `EmbeddedDatabase` implementation as triggers will be reported much faster which can increase your programs performance based on trigger usage.
 
 Since there is no difference in extending one or the other, further examples will always use an `EmbeddedDatabase`.
@@ -119,6 +138,7 @@ Database db = new Database(config);
 Calling the constructor will start the setup process of the database.
 Once that is done, the database is fully functional and accessible.
 
+## Statements
 
 ### Create tables
 To create a new table simply call `create()` on your `DatabaseAccess` implementation.
@@ -201,4 +221,69 @@ db.create().table("testtable")
 By default the values will be autoincremented by 1, but you can override that value with your own desired incrementation by calling `autoIncrement`.
 
 
-#### Column comments
+### Select
+To start a new select statement simply call `select` on your `DatabaseAccess` implementation. Calling `select` without parameters is equivalent to calling `select("*")`. 
+```Java
+db.select()
+          .from("testtable")
+          .execute(true);
+                
+db.select("*")
+          .from("testtable")
+          .execute(true);   
+```
+
+You can also specify the columns that you want to select.
+```Java
+db.select("test_text", "test_long)
+                .from("testtable")
+                .execute(true);
+```
+
+
+  #### Join
+  
+  **Inner join**
+  
+  
+  
+  **Left join**
+  
+  **Right join**
+  
+  **On clause**
+  
+  **Using clause**
+  
+  
+  #### Order by
+
+
+### Insert
+
+
+### Update
+
+
+### Delete
+
+
+### Where
+
+
+### On more than
+
+
+### On less than
+
+
+### Drop
+
+
+### Alter
+
+
+### On fail
+
+
+## Trigger events
