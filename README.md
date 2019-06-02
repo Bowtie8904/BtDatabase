@@ -66,7 +66,7 @@
 
   **EmbeddedDatabase or RemoteDatabase?**
   
-  The main difference between thew two implementations is way how they handle triggers. The `EmbeddedDatabase` class will install the jar file of your program to the database, so that triggers will call the internal methods directly. The `RemoteDatabase` will work with a trigger table where new trigger messages are added and read from on a set interval. 
+  The main difference between the two implementations is way how they handle triggers. The `EmbeddedDatabase` class will install the jar file of your program to the database, so that triggers will call the internal methods directly. The `RemoteDatabase` will work with a trigger table where new trigger messages are added and read from on a set interval. 
   If you can, always go for an `EmbeddedDatabase` implementation as triggers will be reported much faster which can increase your programs performance based on trigger usage.
 
 Since there is no difference in extending one or the other, further examples will always use an `EmbeddedDatabase`.
@@ -101,3 +101,5 @@ public class Database extends LocalDatabase
 }
 ```
 See [this]() for more information on how to create tables.
+
+So now that 
