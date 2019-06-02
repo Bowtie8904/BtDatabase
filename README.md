@@ -70,7 +70,6 @@
 
 
   #### EmbeddedDatabase or RemoteDatabase?
-  
   The main difference between the two implementations is way how they handle triggers. The `EmbeddedDatabase` class will install the jar file of your program to the database, so that triggers will call the internal methods directly. The `RemoteDatabase` will work with a trigger table where new trigger messages are added and read from on a set interval. 
   If you can, always go for an `EmbeddedDatabase` implementation as triggers will be reported much faster which can increase your programs performance based on trigger usage.
 
@@ -78,7 +77,6 @@ Since there is no difference in extending one or the other, further examples wil
 
 
 #### Extending the root classes
-
 All three classes (`DatabaseAccess`, `EmbeddedDatabase` and `RemoteDatabase`) are abstract.
 
 When extending `EmbeddedDatabase` you will need to implement the abstract method `createTables`. Inside that method you should put all code that creates a tables of the database if they don't exist yet.
@@ -138,7 +136,6 @@ The `testtable` will have only one column, the `default_id` which is created aut
 Of course tables can be more complex than that.
 
 #### Adding columns
-
 Custom column can be added like this:
 ```Java
 db.create().table("testtable")
@@ -153,13 +150,55 @@ db.create().table("testtable")
 
 
 #### Default values
-
 Default values can be added to a column like this:
 ```Java
 db.create().table("testtable")
-                .column("test_text", SqlType.VARCHAR).size(50).add()
-                .column("test_long", SqlType.LONG).add()
                 .column("test_bool", SqlType.BOOLEAN).defaultValue(false).add()
                 .column("test_time", SqlType.TIME).defaultValue(SqlValue.CURRENT_TIME).add()
                 .execute(true);
 ```
+
+
+#### Unique
+Columns can be marked as `unique` so that there can not be any duplicate values inside that column.
+```Java
+db.create().table("testtable")
+                .column("test_long", SqlType.LONG).unique().add()
+                .execute(true);
+```
+
+
+#### Not null
+Columns can be marked as `not null` so that when inserting an entry there must be a value inside that column.
+```Java
+db.create().table("testtable")
+                .column("test_long", SqlType.LONG).notNull.add()
+                .execute(true);
+```
+
+
+#### Primary keys
+Columns can be marked as `primary key` so that when inserting an entry there must be a unique value inside that column. 
+```Java
+db.create().table("testtable")
+                .column("test_text", SqlType.VARCHAR).size(50).primaryKey().add()
+                .execute(true);
+```
+
+
+#### Autoincrement identities
+To avoid having the library add the `default_id` column automatically as an identity you can specify you own identity column.
+
+Such columns need to follow this set of requirements:
+- need to be of type LONG
+- have to be set as identity with generation type `ALWAYS`
+
+```Java
+db.create().table("testtable")
+                .column("test_id", SqlType.LONG).asIdentity(Generated.ALWAYS).autoIncrement(5).add()
+                .execute(true);
+```
+By default the values will be autoincremented by 1, but you can override that value with your own desired incrementation by calling `autoIncrement`.
+
+
+#### Column comments
