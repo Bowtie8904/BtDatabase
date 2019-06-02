@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
 import bt.db.statement.SqlModifyStatement;
+import bt.db.statement.clause.BetweenConditionalClause;
 import bt.db.statement.clause.ConditionalClause;
 import bt.db.statement.clause.SetClause;
 
@@ -411,9 +412,24 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
             sql = sql.substring(0, sql.length() - 2);
         }
 
+        // indicates whether the klast clause was a between clause, to skip the duplicate
+        boolean lastBetween = false;
+
         for (ConditionalClause<UpdateStatement> where : this.whereClauses)
         {
-            sql += " " + where.toString(this.prepared);
+            if (!lastBetween)
+            {
+                sql += " " + where.toString(this.prepared);
+
+                if (where instanceof BetweenConditionalClause)
+                {
+                    lastBetween = true;
+                }
+            }
+            else
+            {
+                lastBetween = false;
+            }
         }
 
         return sql;

@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import bt.db.DatabaseAccess;
 import bt.db.statement.SqlModifyStatement;
 import bt.db.statement.SqlStatement;
+import bt.db.statement.clause.BetweenConditionalClause;
 import bt.db.statement.clause.ConditionalClause;
 import bt.db.statement.clause.JoinConditionalClause;
 import bt.db.statement.clause.OrderByClause;
@@ -769,9 +770,24 @@ public class SelectStatement extends SqlStatement<SelectStatement>
             sql += " " + join.toString(this.prepared);
         }
 
+        // indicates whether the klast clause was a between clause, to skip the duplicate
+        boolean lastBetween = false;
+
         for (ConditionalClause<SelectStatement> where : this.whereClauses)
         {
-            sql += " " + where.toString(this.prepared);
+            if (!lastBetween)
+            {
+                sql += " " + where.toString(this.prepared);
+
+                if (where instanceof BetweenConditionalClause)
+                {
+                    lastBetween = true;
+                }
+            }
+            else
+            {
+                lastBetween = false;
+            }
         }
 
         if (this.orderBy != null)
@@ -792,7 +808,19 @@ public class SelectStatement extends SqlStatement<SelectStatement>
 
             for (ConditionalClause<SelectStatement> having : this.havingClauses)
             {
-                sql += " " + having.toString(this.prepared);
+                if (!lastBetween)
+                {
+                    sql += " " + having.toString(this.prepared);
+
+                    if (having instanceof BetweenConditionalClause)
+                    {
+                        lastBetween = true;
+                    }
+                }
+                else
+                {
+                    lastBetween = false;
+                }
             }
         }
 
