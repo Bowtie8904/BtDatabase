@@ -39,14 +39,16 @@ public class BetweenConditionalClause<T extends SqlStatement> extends Conditiona
      * @param valueType2
      *            The value type of the lower bound value.
      */
-    public BetweenConditionalClause(T statement, String column, String value1, String value2, ValueType valueType1,
+    public BetweenConditionalClause(T statement, String column, String keyword, String value1, String value2,
+            ValueType valueType1,
             ValueType valueType2)
     {
-        super(statement, column, ConditionalClause.BETWEEN);
+        super(statement, column, keyword);
         this.value1 = value1;
         this.value2 = value2;
         this.valueType1 = valueType1;
         this.valueType2 = valueType2;
+        this.operator = BETWEEN;
         this.lastParameterIndex = Integer.MIN_VALUE;
     }
 
