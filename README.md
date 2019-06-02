@@ -10,6 +10,7 @@
   - [Create a new database](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#create-a-new-database)
     - [Database configuration](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#database-configuration)
     - [DatabaseAccess class](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#databaseaccess-class)
+    - [EmbeddedDatabase or RemoteDatabase?](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#databaseaccess-class)
   - [Create tables](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#create-tables)
     - [Adding columns](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#adding-columns)
     - [Default values](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#default-values)
@@ -67,7 +68,7 @@
   `DatabaseAccess` is the root class for all database classes. If you want to implement an entirely new system on how to handle the database access, then you should extend this class. This is only recommended if you really know what is going on inside the library. For most cases it will be sufficient to extend `EmbeddedDatabase` or `RemoteDatabase` as they already implement a fully functioning trigger system.
 
 
-  **EmbeddedDatabase or RemoteDatabase?**
+  #### EmbeddedDatabase or RemoteDatabase?
   
   The main difference between the two implementations is way how they handle triggers. The `EmbeddedDatabase` class will install the jar file of your program to the database, so that triggers will call the internal methods directly. The `RemoteDatabase` will work with a trigger table where new trigger messages are added and read from on a set interval. 
   If you can, always go for an `EmbeddedDatabase` implementation as triggers will be reported much faster which can increase your programs performance based on trigger usage.
@@ -75,7 +76,7 @@
 Since there is no difference in extending one or the other, further examples will always use an `EmbeddedDatabase`.
 
 
-**Extending the root classes**
+#### Extending the root classes
 
 All three classes (`DatabaseAccess`, `EmbeddedDatabase` and `RemoteDatabase`) are abstract.
 
