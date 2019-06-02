@@ -56,6 +56,9 @@
   4. sets the character encoding to UTF-8
   5. attempts to automatically reconnect to the database if needed
   
+  Internally this configuration will produce the following connection URL
+  `jdbc:derby:;databaseName=./db;useUnicode=true;create=true;characterEncoding=utf8;autoReconnect=true`
+  
   
   #### DatabaseAccess class
   `DatabaseAccess` is the root class for all databse classes. If you want to implement an entirely new system on how to handle the database access, then you should extend this class. This is only recommended if you really know what is going on inside the library. For most cases it will be sufficient to extend `EmbeddedDatabase` or `RemoteDatabase` as they already implement a fully functioning trigger system.
@@ -91,13 +94,6 @@ public class Database extends LocalDatabase
     protected void createTables()
     {
         create().table("testtable")
-                .column("test_id", SqlType.LONG).primaryKey().add()
-                .column("test_text", SqlType.VARCHAR).size(50).add()
-                .onFail((statement, e) ->
-                {
-                    System.out.println("Table " + statement.getName() + " already exists.");
-                    return 0;
-                })
                 .execute(true);
 
         commit();
