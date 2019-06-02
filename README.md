@@ -253,12 +253,21 @@ db.select("test_text", "test_long)
                   .join("testtable2).using("test_text")
                   .execute(true);
                   
-   db.select().from("testtable")
+  db.select().from("testtable")
                   .join("testtable2).natural()
                   .execute(true);                
   ```
   
   **Left join**
+  
+  To create a left join call `leftJoin` on the select statement.
+  
+  ```Java
+  db.select().from("testtable")
+                  .leftJoin("testtable2).using("test_text")
+                  .execute(true);
+  ```                
+                  
   
   **Right join**
   
