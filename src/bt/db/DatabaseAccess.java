@@ -952,7 +952,7 @@ public abstract class DatabaseAccess implements Killable
         List<Tripple<String, String, String>> columnInfo = new ArrayList<>();
 
         SqlResultSet set = select()
-                .from("column_comments")
+                .from(COMMENT_TABLE)
                 .where("table_name").equals(table.toUpperCase())
                 .onLessThan(1, (num, res) ->
                 {
