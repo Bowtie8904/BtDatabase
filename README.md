@@ -222,6 +222,24 @@ By default the values will be autoincremented by 1, but you can override that va
 
 
 ### Select
+To start a new select statement simply call `select` on your `DatabaseAccess` implementation. Calling `select` without parameters is equivalent to calling `select("*")`. 
+```Java
+db.select()
+          .from("testtable")
+          .execute(true);
+                
+db.select("*")
+          .from("testtable")
+          .execute(true);   
+```
+
+You can also specify the columns that you want to select.
+```Java
+db.select("test_text", "test_long)
+                .from("testtable")
+                .execute(true);
+```
+
 
   #### Join
   
