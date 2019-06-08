@@ -1,5 +1,6 @@
-package bt.db.statement.clause;
+package bt.db.statement.clause.join;
 
+import bt.db.statement.clause.ConditionalClause;
 import bt.db.statement.impl.SelectStatement;
 
 /**
