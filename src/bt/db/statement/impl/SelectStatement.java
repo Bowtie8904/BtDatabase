@@ -14,11 +14,9 @@ import bt.db.statement.SqlModifyStatement;
 import bt.db.statement.SqlStatement;
 import bt.db.statement.clause.BetweenConditionalClause;
 import bt.db.statement.clause.ConditionalClause;
-import bt.db.statement.clause.JoinConditionalClause;
 import bt.db.statement.clause.OrderByClause;
-import bt.db.statement.clause.join.InnerJoin;
 import bt.db.statement.clause.join.JoinClause;
-import bt.db.statement.clause.join.OuterJoin;
+import bt.db.statement.clause.join.JoinConditionalClause;
 import bt.db.statement.result.SqlResultSet;
 
 /**
@@ -187,43 +185,15 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     }
 
     /**
-     * Creates an inner join with the given table.
+     * Creates a join with the given table.
      * 
      * @param table
      *            The table to join with.
-     * @return The created InnerJoin.
+     * @return The created JoinClause.
      */
-    public InnerJoin join(String table)
+    public JoinClause join(String table)
     {
-        InnerJoin join = new InnerJoin(this, this.tables[this.tables.length - 1], table);
-        this.joins.add(join);
-        return join;
-    }
-
-    /**
-     * Creates a left outer join with the given table.
-     * 
-     * @param table
-     *            The table to join with.
-     * @return The created OuterJoin.
-     */
-    public OuterJoin leftJoin(String table)
-    {
-        OuterJoin join = new OuterJoin(this, this.tables[this.tables.length - 1], table, true);
-        this.joins.add(join);
-        return join;
-    }
-
-    /**
-     * Creates a right outer join with the given table.
-     * 
-     * @param table
-     *            The table to join with.
-     * @return The created OuterJoin.
-     */
-    public OuterJoin rightJoin(String table)
-    {
-        OuterJoin join = new OuterJoin(this, this.tables[this.tables.length - 1], table, false);
+        JoinClause join = new JoinClause(this, this.tables[this.tables.length - 1], table);
         this.joins.add(join);
         return join;
     }
