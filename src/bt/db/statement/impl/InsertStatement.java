@@ -358,6 +358,14 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
         return this;
     }
 
+    /**
+     * Defines a data modifying statement (insert, update, delete) which will be executed if there was an error during
+     * the execution of the original select.
+     * 
+     * @param onFail
+     *            The SqlModifyStatement to execute instead.
+     * @return This instance for chaining.
+     */
     public InsertStatement onFail(SqlModifyStatement onFail)
     {
         this.onFail = (statement, e) ->
@@ -368,12 +376,34 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
         return this;
     }
 
+    /**
+     * Defines a BiFunction that will be executed if there was an error during the execution of this statement.
+     * 
+     * <p>
+     * The first parameter (InsertStatement) will be this statement instance, the second one is the SQLException that
+     * caused the fail. The return value (Integer) will be returned by this instances {@link #execute()}.
+     * </p>
+     * 
+     * @param onFail
+     *            The BiFunction to execute.
+     * @return This instance for chaining.
+     */
     public InsertStatement onFail(BiFunction<InsertStatement, SQLException, Integer> onFail)
     {
         this.onFail = onFail;
         return this;
     }
 
+    /**
+     * Defines a data modifying statement (insert, update, delete) to execute if the original insert affected less rows
+     * than the given lower threshhold.
+     * 
+     * @param lowerThreshhold
+     *            The threshhold to check.
+     * @param statement
+     *            The statement to execute.
+     * @return This instance for chaining.
+     */
     public InsertStatement onLessThan(int lowerThreshhold, SqlModifyStatement statement)
     {
         this.lowerThreshhold = lowerThreshhold;
@@ -384,6 +414,21 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
         return this;
     }
 
+    /**
+     * Defines a BiFunction that will be executed if the original insert affected less rows than the given lower
+     * threshhold.
+     * 
+     * <p>
+     * The first parameter (int) will be the number of rows affected, the second one is the InsertStatement from the
+     * original insert. The return value (Integer) will be returned by this instances {@link #execute()}.
+     * </p>
+     * 
+     * @param lowerThreshhold
+     *            The threshhold to check.
+     * @param onLessThan
+     *            The BiFunction to execute.
+     * @return This instance for chaining.
+     */
     public InsertStatement onLessThan(int lowerThreshhold, BiFunction<Integer, InsertStatement, Integer> onLessThan)
     {
         this.lowerThreshhold = lowerThreshhold;
@@ -391,6 +436,16 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
         return this;
     }
 
+    /**
+     * Defines a data modifying statement (insert, update, delete) to execute if the original insert affected more rows
+     * than the given higher threshhold.
+     * 
+     * @param higherThreshhold
+     *            The threshhold to check.
+     * @param statement
+     *            The statement to execute.
+     * @return This instance for chaining.
+     */
     public InsertStatement onMoreThan(int higherThreshhold, SqlModifyStatement statement)
     {
         this.higherThreshhold = higherThreshhold;
@@ -401,6 +456,21 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
         return this;
     }
 
+    /**
+     * Defines a BiFunction that will be executed if the original insert affected more rows than the given higher
+     * threshhold.
+     * 
+     * <p>
+     * The first parameter (int) will be the number of rows affected, the second one is the InsertStatement from the
+     * original insert. The return value (Integer) will be returned by this instances {@link #execute()}.
+     * </p>
+     * 
+     * @param higherThreshhold
+     *            The threshhold to check.
+     * @param onLessThan
+     *            The BiFunction to execute.
+     * @return This instance for chaining.
+     */
     public InsertStatement onMoreThan(int higherThreshhold,
             BiFunction<Integer, InsertStatement, Integer> onMoreThan)
     {

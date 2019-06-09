@@ -91,6 +91,11 @@ public abstract class RemoteDatabase extends DatabaseAccess
     {
     }
 
+    /**
+     * Cancels the trigger check thread and calls {@link DatabaseAccess#kill()}.
+     * 
+     * @see bt.db.DatabaseAccess#kill()
+     */
     @Override
     public void kill()
     {

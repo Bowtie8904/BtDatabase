@@ -549,8 +549,8 @@ public class SelectStatement extends SqlStatement<SelectStatement>
      * Defines a BiFunction that will be executed if there was an error during the execution of this statement.
      * 
      * <p>
-     * The first parameter (SelectStatement) will be this statement instance, the second one is the SqlReSQLExceptiont
-     * that caused the fail. The return value (SqlResultSet) will be returned by this instances {@link #execute()}.
+     * The first parameter (SelectStatement) will be this statement instance, the second one is the SQLException that
+     * caused the fail. The return value (SqlResultSet) will be returned by this instances {@link #execute()}.
      * </p>
      * 
      * @param onFail
