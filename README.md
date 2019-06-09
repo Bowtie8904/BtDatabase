@@ -103,7 +103,7 @@ When extending `EmbeddedDatabase` you will need to implement the abstract method
 
 An example would look like this:
 ```Java
-public class Database extends LocalDatabase
+public class Database extends EmbeddedDatabase
 {
     public Database(DatabaseConfiguration config)
     {
