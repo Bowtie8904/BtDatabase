@@ -68,11 +68,11 @@
   A simple configuration would look like this
   ```Java
   DatabaseConfiguration config = new DatabaseConfiguration()
-                                                            .path("./db") // 1
-                                                            .create() // 2
-                                                            .useUnicode() // 3
-                                                            .characterEncoding("utf8") // 4
-                                                            .autoReconnect(); // 5
+                                                   .path("./db") // 1
+                                                   .create() // 2
+                                                   .useUnicode() // 3
+                                                   .characterEncoding("utf8") // 4
+                                                   .autoReconnect(); // 5         
   ```
   **What it does:**
   1. sets the path of the database to the folder `db` within your projects folder
