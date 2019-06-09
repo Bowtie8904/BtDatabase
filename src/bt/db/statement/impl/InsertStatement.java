@@ -29,6 +29,8 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
 
     private int repeats = 1;
 
+    private SelectStatement dataSelect;
+
     /**
      * Creates a new instance. On duplicate key this will log an error message and return -1.
      * 
@@ -47,18 +49,29 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
         };
     }
 
+    /**
+     * @see bt.db.statement.SqlModifyStatement#commit()
+     */
     @Override
     public InsertStatement commit()
     {
         return (InsertStatement)super.commit();
     }
 
+    /**
+     * @see bt.db.statement.SqlModifyStatement#unprepared()
+     */
     @Override
     public InsertStatement unprepared()
     {
         return (InsertStatement)super.unprepared();
     }
 
+    /**
+     * Gets the name of the table that data is inserted into.
+     * 
+     * @return
+     */
     public String getTable()
     {
         return this.tables.length > 0 ? this.tables[0] : null;
@@ -81,6 +94,22 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
         return this;
     }
     
+    /**
+     * Defines a select statement whichs result set contains the data that will be inserted.
+     * 
+     * <p>
+     * Note that the select will be executed unprepared.
+     * </p>
+     * 
+     * @param select
+     * @return
+     */
+    public InsertStatement from(SelectStatement select)
+    {
+        this.dataSelect = select.unprepared();
+        return this;
+    }
+
     /**
      * Defines how often the statement should be executed. (default=1)
      * 
@@ -418,7 +447,7 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     {
         String sql = toString();
 
-        if (this.setClauses.isEmpty())
+        if (this.setClauses.isEmpty() && this.dataSelect == null)
         {
             DatabaseAccess.log.print(
                     "Can't execute insert statement without any values. Please define at least one column value.");
@@ -431,7 +460,7 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
         {
             log("Executing: " + sql, printLogs);
 
-            if (this.prepared)
+            if (this.dataSelect == null && this.prepared)
             {
                 if (!this.setClauses.isEmpty())
                 {
@@ -501,37 +530,44 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
 
         sql += this.tables[0];
 
-        if (!this.setClauses.isEmpty())
+        if (this.dataSelect == null)
         {
-            sql += " (";
-
-            for (SetClause<InsertStatement> set : this.setClauses)
+            if (!this.setClauses.isEmpty())
             {
-                sql += set.toString(this.prepared) + ", ";
-            }
+                sql += " (";
 
-            sql = sql.substring(0, sql.length() - 2);
-
-            sql += ") VALUES (";
-
-            if (this.prepared)
-            {
                 for (SetClause<InsertStatement> set : this.setClauses)
                 {
-                    sql += "?, ";
+                    sql += set.toString(this.prepared) + ", ";
                 }
-            }
-            else
-            {
-                for (SetClause<InsertStatement> set : this.setClauses)
+
+                sql = sql.substring(0, sql.length() - 2);
+
+                sql += ") VALUES (";
+
+                if (this.prepared)
                 {
-                    sql += set.getStringValue() + ", ";
+                    for (SetClause<InsertStatement> set : this.setClauses)
+                    {
+                        sql += "?, ";
+                    }
                 }
+                else
+                {
+                    for (SetClause<InsertStatement> set : this.setClauses)
+                    {
+                        sql += set.getStringValue() + ", ";
+                    }
+                }
+
+                sql = sql.substring(0, sql.length() - 2);
+
+                sql += ")";
             }
-
-            sql = sql.substring(0, sql.length() - 2);
-
-            sql += ")";
+        }
+        else
+        {
+            sql += " " + this.dataSelect.toString();
         }
 
         return sql;
