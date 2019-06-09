@@ -93,13 +93,13 @@
   The main difference between the two implementations is how they handle [triggers](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#trigger-events). The `EmbeddedDatabase` class will install the jar file of your program to the database, so that triggers will call the internal methods directly. The `RemoteDatabase` will work with a trigger table where new trigger messages are added and read from on a set interval. 
   If you can, always go for an `EmbeddedDatabase` implementation as triggers will be reported much faster which can increase your programs performance based on trigger usage.
 
-Since there is no difference in extending one or the other, further examples will always use an `EmbeddedDatabase`.
+Since there is no difference in usage when extending one or the other, further examples will always use an `EmbeddedDatabase`.
 
 
 #### Extending the root classes
 All three classes (`DatabaseAccess`, `EmbeddedDatabase` and `RemoteDatabase`) are abstract.
 
-When extending `EmbeddedDatabase` you will need to implement the abstract method `createTables`. Inside that method you should put all code that creates a tables of the database if they don't exist yet.
+When extending `EmbeddedDatabase` you will need to implement the abstract method `createTables`. Inside that method you should put all code that creates tables of the database if they don't exist yet.
 
 An example would look like this:
 ```Java
