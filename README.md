@@ -21,6 +21,7 @@
       - [Primary keys](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#primary-keys)
       - [Autoincrement identities](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#autoincrement-identities)
       - [Column comments](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#column-comments)
+    - [As copy](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#as-copy)    
   - [Select](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#select)
     - [Join](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#join)
     - [Order by](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#order-by)
@@ -220,6 +221,39 @@ db.create().table("testtable")
 ```
 By default the values will be autoincremented by 1, but you can override that value with your own desired incrementation by calling `autoIncrement`.
 
+
+#### As Copy
+You can create a table as a copy of a selected result set or another table.
+
+To copy from a select statement:
+```Java
+db.create().table("testtable2")
+                as(db.select()
+                    .from("testtable"))
+                .execute(true);
+```
+This will copy the selected data as well. If you only want the structure without any data call `withData(false)`:
+```Java
+db.create().table("testtable2")
+                as(db.select()
+                    .from("testtable"))
+                .withData(false)    
+                .execute(true);
+```
+
+To copy a table directly:
+```Java
+db.create().table("testtable2")
+                .asCopyOf("testtable")
+                .execute(true);
+```
+This will copy the selected data as well. If you only want the structure without any data call `withData(false)`:
+```Java
+db.create().table("testtable2")
+                .asCopyOf("testtable")
+                .withData(false)    
+                .execute(true);
+```  
 
 ### Select
 To start a new select statement simply call `select` on your `DatabaseAccess` implementation. Calling `select` without parameters is equivalent to calling `select("*")`. 
