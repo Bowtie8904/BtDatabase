@@ -21,6 +21,7 @@
       - [Primary keys](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#primary-keys)
       - [Autoincrement identities](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#autoincrement-identities)
       - [Column comments](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#column-comments)
+    - [As copy](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#as-copy)    
   - [Select](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#select)
     - [Join](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#join)
     - [Order by](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#order-by)
@@ -34,6 +35,8 @@
   - [Alter](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#alter)
   - [On fail](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#on-fail)
 - [Trigger events](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#trigger-events)  
+- [Automatic persisting and initializing](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#automatic-persisting-and-initializing)  
+
 
 
 ## How to get started
@@ -67,11 +70,11 @@
   A simple configuration would look like this
   ```Java
   DatabaseConfiguration config = new DatabaseConfiguration()
-                                                            .path("./db") // 1
-                                                            .create() // 2
-                                                            .useUnicode() // 3
-                                                            .characterEncoding("utf8") // 4
-                                                            .autoReconnect(); // 5
+                                                   .path("./db") // 1
+                                                   .create() // 2
+                                                   .useUnicode() // 3
+                                                   .characterEncoding("utf8") // 4
+                                                   .autoReconnect(); // 5         
   ```
   **What it does:**
   1. sets the path of the database to the folder `db` within your projects folder
@@ -92,17 +95,17 @@
   The main difference between the two implementations is how they handle [triggers](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#trigger-events). The `EmbeddedDatabase` class will install the jar file of your program to the database, so that triggers will call the internal methods directly. The `RemoteDatabase` will work with a trigger table where new trigger messages are added and read from on a set interval. 
   If you can, always go for an `EmbeddedDatabase` implementation as triggers will be reported much faster which can increase your programs performance based on trigger usage.
 
-Since there is no difference in extending one or the other, further examples will always use an `EmbeddedDatabase`.
+Since there is no difference in usage when extending one or the other, further examples will always use an `EmbeddedDatabase`.
 
 
 #### Extending the root classes
 All three classes (`DatabaseAccess`, `EmbeddedDatabase` and `RemoteDatabase`) are abstract.
 
-When extending `EmbeddedDatabase` you will need to implement the abstract method `createTables`. Inside that method you should put all code that creates a tables of the database if they don't exist yet.
+When extending `EmbeddedDatabase` you will need to implement the abstract method `createTables`. Inside that method you should put all code that creates tables of the database if they don't exist yet.
 
 An example would look like this:
 ```Java
-public class Database extends LocalDatabase
+public class Database extends EmbeddedDatabase
 {
     public Database(DatabaseConfiguration config)
     {
@@ -221,6 +224,39 @@ db.create().table("testtable")
 By default the values will be autoincremented by 1, but you can override that value with your own desired incrementation by calling `autoIncrement`.
 
 
+#### As Copy
+You can create a table as a copy of a selected result set or another table.
+
+To copy from a select statement:
+```Java
+db.create().table("testtable2")
+                as(db.select()
+                    .from("testtable"))
+                .execute(true);
+```
+This will copy the selected data as well. If you only want the structure without any data call `withData(false)`:
+```Java
+db.create().table("testtable2")
+                as(db.select()
+                    .from("testtable"))
+                .withData(false)    
+                .execute(true);
+```
+
+To copy a table directly:
+```Java
+db.create().table("testtable2")
+                .asCopyOf("testtable")
+                .execute(true);
+```
+This will copy the selected data as well. If you only want the structure without any data call `withData(false)`:
+```Java
+db.create().table("testtable2")
+                .asCopyOf("testtable")
+                .withData(false)    
+                .execute(true);
+```  
+
 ### Select
 To start a new select statement simply call `select` on your `DatabaseAccess` implementation. Calling `select` without parameters is equivalent to calling `select("*")`. 
 ```Java
@@ -307,3 +343,5 @@ db.select("test_text", "test_long)
 
 
 ## Trigger events
+
+## Automatic persisting and initializing
