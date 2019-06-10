@@ -341,3 +341,5 @@ db.select("test_text", "test_long)
 
 
 ## Trigger events
+
+## Automatic persisting and initializing
