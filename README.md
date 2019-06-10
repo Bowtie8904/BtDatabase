@@ -35,6 +35,8 @@
   - [Alter](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#alter)
   - [On fail](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#on-fail)
 - [Trigger events](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#trigger-events)  
+- [Automatic persisting and initializing](https://github.com/Bowtie8904/BtDatabase/blob/master/README.md#automatic-persisting-and-initializing)  
+
 
 
 ## How to get started
