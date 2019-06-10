@@ -50,12 +50,15 @@ public interface SqlEntry
      * Initializes an instance of the given class by using values from the given database that match the given identity.
      * 
      * <p>
-     * The given class must annotate the required field with {@link Column} to define which column to use for that
-     * field.
-     * </p>
+     * To allow the initialization of an instance, the class must meet the following requirements:
      * 
-     * <p>
-     * The given class must implement a constructor without arguments. The contructor may be private.
+     * <ul>
+     * <li>the class must implement a constructor without arguments</li>
+     * <li>all fields that should be initialized need a {@link Column} annotation</li>
+     * <li>the class either needs a global {@link Table} annotation or one for every required field</li>
+     * <li>one of the fields must also be marked with an {@link Identity} annotation</li>
+     * <li>the identity field must be of type long</li>
+     * </ul>
      * </p>
      * 
      * @param db
@@ -133,12 +136,15 @@ public interface SqlEntry
      * annotation.
      * 
      * <p>
-     * The given class must annotate the required field with {@link Column} to define which column to use for that
-     * field.
-     * </p>
+     * To allow the initialization of an instance, the class must meet the following requirements:
      * 
-     * <p>
-     * The given class must implement a constructor without arguments. The contructor may be private.
+     * <ul>
+     * <li>the class must implement a constructor without arguments</li>
+     * <li>all fields that should be initialized need a {@link Column} annotation</li>
+     * <li>the class either needs a global {@link Table} annotation or one for every required field</li>
+     * <li>one of the fields must also be marked with an {@link Identity} annotation</li>
+     * <li>the identity field must be of type long</li>
+     * </ul>
      * </p>
      * 
      * @param db
@@ -152,6 +158,29 @@ public interface SqlEntry
         return init(db, cls, null);
     }
 
+    /**
+     * Initializes instances of the given class by using matching database identities with the given IDs.
+     * 
+     * <p>
+     * To allow the initialization of an instance, the class must meet the following requirements:
+     * 
+     * <ul>
+     * <li>the class must implement a constructor without arguments</li>
+     * <li>all fields that should be initialized need a {@link Column} annotation</li>
+     * <li>the class either needs a global {@link Table} annotation or one for every required field</li>
+     * <li>one of the fields must also be marked with an {@link Identity} annotation</li>
+     * <li>the identity field must be of type long</li>
+     * </ul>
+     * </p>
+     * 
+     * @param db
+     *            The database to use to retrieve the column values.
+     * @param cls
+     *            The class to create instances of.
+     * @param ids
+     *            A list of IDs which match the identities of the instances that should be initialized.
+     * @return A list filled with one instance for each row contained in the defined table.
+     */
     public static <T> List<T> init(DatabaseAccess db, Class<T> cls, List<Long> ids)
     {
         // just used to either get all entries or the ones with an id in the given list
@@ -302,6 +331,11 @@ public interface SqlEntry
                             continue;
                         }
 
+                        if (col == null)
+                        {
+                            continue;
+                        }
+
                         if (tableAn != null)
                         {
                             tableName = tableAn.value();
@@ -347,12 +381,15 @@ public interface SqlEntry
      * {@link Identity} field.
      * 
      * <p>
-     * The class of the given instance must annotate the required field with {@link Column} to define which column to
-     * use for that field.
-     * </p>
+     * To allow the initialization of an instance, the class must meet the following requirements:
      * 
-     * <p>
-     * The class of the given instance must implement a constructor without arguments. The contructor may be private.
+     * <ul>
+     * <li>the class must implement a constructor without arguments</li>
+     * <li>all fields that should be initialized need a {@link Column} annotation</li>
+     * <li>the class either needs a global {@link Table} annotation or one for every required field</li>
+     * <li>one of the fields must also be marked with an {@link Identity} annotation</li>
+     * <li>the identity field must be of type long</li>
+     * </ul>
      * </p>
      * 
      * @param db
@@ -489,6 +526,11 @@ public interface SqlEntry
                     Identity ident = field.getAnnotation(Identity.class);
                     Table tableAn = field.getAnnotation(Table.class);
 
+                    if (col == null)
+                    {
+                        continue;
+                    }
+
                     String usedTable = null;
 
                     if (tableAn == null)
@@ -541,12 +583,15 @@ public interface SqlEntry
      * class.
      * 
      * <p>
-     * The class of the given instance must annotate the required field with {@link Column} to define which column to
-     * use for that field.
-     * </p>
+     * To allow the persistance of an instance, the class must meet the following requirements:
      * 
-     * <p>
-     * One field of the type long must be annotated with {@link Identity} so it can be used for a duplicate check.
+     * <ul>
+     * <li>the class must implement a constructor without arguments</li>
+     * <li>all fields that should be persisted need a {@link Column} annotation</li>
+     * <li>the class either needs a global {@link Table} annotation or one for every required field</li>
+     * <li>one of the fields must also be marked with an {@link Identity} annotation</li>
+     * <li>the identity field must be of type long</li>
+     * </ul>
      * </p>
      * 
      * @param db
@@ -595,6 +640,11 @@ public interface SqlEntry
             {
                 sqlEntryFields.add(value);
                 hasValues = true;
+                continue;
+            }
+
+            if (col == null)
+            {
                 continue;
             }
 
