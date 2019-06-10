@@ -8,8 +8,9 @@ import bt.db.DatabaseAccess;
 import bt.db.statement.clause.TriggerAction;
 
 /**
+ * Represents an SQL CREATE TRIGGER statement which can be extended through method chaining.
+ * 
  * @author &#8904
- *
  */
 public class CreateTriggerStatement extends CreateStatement<CreateTriggerStatement, CreateTriggerStatement>
 {
@@ -21,7 +22,12 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
     private boolean replace;
 
     /**
+     * Creates a new instance.
+     * 
      * @param db
+     *            The database on which the trigger will be created.
+     * @param name
+     *            The name of the trigger.
      */
     public CreateTriggerStatement(DatabaseAccess db, String name)
     {
@@ -29,32 +35,85 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
         this.statementKeyword = "CREATE TRIGGER";
     }
 
-    public CreateTriggerStatement after(String trigger)
+    /**
+     * Indicates that this trigger should be called AFTER an action on the table.
+     * 
+     * <p>
+     * Actions are:
+     * <ul>
+     * <li>insert</li>
+     * <li>update</li>
+     * <li>delete</li>
+     * </ul>
+     * </p>
+     * 
+     * @param action
+     *            The action which should cause this trigger to be executed. Either 'insert', 'update' or 'delete'.
+     * @return This instance for chaining.
+     */
+    public CreateTriggerStatement after(String action)
     {
-        this.triggerKeyword = trigger.toUpperCase();
+        this.triggerKeyword = action.toUpperCase();
         this.when = "AFTER";
         return this;
     }
 
-    public CreateTriggerStatement before(String trigger)
+    /**
+     * Indicates that this trigger should be called BEFORE an action on the table.
+     * 
+     * <p>
+     * Actions are:
+     * <ul>
+     * <li>insert</li>
+     * <li>update</li>
+     * <li>delete</li>
+     * </ul>
+     * </p>
+     * 
+     * @param action
+     *            The action which should cause this trigger to be executed. Either 'insert', 'update' or 'delete'.
+     * @return This instance for chaining.
+     */
+    public CreateTriggerStatement before(String action)
     {
-        this.triggerKeyword = trigger.toUpperCase();
+        this.triggerKeyword = action.toUpperCase();
         this.when = "NO CASCADE BEFORE";
         return this;
     }
 
+    /**
+     * @see bt.db.statement.SqlModifyStatement#commit()
+     */
     @Override
     public CreateTriggerStatement commit()
     {
         return (CreateTriggerStatement)super.commit();
     }
 
+    /**
+     * @see bt.db.statement.SqlModifyStatement#unprepared()
+     */
     @Override
     public CreateTriggerStatement unprepared()
     {
         return (CreateTriggerStatement)super.unprepared();
     }
 
+    /**
+     * Only usable for UPDATE triggers.
+     * 
+     * <p>
+     * Defines the columns that will cause this trigger to be executed when they are updated.
+     * </p>
+     * 
+     * <p>
+     * Not calling this method to specify columns means that all columns will cause a trigger execution on update.
+     * </p>
+     * 
+     * @param columns
+     *            The names of the columns.
+     * @return This instance for chaining.
+     */
     public CreateTriggerStatement of(String... columns)
     {
         if (!this.triggerKeyword.toUpperCase().equals("UPDATE"))
@@ -74,6 +133,13 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
         return this;
     }
 
+    /**
+     * Sets the table that this trigger should listen on.
+     * 
+     * @param table
+     *            The name of the table.
+     * @return This instance for chaining.
+     */
     public CreateTriggerStatement on(String table)
     {
         this.tables = new String[]
@@ -84,18 +150,49 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
         return this;
     }
 
+    /**
+     * Only usable for INSERT and UPDATE triggers.
+     * 
+     * <p>
+     * Sets an alias for the newly inserted/updated row.
+     * </p>
+     * 
+     * @param alias
+     *            The alias of the row.
+     * @return This instance for chaining.
+     */
     public CreateTriggerStatement newAs(String alias)
     {
         this.newAlias = alias;
         return this;
     }
 
+    /**
+     * Only usable for DELETE and UPDATE triggers.
+     * 
+     * <p>
+     * Sets an alias for the old deleted/updated row.
+     * </p>
+     * 
+     * @param alias
+     *            The alias of the row.
+     * @return This instance for chaining.
+     */
     public CreateTriggerStatement oldAs(String alias)
     {
         this.oldAlias = alias;
         return this;
     }
 
+    /**
+     * Indicates that this trigger should be executed on each affected row.
+     * 
+     * <p>
+     * I.e. an update statement that affected 30 rows will cause this trigger to be executed 30 times.
+     * </p>
+     * 
+     * @return The created {@link TriggerAction} to further extend the action.
+     */
     public TriggerAction forEachRow()
     {
         this.triggerAction = new TriggerAction(this);
@@ -103,6 +200,16 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
         return this.triggerAction;
     }
 
+    /**
+     * Indicates that this trigger should be executed on each affected row.
+     * 
+     * <p>
+     * I.e. an update statement that affected 30 rows will cause this trigger to only be executed once. If the statement
+     * did not affect any rows, this trigger will still be executed once.
+     * </p>
+     * 
+     * @return The created {@link TriggerAction} to further extend the action.
+     */
     public TriggerAction forEachStatement()
     {
         this.triggerAction = new TriggerAction(this);
@@ -110,6 +217,11 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
         return this.triggerAction;
     }
 
+    /**
+     * This statement will attempt to replace the trigger if it already exists.
+     * 
+     * @return This instance for chaining.
+     */
     public CreateTriggerStatement replace()
     {
         this.replace = true;
@@ -204,6 +316,9 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
         return result;
     }
 
+    /**
+     * @see bt.db.statement.SqlStatement#toString()
+     */
     @Override
     public String toString()
     {

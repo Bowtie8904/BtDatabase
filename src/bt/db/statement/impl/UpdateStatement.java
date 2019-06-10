@@ -41,6 +41,9 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
         this.statementKeyword = "UPDATE";
     }
 
+    /**
+     * @see bt.db.statement.SqlModifyStatement#commit()
+     */
     @Override
     public UpdateStatement commit()
     {
@@ -56,6 +59,11 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
         return (UpdateStatement)super.unprepared();
     }
 
+    /**
+     * Gets the table in which this statement will update.
+     * 
+     * @return The name of the table.
+     */
     public String getTable()
     {
         return this.tables.length > 0 ? this.tables[0] : null;
@@ -238,6 +246,14 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
         return set(column, value, SqlType.VARCHAR);
     }
 
+    /**
+     * Defines a data modifying statement (insert, update, delete) which will be executed if there was an error during
+     * the execution of the original update statement.
+     * 
+     * @param onFail
+     *            The SqlModifyStatement to execute instead.
+     * @return This instance for chaining.
+     */
     public UpdateStatement onFail(SqlModifyStatement onFail)
     {
         this.onFail = (statement, e) ->
@@ -248,12 +264,34 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
         return this;
     }
 
+    /**
+     * Defines a BiFunction that will be executed if there was an error during the execution of this statement.
+     * 
+     * <p>
+     * The first parameter (UpdateStatement) will be this statement instance, the second one is the SQLException that
+     * caused the fail. The return value (Integer) will be returned by this instances {@link #execute()}.
+     * </p>
+     * 
+     * @param onFail
+     *            The BiFunction to execute.
+     * @return This instance for chaining.
+     */
     public UpdateStatement onFail(BiFunction<UpdateStatement, SQLException, Integer> onFail)
     {
         this.onFail = onFail;
         return this;
     }
 
+    /**
+     * Defines a data modifying statement (insert, update, delete) to execute if the original update affected less rows
+     * than the given lower threshhold.
+     * 
+     * @param lowerThreshhold
+     *            The threshhold to check.
+     * @param statement
+     *            The statement to execute.
+     * @return This instance for chaining.
+     */
     public UpdateStatement onLessThan(int lowerThreshhold, SqlModifyStatement statement)
     {
         this.lowerThreshhold = lowerThreshhold;
@@ -264,6 +302,21 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
         return this;
     }
 
+    /**
+     * Defines a BiFunction that will be executed if the original update affected less rows than the given lower
+     * threshhold.
+     * 
+     * <p>
+     * The first parameter (int) will be the number of rows affected, the second one is the UpdateStatement from the
+     * original delete. The return value (Integer) will be returned by this instances {@link #execute()}.
+     * </p>
+     * 
+     * @param lowerThreshhold
+     *            The threshhold to check.
+     * @param onLessThan
+     *            The BiFunction to execute.
+     * @return This instance for chaining.
+     */
     public UpdateStatement onLessThan(int lowerThreshhold, BiFunction<Integer, UpdateStatement, Integer> onLessThan)
     {
         this.lowerThreshhold = lowerThreshhold;
@@ -271,6 +324,16 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
         return this;
     }
 
+    /**
+     * Defines a data modifying statement (insert, update, delete) to execute if the original update affected more rows
+     * than the given higher threshhold.
+     * 
+     * @param higherThreshhold
+     *            The threshhold to check.
+     * @param statement
+     *            The statement to execute.
+     * @return This instance for chaining.
+     */
     public UpdateStatement onMoreThan(int higherThreshhold, SqlModifyStatement statement)
     {
         this.higherThreshhold = higherThreshhold;
@@ -281,6 +344,21 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
         return this;
     }
 
+    /**
+     * Defines a BiFunction that will be executed if the original update affected more rows than the given higher
+     * threshhold.
+     * 
+     * <p>
+     * The first parameter (int) will be the number of rows affected, the second one is the UpdateStatement from the
+     * original insert. The return value (Integer) will be returned by this instances {@link #execute()}.
+     * </p>
+     * 
+     * @param higherThreshhold
+     *            The threshhold to check.
+     * @param onLessThan
+     *            The BiFunction to execute.
+     * @return This instance for chaining.
+     */
     public UpdateStatement onMoreThan(int higherThreshhold,
             BiFunction<Integer, UpdateStatement, Integer> onMoreThan)
     {

@@ -14,8 +14,9 @@ import bt.db.constants.SqlType;
 import bt.db.statement.impl.InsertStatement;
 
 /**
+ * Represents a single result (row) of data.
+ * 
  * @author &#8904
- *
  */
 public class SqlResult implements Iterable<Object>
 {
@@ -37,16 +38,31 @@ public class SqlResult implements Iterable<Object>
     private List<String> columnOrder;
     private Map<String, String> columnTypes;
 
+    /**
+     * Creates a new instance.
+     * 
+     * @param columnOrder
+     *            A list containing the names of the columns in correct order.
+     */
     public SqlResult(List<String> columnOrder)
     {
         this.columnOrder = columnOrder;
     }
 
+    /**
+     * Creates a new instance.
+     * 
+     * @param columnOrder
+     *            An array containing the names of the columns in correct order.
+     */
     public SqlResult(String... columnOrder)
     {
         this.columnOrder = List.of(columnOrder);
     }
 
+    /**
+     * Sets the values and links them to the columns.
+     */
     public void useValues(Object... values)
     {
         if (this.columnOrder.size() != values.length)

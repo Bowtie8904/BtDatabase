@@ -12,17 +12,40 @@ import java.sql.Types;
  */
 public enum SqlType
 {
+    /** Represents the sql type BOOLEAN. */
     BOOLEAN("BOOLEAN", Types.BOOLEAN),
+
+    /** Represents the sql type VARCHAR. */
     VARCHAR("VARCHAR", Types.VARCHAR),
+
+    /** Represents the sql type INTEGER. */
     INTEGER("INTEGER", Types.INTEGER),
+
+    /** Represents the sql type BIGINT. */
     LONG("BIGINT", Types.BIGINT),
+
+    /** Represents the sql type DOUBLE. */
     DOUBLE("DOUBLE", Types.DOUBLE),
+
+    /** Represents the sql type FLOAT. */
     FLOAT("FLOAT", Types.FLOAT),
+
+    /** Represents the sql type DATE. */
     DATE("DATE", Types.DATE),
+
+    /** Represents the sql type TIME. */
     TIME("TIME", Types.TIME),
+
+    /** Represents the sql type TIMESTAMP. */
     TIMESTAMP("TIMESTAMP", Types.TIMESTAMP),
+
+    /** Represents the sql type CLOB. */
     CLOB("CLOB", Types.CLOB),
+
+    /** Represents the sql type BLOB. */
     BLOB("BLOB", Types.BLOB),
+
+    /** An unknown/invalid type which can't be used effectively in this library. */
     UNKNOWN("UNKNOWN", -1);
 
     private String name;

@@ -3,7 +3,7 @@ package bt.db.listener.evnt;
 import bt.db.DatabaseAccess;
 
 /**
- * Supertype of all events fired by the {@link DatabaseAccess} implementation in case of an insert, updaet or delete
+ * Supertype of all events fired by the {@link DatabaseAccess} implementation in case of an insert, update or delete
  * trigger.
  * 
  * @author &#8904
@@ -88,6 +88,11 @@ public class DatabaseChangeEvent
         return this.sourceDb;
     }
 
+    /**
+     * Sets the {@link DatabaseAccess} instance that fired this event.
+     * 
+     * @param sourceDb
+     */
     public void setSourceDatabase(DatabaseAccess sourceDb)
     {
         this.sourceDb = sourceDb;

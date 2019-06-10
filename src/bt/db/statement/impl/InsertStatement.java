@@ -360,7 +360,7 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
 
     /**
      * Defines a data modifying statement (insert, update, delete) which will be executed if there was an error during
-     * the execution of the original select.
+     * the execution of the original insert statement.
      * 
      * @param onFail
      *            The SqlModifyStatement to execute instead.
@@ -589,9 +589,7 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     }
 
     /**
-     * Formats the full statement without instering values.
-     * 
-     * @see java.lang.Object#toString()
+     * @see bt.db.statement.SqlStatement#toString()
      */
     @Override
     public String toString()

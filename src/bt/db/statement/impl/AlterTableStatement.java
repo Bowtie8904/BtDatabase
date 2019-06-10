@@ -31,12 +31,26 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
         this.statementKeyword = "ALTER TABLE";
     }
 
-    public TableColumn<AlterTableStatement> addColumn(String name, SqlType type)
+    /**
+     * Adds a new column in this table which has the given name and the given sql type.
+     * 
+     * @param name
+     *            The name of the column.
+     * @param type
+     *            The {@link SqlType type} of the column.
+     * @return The created column.
+     */
+    public TableColumn<AlterTableStatement> column(String name, SqlType type)
     {
         TableColumn<AlterTableStatement> column = new TableColumn<AlterTableStatement>(this, name, type);
         return column;
     }
 
+    /**
+     * Adds the column to this table.
+     * 
+     * @see bt.db.statement.impl.CreateStatement#addColumn(bt.db.statement.clause.TableColumn)
+     */
     @Override
     public AlterTableStatement addColumn(TableColumn column)
     {
@@ -44,12 +58,18 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
         return this;
     }
 
+    /**
+     * @see bt.db.statement.SqlModifyStatement#commit()
+     */
     @Override
     public AlterTableStatement commit()
     {
         return (AlterTableStatement)super.commit();
     }
 
+    /**
+     * @see bt.db.statement.SqlModifyStatement#unprepared()
+     */
     @Override
     public AlterTableStatement unprepared()
     {
@@ -169,6 +189,9 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
         return result;
     }
 
+    /**
+     * Returns the string representing this statement.
+     */
     @Override
     public String toString()
     {

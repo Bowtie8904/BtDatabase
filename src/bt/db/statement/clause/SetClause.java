@@ -182,6 +182,13 @@ public class SetClause<T extends SqlModifyStatement>
         return "Invalid statement type";
     }
 
+    /**
+     * Returns the String representing this set clause.
+     * 
+     * @param prepared
+     *            Indicates whether values should be treated for prepared statements or inserted as plain text. true =
+     *            use prepared statement, false = insert plain.
+     */
     public String toString(boolean prepared)
     {
         if (prepared)
@@ -201,6 +208,11 @@ public class SetClause<T extends SqlModifyStatement>
         return "Invalid statement type";
     }
 
+    /**
+     * Gets a string representation of the value used in this set clause.
+     * 
+     * @return
+     */
     public String getStringValue()
     {
         String strValue = null;

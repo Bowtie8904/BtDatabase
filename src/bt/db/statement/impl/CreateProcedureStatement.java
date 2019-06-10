@@ -10,7 +10,11 @@ import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
 
 /**
+ * Represents an SQL CREATE PROCEDURE statement which can be extended through method chaining.
  * 
+ * <p>
+ * Procedures can be used to call java methods from the database, i.e. to alert triggers to the program.
+ * </p>
  * 
  * @author &#8904
  */
@@ -20,6 +24,14 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
     private boolean replace;
     private String method;
 
+    /**
+     * Creates a new instance.
+     * 
+     * @param db
+     *            The database on which the procedure will be created.
+     * @param name
+     *            The name of the procedure.
+     */
     public CreateProcedureStatement(DatabaseAccess db, String name)
     {
         super(db, name);
@@ -27,6 +39,15 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
         this.statementKeyword = "CREATE PROCEDURE";
     }
 
+    /**
+     * Adds a parameter to the procedure.
+     * 
+     * @param name
+     *            The name of the parameter.
+     * @param type
+     *            The {@link SqlType} of the parameter.
+     * @return This instance for chaining.
+     */
     public CreateProcedureStatement parameter(String name, SqlType type)
     {
         this.parameters.add(new String[]
@@ -37,12 +58,18 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
         return this;
     }
 
+    /**
+     * @see bt.db.statement.SqlModifyStatement#commit()
+     */
     @Override
     public CreateProcedureStatement commit()
     {
         return (CreateProcedureStatement)super.commit();
     }
 
+    /**
+     * @see bt.db.statement.SqlModifyStatement#unprepared()
+     */
     @Override
     public CreateProcedureStatement unprepared()
     {
@@ -86,7 +113,7 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
      * this one. Dropping a procedure does not work if it is still being used, for example by a trigger.
      * </p>
      * 
-     * @return This instance for chining.
+     * @return This instance for chaining.
      */
     public CreateProcedureStatement replace()
     {
@@ -94,6 +121,13 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
         return this;
     }
 
+    /**
+     * Sets the java method that should be called by this procedure.
+     * 
+     * @param javaMethod
+     *            The full method name (class name + methodname).
+     * @return This instance for chaining.
+     */
     public CreateProcedureStatement call(String javaMethod)
     {
         this.method = javaMethod;
@@ -201,6 +235,9 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
         return result;
     }
 
+    /**
+     * @see bt.db.statement.SqlStatement#toString()
+     */
     @Override
     public String toString()
     {

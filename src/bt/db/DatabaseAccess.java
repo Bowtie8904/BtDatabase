@@ -26,6 +26,7 @@ import bt.db.listener.evnt.InsertEvent;
 import bt.db.listener.evnt.UpdateEvent;
 import bt.db.statement.Alter;
 import bt.db.statement.Create;
+import bt.db.statement.clause.ColumnEntry;
 import bt.db.statement.clause.TableColumn;
 import bt.db.statement.impl.DeleteStatement;
 import bt.db.statement.impl.DropStatement;
@@ -810,6 +811,11 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Creates a select statement which selects the toString() values of the given objects.
+     * 
+     * <p>
+     * This method is meant to be used with {@link ColumnEntry} parameters to represent table.column pairs in selects
+     * from multiple tables. Call {@link Sql#column(String, String)} to create a new columnentry.
+     * </p>
      * 
      * @return The statement.
      */

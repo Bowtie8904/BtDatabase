@@ -142,6 +142,11 @@ public class SelectStatement extends SqlStatement<SelectStatement>
         };
     }
 
+    /**
+     * Gets the tables that were specified via {@link #from(String...)}.
+     * 
+     * @return An array of the table names.
+     */
     public String[] getTables()
     {
         return this.tables;

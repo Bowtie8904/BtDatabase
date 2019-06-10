@@ -66,7 +66,9 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
     }
 
     /**
-     * Adds the given column to this statement.
+     * Adds the column to this table.
+     * 
+     * @see bt.db.statement.impl.CreateStatement#addColumn(bt.db.statement.clause.TableColumn)
      */
     @Override
     public CreateTableStatement addColumn(TableColumn column)
@@ -381,6 +383,9 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
         return result;
     }
 
+    /**
+     * Returns the string representing this statement.
+     */
     @Override
     public String toString()
     {

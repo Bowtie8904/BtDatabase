@@ -6,12 +6,19 @@ import java.util.Map;
 /**
  * A class to define connection attributes for a database.
  * 
+ * <p>
+ * This class effectively offers a conmvinient way to create a connection string through method chaining.
+ * </p>
+ * 
  * @author &#8904
  */
 public class DatabaseConfiguration
 {
     private Map<String, String> attributes;
 
+    /**
+     * Creates a new instance.
+     */
     public DatabaseConfiguration()
     {
         this.attributes = new HashMap<>();

@@ -30,12 +30,18 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
         this.statementKeyword = "DELETE";
     }
 
+    /**
+     * @see bt.db.statement.SqlModifyStatement#commit()
+     */
     @Override
     public DeleteStatement commit()
     {
         return (DeleteStatement)super.commit();
     }
 
+    /**
+     * @see bt.db.statement.SqlModifyStatement#unprepared()
+     */
     @Override
     public DeleteStatement unprepared()
     {
@@ -58,6 +64,11 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
         return this;
     }
 
+    /**
+     * Gets the table from which this statement will delete.
+     * 
+     * @return The name of the table or null if none has been set yet via {@link #from(String)}.
+     */
     public String getTable()
     {
         return this.tables.length > 0 ? this.tables[0] : null;
@@ -107,6 +118,14 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
         return where;
     }
 
+    /**
+     * Defines a data modifying statement (insert, update, delete) which will be executed if there was an error during
+     * the execution of the original delete statement.
+     * 
+     * @param onFail
+     *            The SqlModifyStatement to execute instead.
+     * @return This instance for chaining.
+     */
     public DeleteStatement onFail(SqlModifyStatement onFail)
     {
         this.onFail = (statement, e) ->
@@ -117,12 +136,34 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
         return this;
     }
 
+    /**
+     * Defines a BiFunction that will be executed if there was an error during the execution of this statement.
+     * 
+     * <p>
+     * The first parameter (DeleteStatement) will be this statement instance, the second one is the SQLException that
+     * caused the fail. The return value (Integer) will be returned by this instances {@link #execute()}.
+     * </p>
+     * 
+     * @param onFail
+     *            The BiFunction to execute.
+     * @return This instance for chaining.
+     */
     public DeleteStatement onFail(BiFunction<DeleteStatement, SQLException, Integer> onFail)
     {
         this.onFail = onFail;
         return this;
     }
 
+    /**
+     * Defines a data modifying statement (insert, update, delete) to execute if the original delete affected less rows
+     * than the given lower threshhold.
+     * 
+     * @param lowerThreshhold
+     *            The threshhold to check.
+     * @param statement
+     *            The statement to execute.
+     * @return This instance for chaining.
+     */
     public DeleteStatement onLessThan(int lowerThreshhold, SqlModifyStatement statement)
     {
         this.lowerThreshhold = lowerThreshhold;
@@ -133,6 +174,21 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
         return this;
     }
 
+    /**
+     * Defines a BiFunction that will be executed if the original delete affected less rows than the given lower
+     * threshhold.
+     * 
+     * <p>
+     * The first parameter (int) will be the number of rows affected, the second one is the DeleteStatement from the
+     * original delete. The return value (Integer) will be returned by this instances {@link #execute()}.
+     * </p>
+     * 
+     * @param lowerThreshhold
+     *            The threshhold to check.
+     * @param onLessThan
+     *            The BiFunction to execute.
+     * @return This instance for chaining.
+     */
     public DeleteStatement onLessThan(int lowerThreshhold, BiFunction<Integer, DeleteStatement, Integer> onLessThan)
     {
         this.lowerThreshhold = lowerThreshhold;
@@ -140,6 +196,16 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
         return this;
     }
 
+    /**
+     * Defines a data modifying statement (insert, update, delete) to execute if the original delete affected more rows
+     * than the given higher threshhold.
+     * 
+     * @param higherThreshhold
+     *            The threshhold to check.
+     * @param statement
+     *            The statement to execute.
+     * @return This instance for chaining.
+     */
     public DeleteStatement onMoreThan(int higherThreshhold, SqlModifyStatement statement)
     {
         this.higherThreshhold = higherThreshhold;
@@ -150,6 +216,21 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
         return this;
     }
 
+    /**
+     * Defines a BiFunction that will be executed if the original delete affected more rows than the given higher
+     * threshhold.
+     * 
+     * <p>
+     * The first parameter (int) will be the number of rows affected, the second one is the DeleteStatement from the
+     * original insert. The return value (Integer) will be returned by this instances {@link #execute()}.
+     * </p>
+     * 
+     * @param higherThreshhold
+     *            The threshhold to check.
+     * @param onLessThan
+     *            The BiFunction to execute.
+     * @return This instance for chaining.
+     */
     public DeleteStatement onMoreThan(int higherThreshhold,
             BiFunction<Integer, DeleteStatement, Integer> onMoreThan)
     {
@@ -234,9 +315,7 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
     }
 
     /**
-     * Formats the full delete statement without instering values.
-     * 
-     * @see java.lang.Object#toString()
+     * @see bt.db.statement.SqlStatement#toString()
      */
     @Override
     public String toString()
@@ -250,7 +329,7 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
             sql += table;
         }
 
-        // indicates whether the klast clause was a between clause, to skip the duplicate
+        // indicates whether the last clause was a between clause, to skip the duplicate
         boolean lastBetween = false;
 
         for (ConditionalClause<DeleteStatement> where : this.whereClauses)

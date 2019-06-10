@@ -136,4 +136,13 @@ public class SqlStatement<T extends SqlStatement>
     {
         this.db = db;
     }
+
+    /**
+     * Returns the String representing this statement.
+     */
+    @Override
+    public String toString()
+    {
+        return "";
+    }
 }
