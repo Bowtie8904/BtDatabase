@@ -66,6 +66,11 @@ public class SqlStatement<T extends SqlStatement>
         this.whereClauses.add(where);
     }
 
+    /**
+     * Gets a list with all added where clauses.
+     * 
+     * @return The list of where clauses.
+     */
     public List<ConditionalClause<T>> getWhereClauses()
     {
         return this.whereClauses;
@@ -82,6 +87,11 @@ public class SqlStatement<T extends SqlStatement>
         this.havingClauses.add(having);
     }
 
+    /**
+     * Gets a list with all added having clauses.
+     * 
+     * @return The list of having clauses.
+     */
     public List<ConditionalClause<T>> getHavingClauses()
     {
         return this.havingClauses;

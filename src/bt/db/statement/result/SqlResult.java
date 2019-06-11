@@ -62,6 +62,14 @@ public class SqlResult implements Iterable<Object>
 
     /**
      * Sets the values and links them to the columns.
+     * 
+     * <p>
+     * Values are added to maps based on their type. Every value will also be added to the {@link Object} map,
+     * regardless of type. This makes every value accessible via {@link #get(String)}.
+     * </p>
+     * 
+     * @param values
+     *            An Object array containing the values in the correct order according to the column order.
      */
     public void useValues(Object... values)
     {
@@ -130,12 +138,32 @@ public class SqlResult implements Iterable<Object>
         }
     }
 
+    /**
+     * Maps the given value to the given name.
+     * 
+     * @param name
+     *            The mapped name of the value.
+     * @param value
+     *            The value to be mapped.
+     */
     public void putObject(String name, Object value)
     {
         name = name.toUpperCase();
         objectResults.put(name, value);
     }
 
+    /**
+     * Maps the given value to the given name.
+     * 
+     * <p>
+     * The value will also be added implicitely via {@link #putObject(String, Object)}.
+     * </p>
+     * 
+     * @param name
+     *            The mapped name of the value.
+     * @param value
+     *            The value to be mapped.
+     */
     public void put(String name, String value)
     {
         name = name.toUpperCase();
@@ -143,6 +171,18 @@ public class SqlResult implements Iterable<Object>
         putObject(name, value);
     }
 
+    /**
+     * Maps the given value to the given name.
+     * 
+     * <p>
+     * The value will also be added implicitely via {@link #putObject(String, Object)}.
+     * </p>
+     * 
+     * @param name
+     *            The mapped name of the value.
+     * @param value
+     *            The value to be mapped.
+     */
     public void put(String name, Time value)
     {
         name = name.toUpperCase();
@@ -150,6 +190,18 @@ public class SqlResult implements Iterable<Object>
         putObject(name, value);
     }
 
+    /**
+     * Maps the given value to the given name.
+     * 
+     * <p>
+     * The value will also be added implicitely via {@link #putObject(String, Object)}.
+     * </p>
+     * 
+     * @param name
+     *            The mapped name of the value.
+     * @param value
+     *            The value to be mapped.
+     */
     public void put(String name, Timestamp value)
     {
         name = name.toUpperCase();
@@ -157,6 +209,18 @@ public class SqlResult implements Iterable<Object>
         putObject(name, value);
     }
 
+    /**
+     * Maps the given value to the given name.
+     * 
+     * <p>
+     * The value will also be added implicitely via {@link #putObject(String, Object)}.
+     * </p>
+     * 
+     * @param name
+     *            The mapped name of the value.
+     * @param value
+     *            The value to be mapped.
+     */
     public void put(String name, Clob value)
     {
         name = name.toUpperCase();
@@ -164,6 +228,18 @@ public class SqlResult implements Iterable<Object>
         putObject(name, value);
     }
 
+    /**
+     * Maps the given value to the given name.
+     * 
+     * <p>
+     * The value will also be added implicitely via {@link #putObject(String, Object)}.
+     * </p>
+     * 
+     * @param name
+     *            The mapped name of the value.
+     * @param value
+     *            The value to be mapped.
+     */
     public void put(String name, Blob value)
     {
         name = name.toUpperCase();
@@ -171,6 +247,18 @@ public class SqlResult implements Iterable<Object>
         putObject(name, value);
     }
 
+    /**
+     * Maps the given value to the given name.
+     * 
+     * <p>
+     * The value will also be added implicitely via {@link #putObject(String, Object)}.
+     * </p>
+     * 
+     * @param name
+     *            The mapped name of the value.
+     * @param value
+     *            The value to be mapped.
+     */
     public void put(String name, byte value)
     {
         name = name.toUpperCase();
@@ -178,6 +266,18 @@ public class SqlResult implements Iterable<Object>
         putObject(name, value);
     }
 
+    /**
+     * Maps the given value to the given name.
+     * 
+     * <p>
+     * The value will also be added implicitely via {@link #putObject(String, Object)}.
+     * </p>
+     * 
+     * @param name
+     *            The mapped name of the value.
+     * @param value
+     *            The value to be mapped.
+     */
     public void put(String name, short value)
     {
         name = name.toUpperCase();
@@ -185,6 +285,18 @@ public class SqlResult implements Iterable<Object>
         putObject(name, value);
     }
 
+    /**
+     * Maps the given value to the given name.
+     * 
+     * <p>
+     * The value will also be added implicitely via {@link #putObject(String, Object)}.
+     * </p>
+     * 
+     * @param name
+     *            The mapped name of the value.
+     * @param value
+     *            The value to be mapped.
+     */
     public void put(String name, int value)
     {
         name = name.toUpperCase();
@@ -192,6 +304,18 @@ public class SqlResult implements Iterable<Object>
         putObject(name, value);
     }
     
+    /**
+     * Maps the given value to the given name.
+     * 
+     * <p>
+     * The value will also be added implicitely via {@link #putObject(String, Object)}.
+     * </p>
+     * 
+     * @param name
+     *            The mapped name of the value.
+     * @param value
+     *            The value to be mapped.
+     */
     public void put(String name, long value)
     {
         name = name.toUpperCase();
@@ -199,6 +323,18 @@ public class SqlResult implements Iterable<Object>
         putObject(name, value);
     }
     
+    /**
+     * Maps the given value to the given name.
+     * 
+     * <p>
+     * The value will also be added implicitely via {@link #putObject(String, Object)}.
+     * </p>
+     * 
+     * @param name
+     *            The mapped name of the value.
+     * @param value
+     *            The value to be mapped.
+     */
     public void put(String name, double value)
     {
         name = name.toUpperCase();
@@ -206,6 +342,18 @@ public class SqlResult implements Iterable<Object>
         putObject(name, value);
     }
     
+    /**
+     * Maps the given value to the given name.
+     * 
+     * <p>
+     * The value will also be added implicitely via {@link #putObject(String, Object)}.
+     * </p>
+     * 
+     * @param name
+     *            The mapped name of the value.
+     * @param value
+     *            The value to be mapped.
+     */
     public void put(String name, float value)
     {
         name = name.toUpperCase();
@@ -213,6 +361,18 @@ public class SqlResult implements Iterable<Object>
         putObject(name, value);
     }
     
+    /**
+     * Maps the given value to the given name.
+     * 
+     * <p>
+     * The value will also be added implicitely via {@link #putObject(String, Object)}.
+     * </p>
+     * 
+     * @param name
+     *            The mapped name of the value.
+     * @param value
+     *            The value to be mapped.
+     */
     public void put(String name, Date value)
     {
         name = name.toUpperCase();
@@ -220,6 +380,18 @@ public class SqlResult implements Iterable<Object>
         putObject(name, value);
     }
     
+    /**
+     * Maps the given value to the given name.
+     * 
+     * <p>
+     * The value will also be added implicitely via {@link #putObject(String, Object)}.
+     * </p>
+     * 
+     * @param name
+     *            The mapped name of the value.
+     * @param value
+     *            The value to be mapped.
+     */
     public void put(String name, boolean value)
     {
         name = name.toUpperCase();
@@ -227,84 +399,182 @@ public class SqlResult implements Iterable<Object>
         putObject(name, value);
     }
     
+    /**
+     * Gets the value mapped to the given name.
+     * 
+     * @param name
+     *            The name of the value to get.
+     * @return The value or null if no value of this type was mapped to the given name.
+     */
     public String getString(String name)
     {
         name = name.toUpperCase();
         return stringResults.get(name);
     }
     
+    /**
+     * Gets the value mapped to the given name.
+     * 
+     * @param name
+     *            The name of the value to get.
+     * @return The value or 0 if no value of this type was mapped to the given name.
+     */
     public byte getByte(String name)
     {
         name = name.toUpperCase();
         return byteResults.get(name);
     }
 
+    /**
+     * Gets the value mapped to the given name.
+     * 
+     * @param name
+     *            The name of the value to get.
+     * @return The value or 0 if no value of this type was mapped to the given name.
+     */
     public short getShort(String name)
     {
         name = name.toUpperCase();
         return shortResults.get(name);
     }
 
+    /**
+     * Gets the value mapped to the given name.
+     * 
+     * @param name
+     *            The name of the value to get.
+     * @return The value or 0 if no value of this type was mapped to the given name.
+     */
     public int getInt(String name)
     {
         name = name.toUpperCase();
         return intResults.get(name);
     }
     
+    /**
+     * Gets the value mapped to the given name.
+     * 
+     * @param name
+     *            The name of the value to get.
+     * @return The value or 0 if no value of this type was mapped to the given name.
+     */
     public long getLong(String name)
     {
         name = name.toUpperCase();
         return longResults.get(name);
     }
     
+    /**
+     * Gets the value mapped to the given name.
+     * 
+     * @param name
+     *            The name of the value to get.
+     * @return The value or 0 if no value of this type was mapped to the given name.
+     */
     public double getDouble(String name)
     {
         name = name.toUpperCase();
         return doubleResults.get(name);
     }
     
+    /**
+     * Gets the value mapped to the given name.
+     * 
+     * @param name
+     *            The name of the value to get.
+     * @return The value or 0 if no value of this type was mapped to the given name.
+     */
     public float getFloat(String name)
     {
         name = name.toUpperCase();
         return floatResults.get(name);
     }
     
+    /**
+     * Gets the value mapped to the given name.
+     * 
+     * @param name
+     *            The name of the value to get.
+     * @return The value or null if no value of this type was mapped to the given name.
+     */
     public Date getDate(String name)
     {
         name = name.toUpperCase();
         return dateResults.get(name);
     }
     
+    /**
+     * Gets the value mapped to the given name.
+     * 
+     * @param name
+     *            The name of the value to get.
+     * @return The value or null if no value of this type was mapped to the given name.
+     */
     public Time getTime(String name)
     {
         name = name.toUpperCase();
         return timeResults.get(name);
     }
 
+    /**
+     * Gets the value mapped to the given name.
+     * 
+     * @param name
+     *            The name of the value to get.
+     * @return The value or null if no value of this type was mapped to the given name.
+     */
     public Timestamp getTimestamp(String name)
     {
         name = name.toUpperCase();
         return timestampResults.get(name);
     }
 
+    /**
+     * Gets the value mapped to the given name.
+     * 
+     * @param name
+     *            The name of the value to get.
+     * @return The value or null if no value of this type was mapped to the given name.
+     */
     public Clob getClob(String name)
     {
         name = name.toUpperCase();
         return clobResults.get(name);
     }
 
+    /**
+     * Gets the value mapped to the given name.
+     * 
+     * @param name
+     *            The name of the value to get.
+     * @return The value or null if no value of this type was mapped to the given name.
+     */
     public Blob getBlob(String name)
     {
         name = name.toUpperCase();
         return blobResults.get(name);
     }
 
+    /**
+     * Gets the value mapped to the given name.
+     * 
+     * @param name
+     *            The name of the value to get.
+     * @return The value or false if no value of this type was mapped to the given name.
+     */
     public boolean getBoolean(String name)
     {
         name = name.toUpperCase();
         return booleanResults.get(name);
     }
 
+    /**
+     * Gets the value mapped to the given name.
+     * 
+     * @param name
+     *            The name of the value to get.
+     * @return The value or null if no value was mapped to the given name.
+     */
     public Object get(String name)
     {
         name = name.toUpperCase();
@@ -338,16 +608,37 @@ public class SqlResult implements Iterable<Object>
         return values;
     }
 
+    /**
+     * Sets the column types of the contained column order.
+     * 
+     * @param types
+     *            A map containing the column names as a key and the string representation of {@link SqlType}s as
+     *            values.
+     */
     protected void setColumnTypes(Map<String, String> types)
     {
         this.columnTypes = types;
     }
 
+    /**
+     * Gets a list containing the column names in the correct order.
+     * 
+     * @return The list of names.
+     */
     public List<String> getColumnNames()
     {
         return this.columnOrder;
     }
 
+    /**
+     * Creates an insert statement string that can be used to reproduce this rows values.
+     * 
+     * @param table
+     *            The table to insert into.
+     * @param excludeColumns
+     *            An array containing the names of columns that should not be added via the created insert string.
+     * @return The created insert statement string.
+     */
     public String export(String table, String[] excludeColumns)
     {
         var statement = new InsertStatement(null);

@@ -36,6 +36,9 @@ public class SqlResultSet implements Iterable<SqlResult>
      * <p>
      * {@link #parse(ResultSet)} needs to be called before this instance is usable.
      * </p>
+     * 
+     * @param columnOrder
+     *            A list containing the names of the columns in correct order.
      */
     public SqlResultSet(List<String> columnOrder)
     {
@@ -52,6 +55,16 @@ public class SqlResultSet implements Iterable<SqlResult>
         }
     }
 
+    /**
+     * Creates a new instance.
+     * 
+     * <p>
+     * {@link #parse(ResultSet)} needs to be called before this instance is usable.
+     * </p>
+     * 
+     * @param columnOrder
+     *            An array containing the names of the columns in correct order.
+     */
     public SqlResultSet(String... columnOrder)
     {
         this(List.of(columnOrder));
@@ -80,6 +93,12 @@ public class SqlResultSet implements Iterable<SqlResult>
         }
     }
 
+    /**
+     * Sets the {@link SqlResult results} that should be wrapped by this instance.
+     * 
+     * @param results
+     *            A list containing all results that this instance should wrap.
+     */
     public void setResults(List<SqlResult> results)
     {
         for (SqlResult result : results)
