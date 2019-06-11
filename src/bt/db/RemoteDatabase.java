@@ -27,16 +27,34 @@ public abstract class RemoteDatabase extends DatabaseAccess
     protected ScheduledFuture triggerCheck;
     protected long triggerCheckInterval;
 
+    /**
+     * Creates a new instance which uses the default local db connection string and a trigger check interval of 3
+     * seconds.
+     */
     protected RemoteDatabase()
     {
         this(DEFAULT_LOCAL_DB, 3000);
     }
 
+    /**
+     * Creates a new instance which uses the given connection string and a trigger check interval of 3 seconds.
+     * 
+     * @param dbURL
+     *            The DB connection string.
+     */
     protected RemoteDatabase(String dbURL)
     {
         this(dbURL, 3000);
     }
 
+    /**
+     * Creates a new instance which uses the given connection string and a given trigger check interval.
+     * 
+     * @param dbURL
+     *            The DB connection string.
+     * @param triggerCheckInterval
+     *            The trigger check interval in milliseconds.
+     */
     protected RemoteDatabase(String dbURL, long triggerCheckInterval)
     {
         super(dbURL);
@@ -47,9 +65,25 @@ public abstract class RemoteDatabase extends DatabaseAccess
         startTriggerCheck();
     }
 
+    /**
+     * Creates a new instance which uses the given configuration and a trigger check interval of 3 seconds..
+     * 
+     * @param configuration
+     */
     protected RemoteDatabase(DatabaseConfiguration configuration)
     {
-        this(configuration.toString());
+        this(configuration.toString(), 3000);
+    }
+
+    /**
+     * Creates a new instance which uses the given configuration and trigger check interval.
+     * 
+     * @param configuration
+     * @param triggerCheckInterval
+     */
+    protected RemoteDatabase(DatabaseConfiguration configuration, long triggerCheckInterval)
+    {
+        this(configuration.toString(), triggerCheckInterval);
     }
 
     private void createTriggerTable()

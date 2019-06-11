@@ -19,11 +19,20 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
     /** The set derby home path. */
     protected static String derbyHome;
 
+    /**
+     * Creates a new instance which uses the default local db connection string.
+     */
     public EmbeddedDatabase()
     {
         this(DEFAULT_LOCAL_DB);
     }
 
+    /**
+     * Creates a new instance which uses the given connection string.
+     * 
+     * @param dbURL
+     *            The DB connection string.
+     */
     public EmbeddedDatabase(String dbURL)
     {
         super(dbURL);
@@ -34,11 +43,19 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
         createTables();
     }
 
+    /**
+     * Creates a new instance which uses the given configuration.
+     * 
+     * @param configuration
+     */
     protected EmbeddedDatabase(DatabaseConfiguration configuration)
     {
         this(configuration.toString());
     }
 
+    /**
+     * @see bt.db.DatabaseAccess#createDefaultProcedures()
+     */
     @Override
     protected void createDefaultProcedures()
     {
