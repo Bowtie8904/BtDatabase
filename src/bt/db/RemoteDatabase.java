@@ -119,7 +119,7 @@ public abstract class RemoteDatabase extends DatabaseAccess
                         .from("recent_triggers")
                         .where("ID").notIn(select("trigger_id")
                                 .from("handled_triggers")
-                                .where("db_id").equals(getID())
+                                .where("db_id").equals(getInstanceID())
                                 .unprepared())
                         .onLessThan(1, (num, res) ->
                         {
@@ -141,13 +141,13 @@ public abstract class RemoteDatabase extends DatabaseAccess
                     switch (triggerType.toUpperCase())
                     {
                     case "INSERT":
-                        onInsert(getID(), table, idFieldName, rowId);
+                        onInsert(getInstanceID(), table, idFieldName, rowId);
                         break;
                     case "UPDATE":
-                        onUpdate(getID(), table, idFieldName, rowId);
+                        onUpdate(getInstanceID(), table, idFieldName, rowId);
                         break;
                     case "DELETE":
-                        onDelete(getID(), table, idFieldName, rowId);
+                        onDelete(getInstanceID(), table, idFieldName, rowId);
                         break;
                     }
                 }
@@ -155,7 +155,7 @@ public abstract class RemoteDatabase extends DatabaseAccess
                 for (long id : ids)
                 {
                     insert().into("handled_triggers")
-                            .set("db_id", getID())
+                            .set("db_id", getInstanceID())
                             .set("trigger_id", id)
                             .execute();
                 }

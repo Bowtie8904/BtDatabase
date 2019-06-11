@@ -187,7 +187,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                     .oldAs("oldRow")
                     .forEachRow()
                     .call("onDelete")
-                    .with(db.getID(), this.name.toUpperCase(), this.identity, new ColumnEntry("oldRow", this.identity))
+                    .with(db.getInstanceID(), this.name.toUpperCase(), this.identity, new ColumnEntry("oldRow", this.identity))
                     .replace()
                     .execute(printLogs);
 
@@ -197,7 +197,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                     .newAs("newRow")
                     .forEachRow()
                     .call("onInsert")
-                    .with(db.getID(), this.name.toUpperCase(), this.identity, new ColumnEntry("newRow", this.identity))
+                    .with(db.getInstanceID(), this.name.toUpperCase(), this.identity, new ColumnEntry("newRow", this.identity))
                     .replace()
                     .execute(printLogs);
 
@@ -207,7 +207,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                     .newAs("newRow")
                     .forEachRow()
                     .call("onUpdate")
-                    .with(db.getID(), this.name.toUpperCase(), this.identity, new ColumnEntry("newRow", this.identity))
+                    .with(db.getInstanceID(), this.name.toUpperCase(), this.identity, new ColumnEntry("newRow", this.identity))
                     .replace()
                     .execute(printLogs);
         }

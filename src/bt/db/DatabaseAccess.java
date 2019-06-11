@@ -91,7 +91,7 @@ public abstract class DatabaseAccess implements Killable
      * The runtime unique ID of this database instance. Used to map this instance in {@link #instances}. This ID will
      * change with every program execution and is only stored during runtime.
      */
-    private String id;
+    private String instanceID;
 
     /** The connection to the database. */
     protected Connection connection;
@@ -175,10 +175,10 @@ public abstract class DatabaseAccess implements Killable
         checkID();
         synchronized (DatabaseAccess.class)
         {
-            instances.put(this.id, this);
+            instances.put(this.instanceID, this);
         }
         createDefaultProcedures();
-        log.print(this, "Setup database instance " + this.id);
+        log.print(this, "Setup database instance " + this.instanceID);
         log.print(this, "Using connection string: " + this.dbConnectionString);
     }
 
@@ -187,9 +187,9 @@ public abstract class DatabaseAccess implements Killable
      * 
      * @return The String ID.
      */
-    public String getID()
+    public String getInstanceID()
     {
-        return this.id;
+        return this.instanceID;
     }
 
     /**
@@ -201,12 +201,12 @@ public abstract class DatabaseAccess implements Killable
      */
     protected void checkID()
     {
-        this.id = getProperty("instanceID");
+        this.instanceID = getProperty("instanceID");
 
-        if (this.id == null)
+        if (this.instanceID == null)
         {
-            this.id = StringID.uniqueID();
-            setProperty("instanceID", this.id);
+            this.instanceID = StringID.uniqueID();
+            setProperty("instanceID", this.instanceID);
         }
     }
 
@@ -355,7 +355,7 @@ public abstract class DatabaseAccess implements Killable
         log.print(this,
                 "Registered database listener of type '" + listener.getClass().getName() + "' for '"
                         + listenFor.getName() + "' to instance "
-                        + this.getID() + ".");
+                        + this.getInstanceID() + ".");
 
         return cons;
     }
@@ -377,7 +377,7 @@ public abstract class DatabaseAccess implements Killable
             log.print(this,
                     "Unregistered database listener of type '" + listener.getClass().getName() + "' for '"
                             + type.getName() + "' to instance "
-                            + this.getID() + ".");
+                            + this.getInstanceID() + ".");
         }
     }
 
@@ -445,7 +445,7 @@ public abstract class DatabaseAccess implements Killable
                 this.connection.close();
                 synchronized (DatabaseAccess.class)
                 {
-                    instances.remove(this.id);
+                    instances.remove(this.instanceID);
                 }
                 log.print(this, "Closed database.");
             }
