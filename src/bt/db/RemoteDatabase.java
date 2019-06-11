@@ -7,9 +7,6 @@ import bt.db.config.DatabaseConfiguration;
 import bt.db.constants.Generated;
 import bt.db.constants.SqlType;
 import bt.db.constants.SqlValue;
-import bt.db.listener.evnt.DeleteEvent;
-import bt.db.listener.evnt.InsertEvent;
-import bt.db.listener.evnt.UpdateEvent;
 import bt.db.statement.result.SqlResult;
 import bt.db.statement.result.SqlResultSet;
 import bt.utils.thread.Threads;
@@ -144,13 +141,13 @@ public abstract class RemoteDatabase extends DatabaseAccess
                     switch (triggerType.toUpperCase())
                     {
                     case "INSERT":
-                        onInsert(table, idFieldName, rowId);
+                        onInsert(getID(), table, idFieldName, rowId);
                         break;
                     case "UPDATE":
-                        onUpdate(table, idFieldName, rowId);
+                        onUpdate(getID(), table, idFieldName, rowId);
                         break;
                     case "DELETE":
-                        onDelete(table, idFieldName, rowId);
+                        onDelete(getID(), table, idFieldName, rowId);
                         break;
                     }
                 }
@@ -169,170 +166,5 @@ public abstract class RemoteDatabase extends DatabaseAccess
             }
 
         }, this.triggerCheckInterval, this.triggerCheckInterval, TimeUnit.MILLISECONDS, "DATABASE_TRIGGER_CHECK");
-    }
-
-    public synchronized void onInsert(String table, String idFieldName, long id)
-    {
-        onInsert(table, idFieldName, id, new String[] {});
-    }
-
-    public synchronized void onInsert(String table, String idFieldName, long id, String data1)
-    {
-        onInsert(table, idFieldName, id, new String[]
-        {
-                data1
-        });
-    }
-
-    public synchronized void onInsert(String table, String idFieldName, long id, String data1, String data2)
-    {
-        onInsert(table, idFieldName, id, new String[]
-        {
-                data1, data1
-        });
-    }
-
-    public synchronized void onInsert(String table, String idFieldName, long id, String data1, String data2,
-            String data3)
-    {
-        onInsert(table, idFieldName, id, new String[]
-        {
-                data1, data2, data3
-        });
-    }
-
-    public synchronized void onInsert(String table, String idFieldName, long id, String data1, String data2,
-            String data3, String data4)
-    {
-        onInsert(table, idFieldName, id, new String[]
-        {
-                data1, data2, data3, data4
-        });
-    }
-
-    public synchronized void onInsert(String table, String idFieldName, long id, String data1, String data2,
-            String data3, String data4, String data5)
-    {
-        onInsert(table, idFieldName, id, new String[]
-        {
-                data1, data2, data3, data4, data5
-        });
-    }
-
-    public synchronized void onInsert(String table, String idFieldName, long id, String... data)
-    {
-        int count = this.triggerDispatcher.dispatch(new InsertEvent(this, table, idFieldName, id, data));
-
-        log.print(this, "Dispatched insert event to " + count + " listeners.");
-    }
-
-    public synchronized void onUpdate(String table, String idFieldName, long id)
-    {
-        onUpdate(table, idFieldName, id, new String[] {});
-    }
-
-    public synchronized void onUpdate(String table, String idFieldName, long id, String data1)
-    {
-        onUpdate(table, idFieldName, id, new String[]
-        {
-                data1
-        });
-    }
-
-    public synchronized void onUpdate(String table, String idFieldName, long id, String data1, String data2)
-    {
-        onUpdate(table, idFieldName, id, new String[]
-        {
-                data1, data1
-        });
-    }
-
-    public synchronized void onUpdate(String table, String idFieldName, long id, String data1, String data2,
-            String data3)
-    {
-        onUpdate(table, idFieldName, id, new String[]
-        {
-                data1, data2, data3
-        });
-    }
-
-    public synchronized void onUpdate(String table, String idFieldName, long id, String data1, String data2,
-            String data3, String data4)
-    {
-        onUpdate(table, idFieldName, id, new String[]
-        {
-                data1, data2, data3, data4
-        });
-    }
-
-    public synchronized void onUpdate(String table, String idFieldName, long id, String data1, String data2,
-            String data3, String data4, String data5)
-    {
-        onUpdate(table, idFieldName, id, new String[]
-        {
-                data1, data2, data3, data4, data5
-        });
-    }
-
-    public synchronized void onUpdate(String table, String idFieldName, long id, String... data)
-    {
-        int count = this.triggerDispatcher.dispatch(new UpdateEvent(this, table, idFieldName, id, data));
-
-        log.print(this, "Dispatched update event to " + count + " listeners.");
-    }
-
-    public synchronized void onDelete(String table, String idFieldName, long id)
-    {
-        onDelete(table, idFieldName, id, new String[] {});
-    }
-
-    public synchronized void onDelete(String table, String idFieldName, long id, String data1)
-    {
-        onDelete(table, idFieldName, id, new String[]
-        {
-                data1
-        });
-    }
-
-    public synchronized void onDelete(String table, String idFieldName, long id, String data1, String data2)
-    {
-        onDelete(table, idFieldName, id, new String[]
-        {
-                data1, data1
-        });
-    }
-
-    public synchronized void onDelete(String table, String idFieldName, long id, String data1, String data2,
-            String data3)
-    {
-        onDelete(table, idFieldName, id, new String[]
-        {
-                data1, data2, data3
-        });
-    }
-
-    public synchronized void onDelete(String table, String idFieldName, long id, String data1, String data2,
-            String data3, String data4)
-    {
-        onDelete(table, idFieldName, id, new String[]
-        {
-                data1, data2, data3, data4
-        });
-    }
-
-    public synchronized void onDelete(String table, String idFieldName, long id, String data1, String data2,
-            String data3, String data4, String data5)
-    {
-        onDelete(table, idFieldName, id, new String[]
-        {
-                data1, data2, data3, data4, data5
-        });
-    }
-
-    public synchronized void onDelete(String table, String idFieldName, long id, String... data)
-    {
-        int count = this.triggerDispatcher.dispatch(new DeleteEvent(this, table, idFieldName, id, data));
-
-        log.print(this, "Dispatched delete event to " + count + " listeners.");
     }
 }

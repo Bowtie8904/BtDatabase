@@ -977,6 +977,123 @@ public abstract class DatabaseAccess implements Killable
     }
 
     /**
+     * Calls {@link #onInsert(InsertEvent)} of the database with the given instanceID.
+     * 
+     * @param instanceID
+     *            The instanceID of the database that is concerned.
+     * @param table
+     *            The table that has been inserted into.
+     * @param idFieldName
+     *            The name of the identity field inside the table.
+     * @param id
+     *            The id (identity value of the new row).
+     */
+    public synchronized static void onInsert(String instanceID, String table, String idFieldName, long id)
+    {
+        DatabaseAccess instance = getInstance(instanceID);
+
+        if (instance != null)
+        {
+            instance.onInsert(new InsertEvent(instance, table, idFieldName, id));
+        }
+    }
+
+    /**
+     * Dispatches the given {@link InsertEvent} to all concerned listeners.
+     * 
+     * <p>
+     * This method exists alongside the static {@link #onInsert(String, String, String, long) onInsert} to allow
+     * overriding of this logic.
+     * </p>
+     * 
+     * @param event
+     *            The event to dispatch.
+     */
+    protected void onInsert(InsertEvent event)
+    {
+        int count = this.triggerDispatcher.dispatch(event);
+        log.print(this, "Dispatched insert event to " + count + " listeners.");
+    }
+
+    /**
+     * Calls {@link #onUpdate(UpdateEvent)} of the database with the given instanceID.
+     * 
+     * @param instanceID
+     *            The instanceID of the database that is concerned.
+     * @param table
+     *            The table that has been updated.
+     * @param idFieldName
+     *            The name of the identity field inside the table.
+     * @param id
+     *            The id (identity value of the updated row).
+     */
+    public synchronized static void onUpdate(String instanceID, String table, String idFieldName, long id)
+    {
+        DatabaseAccess instance = getInstance(instanceID);
+
+        if (instance != null)
+        {
+            instance.onUpdate(new UpdateEvent(instance, table, idFieldName, id));
+        }
+    }
+
+    /**
+     * Dispatches the given {@link UpdateEvent} to all concerned listeners.
+     * 
+     * <p>
+     * This method exists alongside the static {@link #onUpdate(String, String, String, long) onUpdate} to allow
+     * overriding of this logic.
+     * </p>
+     * 
+     * @param event
+     *            The event to dispatch.
+     */
+    protected void onUpdate(UpdateEvent event)
+    {
+        int count = this.triggerDispatcher.dispatch(event);
+        log.print(this, "Dispatched update event to " + count + " listeners.");
+    }
+
+    /**
+     * Calls {@link #onDelete(DeleteEvent)} of the database with the given instanceID.
+     * 
+     * @param instanceID
+     *            The instanceID of the database that is concerned.
+     * @param table
+     *            The table that has been deleted from.
+     * @param idFieldName
+     *            The name of the identity field inside the table.
+     * @param id
+     *            The id (identity value of the deleted row).
+     */
+    public synchronized static void onDelete(String instanceID, String table, String idFieldName, long id)
+    {
+        DatabaseAccess instance = getInstance(instanceID);
+
+        if (instance != null)
+        {
+            instance.onDelete(new DeleteEvent(instance, table, idFieldName, id));
+        }
+    }
+
+    /**
+     * Dispatches the given {@link DeleteEvent} to all concerned listeners.
+     * 
+     * <p>
+     * This method exists alongside the static {@link #onDelete(String, String, String, long) onDelete} to allow
+     * overriding of this logic.
+     * </p>
+     * 
+     * @param event
+     *            The event to dispatch.
+     */
+    protected void onDelete(DeleteEvent event)
+    {
+        int count = this.triggerDispatcher.dispatch(event);
+        log.print(this, "Dispatched delete event to " + count + " listeners.");
+    }
+
+    /**
      * Defines the tables that should be created.
      * 
      * <p>
