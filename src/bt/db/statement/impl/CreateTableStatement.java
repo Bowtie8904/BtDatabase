@@ -142,7 +142,8 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                                    .from(table)
                                    .unprepared()
                                    .onLessThan(1,
-                                               (i, set) -> {
+                                               (i, set) ->
+                                               {
                                                    return set;
                                                });
         this.createDefaultTriggers = false;

@@ -75,7 +75,8 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
                                          SqlType.LONG)
                               .call(this.getClass().getName() + ".onInsert")
                               .replace()
-                              .onFail((s, e) -> {
+                              .onFail((s, e) ->
+                              {
                                   return 0;
                               })
                               .execute();
@@ -101,7 +102,8 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
                                      SqlType.LONG)
                           .call(this.getClass().getName() + ".onDelete")
                           .replace()
-                          .onFail((s, e) -> {
+                          .onFail((s, e) ->
+                          {
                               return 0;
                           })
                           .execute();
@@ -127,7 +129,8 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
                                      SqlType.LONG)
                           .call(this.getClass().getName() + ".onUpdate")
                           .replace()
-                          .onFail((s, e) -> {
+                          .onFail((s, e) ->
+                          {
                               return 0;
                           })
                           .execute();

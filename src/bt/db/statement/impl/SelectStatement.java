@@ -77,7 +77,8 @@ public class SelectStatement extends SqlStatement<SelectStatement>
         this.statementKeyword = "SELECT";
 
         this.lowerThreshhold = 1;
-        this.onLessThan = (i, set) -> {
+        this.onLessThan = (i, set) ->
+        {
             DatabaseAccess.log.print("< " + set.getSql() + " > did not return any data.");
 
             if (set.getValues().size() > 0)
@@ -121,7 +122,8 @@ public class SelectStatement extends SqlStatement<SelectStatement>
         this.statementKeyword = "SELECT";
 
         this.lowerThreshhold = 1;
-        this.onLessThan = (i, set) -> {
+        this.onLessThan = (i, set) ->
+        {
             DatabaseAccess.log.print("< " + set.getSql() + " > did not return any data.");
 
             if (set.getValues().size() > 0)
@@ -416,7 +418,8 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     public SelectStatement onLessThan(int lowerThreshhold, SelectStatement statement)
     {
         this.lowerThreshhold = lowerThreshhold;
-        this.onLessThan = (i, set) -> {
+        this.onLessThan = (i, set) ->
+        {
             return statement.execute();
         };
         return this;
@@ -435,7 +438,8 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     public SelectStatement onLessThan(int lowerThreshhold, SqlModifyStatement statement)
     {
         this.lowerThreshhold = lowerThreshhold;
-        this.onLessThan = (i, set) -> {
+        this.onLessThan = (i, set) ->
+        {
             statement.execute();
             return set;
         };
@@ -477,7 +481,8 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     public SelectStatement onMoreThan(int higherThreshhold, SelectStatement statement)
     {
         this.higherThreshhold = higherThreshhold;
-        this.onMoreThan = (i, set) -> {
+        this.onMoreThan = (i, set) ->
+        {
             return statement.execute();
         };
         return this;
@@ -496,7 +501,8 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     public SelectStatement onMoreThan(int higherThreshhold, SqlModifyStatement statement)
     {
         this.higherThreshhold = higherThreshhold;
-        this.onMoreThan = (i, set) -> {
+        this.onMoreThan = (i, set) ->
+        {
             statement.execute();
             return set;
         };
@@ -550,7 +556,8 @@ public class SelectStatement extends SqlStatement<SelectStatement>
      */
     public SelectStatement onFail(SelectStatement onFail)
     {
-        this.onFail = (statement, e) -> {
+        this.onFail = (statement, e) ->
+        {
             return onFail.execute();
         };
 

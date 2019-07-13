@@ -134,7 +134,8 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
      */
     public DeleteStatement onFail(SqlModifyStatement onFail)
     {
-        this.onFail = (statement, e) -> {
+        this.onFail = (statement, e) ->
+        {
             return onFail.execute();
         };
 
@@ -172,7 +173,8 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
     public DeleteStatement onLessThan(int lowerThreshhold, SqlModifyStatement statement)
     {
         this.lowerThreshhold = lowerThreshhold;
-        this.onLessThan = (i, set) -> {
+        this.onLessThan = (i, set) ->
+        {
             return statement.execute();
         };
         return this;
@@ -213,7 +215,8 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
     public DeleteStatement onMoreThan(int higherThreshhold, SqlModifyStatement statement)
     {
         this.higherThreshhold = higherThreshhold;
-        this.onMoreThan = (i, set) -> {
+        this.onMoreThan = (i, set) ->
+        {
             return statement.execute();
         };
         return this;

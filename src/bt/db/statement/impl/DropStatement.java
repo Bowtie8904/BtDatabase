@@ -222,7 +222,8 @@ public class DropStatement extends SqlModifyStatement<DropStatement, DropStateme
      */
     public DropStatement onFail(SqlModifyStatement onFail)
     {
-        this.onFail = (statement, e) -> {
+        this.onFail = (statement, e) ->
+        {
             return onFail.execute();
         };
 

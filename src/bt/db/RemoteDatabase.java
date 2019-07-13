@@ -180,7 +180,8 @@ public abstract class RemoteDatabase extends DatabaseAccess
             this.triggerCheck.cancel(false);
         }
 
-        this.triggerCheck = Threads.get().scheduleAtFixedRateDaemon(() -> {
+        this.triggerCheck = Threads.get().scheduleAtFixedRateDaemon(() ->
+        {
             try
             {
                 SqlResultSet set = select()
@@ -192,7 +193,8 @@ public abstract class RemoteDatabase extends DatabaseAccess
                                                                       .equals(getInstanceID())
                                                                       .unprepared())
                                            .onLessThan(1,
-                                                       (num, res) -> {
+                                                       (num, res) ->
+                                                       {
                                                            return res;
                                                        })
                                            .execute();

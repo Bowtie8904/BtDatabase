@@ -41,7 +41,8 @@ public abstract class CreateStatement<T extends CreateStatement, K extends Creat
      */
     public CreateStatement<T, K> onFail(SqlModifyStatement onFail)
     {
-        this.onFail = (statement, e) -> {
+        this.onFail = (statement, e) ->
+        {
             return onFail.execute();
         };
 

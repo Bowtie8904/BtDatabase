@@ -523,7 +523,8 @@ public abstract class DatabaseAccess implements Killable
                                                                               .where("property_key")
                                                                               .equals(key)
                                                                               .onLessThan(1,
-                                                                                          (i, set) -> {
+                                                                                          (i, set) ->
+                                                                                          {
                                                                                               return null;
                                                                                           })
                                                                               .execute();
@@ -557,7 +558,8 @@ public abstract class DatabaseAccess implements Killable
                               .add()
 
                               .createDefaultTriggers(false)
-                              .onFail((s, e) -> {
+                              .onFail((s, e) ->
+                              {
                                   return 0;
                               })
                               .execute();
@@ -599,7 +601,8 @@ public abstract class DatabaseAccess implements Killable
                               .add()
 
                               .createDefaultTriggers(false)
-                              .onFail((s, e) -> {
+                              .onFail((s, e) ->
+                              {
                                   return 0;
                               })
                               .execute();
@@ -758,7 +761,8 @@ public abstract class DatabaseAccess implements Killable
         SqlResultSet set = select()
                                    .from(table)
                                    .onLessThan(1,
-                                               (num, res) -> {
+                                               (num, res) ->
+                                               {
                                                    return res;
                                                })
                                    .execute();
@@ -818,7 +822,8 @@ public abstract class DatabaseAccess implements Killable
                                               .where("tabletype")
                                               .equals("T")
                                               .onLessThan(1,
-                                                          (num, res) -> {
+                                                          (num, res) ->
+                                                          {
                                                               return res;
                                                           })
                                               .execute();
@@ -1020,7 +1025,8 @@ public abstract class DatabaseAccess implements Killable
         List<Entry<String, String>> columnTypes = select()
                                                           .from(table)
                                                           .onLessThan(1,
-                                                                      (num, res) -> {
+                                                                      (num, res) ->
+                                                                      {
                                                                           return res;
                                                                       })
                                                           .execute()
@@ -1040,7 +1046,8 @@ public abstract class DatabaseAccess implements Killable
                                    .where("table_name")
                                    .equals(table.toUpperCase())
                                    .onLessThan(1,
-                                               (num, res) -> {
+                                               (num, res) ->
+                                               {
                                                    return res;
                                                })
                                    .execute();

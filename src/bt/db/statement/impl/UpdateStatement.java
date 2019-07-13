@@ -281,7 +281,8 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      */
     public UpdateStatement onFail(SqlModifyStatement onFail)
     {
-        this.onFail = (statement, e) -> {
+        this.onFail = (statement, e) ->
+        {
             return onFail.execute();
         };
 
@@ -319,7 +320,8 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     public UpdateStatement onLessThan(int lowerThreshhold, SqlModifyStatement statement)
     {
         this.lowerThreshhold = lowerThreshhold;
-        this.onLessThan = (i, set) -> {
+        this.onLessThan = (i, set) ->
+        {
             return statement.execute();
         };
         return this;
@@ -360,7 +362,8 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     public UpdateStatement onMoreThan(int higherThreshhold, SqlModifyStatement statement)
     {
         this.higherThreshhold = higherThreshhold;
-        this.onMoreThan = (i, set) -> {
+        this.onMoreThan = (i, set) ->
+        {
             return statement.execute();
         };
         return this;

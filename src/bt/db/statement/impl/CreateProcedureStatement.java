@@ -175,7 +175,8 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
                 log("Replacing procedure '" + this.name + "'.",
                     printLogs);
 
-                DropStatement drop = this.db.drop().procedure(this.name).onFail((s, ex) -> {
+                DropStatement drop = this.db.drop().procedure(this.name).onFail((s, ex) ->
+                {
                     log(ex.getMessage(),
                         printLogs);
                     return 0;

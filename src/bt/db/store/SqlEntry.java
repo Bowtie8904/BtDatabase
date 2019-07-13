@@ -265,7 +265,8 @@ public interface SqlEntry
                                    .or(idField)
                                    .greaterOrEqual(checkValue)
                                    .onLessThan(1,
-                                               (i, sqlSet) -> {
+                                               (i, sqlSet) ->
+                                               {
                                                    return sqlSet;
                                                })
                                    .execute();
@@ -307,7 +308,8 @@ public interface SqlEntry
                                  .or(idField)
                                  .greaterOrEqual(checkValue)
                                  .onLessThan(1,
-                                             (i, sqlSet) -> {
+                                             (i, sqlSet) ->
+                                             {
                                                  return sqlSet;
                                              })
                                  .execute();
@@ -525,7 +527,8 @@ public interface SqlEntry
                                  .where(id.getKey())
                                  .equals(id.getSecondValue().longValue())
                                  .onLessThan(1,
-                                             (i, sqlSet) -> {
+                                             (i, sqlSet) ->
+                                             {
                                                  return sqlSet;
                                              })
                                  .execute();
@@ -784,14 +787,16 @@ public interface SqlEntry
                        SqlType.LONG);
 
             insert.commit();
-            insert.onFail((select, e) -> {
+            insert.onFail((select, e) ->
+            {
                 DatabaseAccess.log.print(e);
                 db.rollback();
                 return -1;
             });
 
             update.commit();
-            update.onFail((select, e) -> {
+            update.onFail((select, e) ->
+            {
                 db.rollback();
                 return -1;
             });
@@ -806,7 +811,8 @@ public interface SqlEntry
                           insert)
               .onMoreThan(0,
                           update)
-              .onFail((select, e) -> {
+              .onFail((select, e) ->
+              {
                   db.rollback();
                   return null;
               })
