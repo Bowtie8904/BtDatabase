@@ -33,7 +33,8 @@ public class Create extends SqlStatement<Create>
      */
     public CreateTriggerStatement trigger(String name)
     {
-        return new CreateTriggerStatement(this.db, name);
+        return new CreateTriggerStatement(this.db,
+                                          name);
     }
 
     /**
@@ -45,7 +46,8 @@ public class Create extends SqlStatement<Create>
      */
     public CreateTableStatement table(String name)
     {
-        return new CreateTableStatement(this.db, name);
+        return new CreateTableStatement(this.db,
+                                        name);
     }
 
     /**
@@ -57,6 +59,7 @@ public class Create extends SqlStatement<Create>
      */
     public CreateProcedureStatement procedure(String name)
     {
-        return new CreateProcedureStatement(this.db, name);
+        return new CreateProcedureStatement(this.db,
+                                            name);
     }
 }

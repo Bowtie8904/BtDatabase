@@ -34,7 +34,8 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
      */
     public CreateProcedureStatement(DatabaseAccess db, String name)
     {
-        super(db, name);
+        super(db,
+              name);
         this.parameters = new ArrayList<>();
         this.statementKeyword = "CREATE PROCEDURE";
     }
@@ -52,7 +53,7 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
     {
         this.parameters.add(new String[]
         {
-                name, type.toString()
+          name, type.toString()
         });
 
         return this;
@@ -96,7 +97,8 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
                 size += i + ", ";
             }
 
-            size = size.substring(0, size.length() - 2);
+            size = size.substring(0,
+                                  size.length() - 2);
             size += ")";
 
             param[1] = param[1] + size;
@@ -156,7 +158,8 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
 
         try (Statement statement = this.db.getConnection().createStatement())
         {
-            log("Executing: " + sql, printLogs);
+            log("Executing: " + sql,
+                printLogs);
             statement.execute(sql);
             result = 1;
 
@@ -169,11 +172,12 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
         {
             if (e.getSQLState().equals(ALREADY_EXISTS_ERROR) && this.replace)
             {
-                log("Replacing procedure '" + this.name + "'.", printLogs);
+                log("Replacing procedure '" + this.name + "'.",
+                    printLogs);
 
-                DropStatement drop = this.db.drop().procedure(this.name).onFail((s, ex) ->
-                {
-                    log(ex.getMessage(), printLogs);
+                DropStatement drop = this.db.drop().procedure(this.name).onFail((s, ex) -> {
+                    log(ex.getMessage(),
+                        printLogs);
                     return 0;
                 });
 
@@ -194,7 +198,8 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
                     {
                         if (this.onFail != null)
                         {
-                            result = this.onFail.apply(this, ex);
+                            result = this.onFail.apply(this,
+                                                       ex);
                         }
                         else
                         {
@@ -205,11 +210,13 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
                 }
                 else
                 {
-                    log("Failed to drop procedure.", printLogs);
+                    log("Failed to drop procedure.",
+                        printLogs);
 
                     if (this.onFail != null)
                     {
-                        result = this.onFail.apply(this, e);
+                        result = this.onFail.apply(this,
+                                                   e);
                     }
                     else
                     {
@@ -222,7 +229,8 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
             {
                 if (this.onFail != null)
                 {
-                    result = this.onFail.apply(this, e);
+                    result = this.onFail.apply(this,
+                                               e);
                 }
                 else
                 {
@@ -248,7 +256,8 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
             sql += param[0] + " " + param[1] + ", ";
         }
 
-        sql = sql.substring(0, sql.length() - 2);
+        sql = sql.substring(0,
+                            sql.length() - 2);
         sql += ") PARAMETER STYLE JAVA LANGUAGE JAVA DYNAMIC RESULT SETS 0 EXTERNAL NAME '" + this.method + "'";
 
         return sql;

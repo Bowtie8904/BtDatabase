@@ -222,8 +222,7 @@ public class DropStatement extends SqlModifyStatement<DropStatement, DropStateme
      */
     public DropStatement onFail(SqlModifyStatement onFail)
     {
-        this.onFail = (statement, e) ->
-        {
+        this.onFail = (statement, e) -> {
             return onFail.execute();
         };
 
@@ -269,7 +268,8 @@ public class DropStatement extends SqlModifyStatement<DropStatement, DropStateme
 
         try (PreparedStatement statement = this.db.getConnection().prepareStatement(sql))
         {
-            log("Executing: " + sql, printLogs);
+            log("Executing: " + sql,
+                printLogs);
             statement.executeUpdate();
             result = 1;
 
@@ -282,7 +282,8 @@ public class DropStatement extends SqlModifyStatement<DropStatement, DropStateme
         {
             if (this.onFail != null)
             {
-                result = this.onFail.apply(this, e);
+                result = this.onFail.apply(this,
+                                           e);
             }
             else
             {

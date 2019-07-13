@@ -41,9 +41,8 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     {
         super(db);
         this.statementKeyword = "INSERT INTO";
-        
-        this.onDuplicateKey = (e) ->
-        {
+
+        this.onDuplicateKey = (e) -> {
             System.err.println(e.getMessage());
             return -1;
         };
@@ -88,12 +87,12 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     {
         this.tables = new String[]
         {
-                table.toUpperCase()
+          table.toUpperCase()
         };
 
         return this;
     }
-    
+
     /**
      * Defines a select statement whichs result set contains the data that will be inserted.
      * 
@@ -135,7 +134,9 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
      */
     public InsertStatement setNull(String column, SqlType sqlType)
     {
-        return set(column, null, sqlType);
+        return set(column,
+                   null,
+                   sqlType);
     }
 
     /**
@@ -151,7 +152,10 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
      */
     public InsertStatement set(String column, Object value, SqlType sqlType)
     {
-        SetClause<InsertStatement> set = new SetClause<InsertStatement>(this, column, value, sqlType);
+        SetClause<InsertStatement> set = new SetClause<InsertStatement>(this,
+                                                                        column,
+                                                                        value,
+                                                                        sqlType);
         addSetClause(set);
         return this;
     }
@@ -168,7 +172,9 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
      */
     public InsertStatement set(String column, Supplier<Long> longSupplier)
     {
-        SetClause<InsertStatement> set = new SetClause<InsertStatement>(this, column, longSupplier);
+        SetClause<InsertStatement> set = new SetClause<InsertStatement>(this,
+                                                                        column,
+                                                                        longSupplier);
         addSetClause(set);
         return this;
     }
@@ -184,7 +190,9 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
      */
     public InsertStatement set(String column, Date value)
     {
-        return set(column, value, SqlType.DATE);
+        return set(column,
+                   value,
+                   SqlType.DATE);
     }
 
     /**
@@ -198,7 +206,9 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
      */
     public InsertStatement set(String column, Time value)
     {
-        return set(column, value, SqlType.TIME);
+        return set(column,
+                   value,
+                   SqlType.TIME);
     }
 
     /**
@@ -212,7 +222,9 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
      */
     public InsertStatement set(String column, Timestamp value)
     {
-        return set(column, value, SqlType.TIMESTAMP);
+        return set(column,
+                   value,
+                   SqlType.TIMESTAMP);
     }
 
     /**
@@ -226,7 +238,9 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
      */
     public InsertStatement set(String column, int value)
     {
-        return set(column, value, SqlType.INTEGER);
+        return set(column,
+                   value,
+                   SqlType.INTEGER);
     }
 
     /**
@@ -240,7 +254,9 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
      */
     public InsertStatement set(String column, long value)
     {
-        return set(column, value, SqlType.LONG);
+        return set(column,
+                   value,
+                   SqlType.LONG);
     }
 
     /**
@@ -254,7 +270,9 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
      */
     public InsertStatement set(String column, double value)
     {
-        return set(column, value, SqlType.DOUBLE);
+        return set(column,
+                   value,
+                   SqlType.DOUBLE);
     }
 
     /**
@@ -268,7 +286,9 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
      */
     public InsertStatement set(String column, float value)
     {
-        return set(column, value, SqlType.FLOAT);
+        return set(column,
+                   value,
+                   SqlType.FLOAT);
     }
 
     /**
@@ -282,7 +302,9 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
      */
     public InsertStatement set(String column, boolean value)
     {
-        return set(column, value, SqlType.BOOLEAN);
+        return set(column,
+                   value,
+                   SqlType.BOOLEAN);
     }
 
     /**
@@ -296,7 +318,9 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
      */
     public InsertStatement set(String column, String value)
     {
-        return set(column, value, SqlType.VARCHAR);
+        return set(column,
+                   value,
+                   SqlType.VARCHAR);
     }
 
     /**
@@ -310,7 +334,9 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
      */
     public InsertStatement set(String column, Blob value)
     {
-        return set(column, value, SqlType.BLOB);
+        return set(column,
+                   value,
+                   SqlType.BLOB);
     }
 
     /**
@@ -324,7 +350,9 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
      */
     public InsertStatement set(String column, Clob value)
     {
-        return set(column, value, SqlType.CLOB);
+        return set(column,
+                   value,
+                   SqlType.CLOB);
     }
 
     /**
@@ -337,8 +365,7 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
      */
     public InsertStatement onDuplicateKey(SqlModifyStatement statement)
     {
-        this.onDuplicateKey = (e) ->
-        {
+        this.onDuplicateKey = (e) -> {
             return statement.execute();
         };
         return this;
@@ -368,8 +395,7 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
      */
     public InsertStatement onFail(SqlModifyStatement onFail)
     {
-        this.onFail = (statement, e) ->
-        {
+        this.onFail = (statement, e) -> {
             return onFail.execute();
         };
 
@@ -407,8 +433,7 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     public InsertStatement onLessThan(int lowerThreshhold, SqlModifyStatement statement)
     {
         this.lowerThreshhold = lowerThreshhold;
-        this.onLessThan = (i, set) ->
-        {
+        this.onLessThan = (i, set) -> {
             return statement.execute();
         };
         return this;
@@ -449,8 +474,7 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     public InsertStatement onMoreThan(int higherThreshhold, SqlModifyStatement statement)
     {
         this.higherThreshhold = higherThreshhold;
-        this.onMoreThan = (i, set) ->
-        {
+        this.onMoreThan = (i, set) -> {
             return statement.execute();
         };
         return this;
@@ -472,7 +496,7 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
      * @return This instance for chaining.
      */
     public InsertStatement onMoreThan(int higherThreshhold,
-            BiFunction<Integer, InsertStatement, Integer> onMoreThan)
+                                      BiFunction<Integer, InsertStatement, Integer> onMoreThan)
     {
         this.higherThreshhold = higherThreshhold;
         this.onMoreThan = onMoreThan;
@@ -503,11 +527,13 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
 
         if (result < this.lowerThreshhold && this.onLessThan != null)
         {
-            return this.onLessThan.apply(result, this);
+            return this.onLessThan.apply(result,
+                                         this);
         }
         else if (result > this.higherThreshhold && this.onMoreThan != null)
         {
-            return this.onMoreThan.apply(result, this);
+            return this.onMoreThan.apply(result,
+                                         this);
         }
 
         return result;
@@ -520,7 +546,7 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
         if (this.setClauses.isEmpty() && this.dataSelect == null)
         {
             DatabaseAccess.log.print(
-                    "Can't execute insert statement without any values. Please define at least one column value.");
+                                     "Can't execute insert statement without any values. Please define at least one column value.");
             return -1;
         }
 
@@ -528,26 +554,31 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
 
         try (PreparedStatement statement = this.db.getConnection().prepareStatement(sql))
         {
-            log("Executing: " + sql, printLogs);
+            log("Executing: " + sql,
+                printLogs);
 
             if (this.dataSelect == null && this.prepared)
             {
                 if (!this.setClauses.isEmpty())
                 {
-                    log("With values:", printLogs);
+                    log("With values:",
+                        printLogs);
                 }
 
                 for (int i = 0; i < this.setClauses.size(); i ++ )
                 {
                     SetClause<InsertStatement> set = this.setClauses.get(i);
-                    log("p" + (i + 1) + " = " + set.prepareValue(statement, i + 1), printLogs);
+                    log("p" + (i + 1) + " = " + set.prepareValue(statement,
+                                                                 i + 1),
+                        printLogs);
                 }
             }
 
             try
             {
                 result = statement.executeUpdate();
-                log("Affected rows: " + result, printLogs);
+                log("Affected rows: " + result,
+                    printLogs);
 
                 if (this.shouldCommit)
                 {
@@ -562,7 +593,8 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
                 }
                 else if (this.onFail != null)
                 {
-                    result = this.onFail.apply(this, duplicate);
+                    result = this.onFail.apply(this,
+                                               duplicate);
                 }
                 else
                 {
@@ -575,7 +607,8 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
         {
             if (this.onFail != null)
             {
-                result = this.onFail.apply(this, e);
+                result = this.onFail.apply(this,
+                                           e);
             }
             else
             {
@@ -609,7 +642,8 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
                     sql += set.toString(this.prepared) + ", ";
                 }
 
-                sql = sql.substring(0, sql.length() - 2);
+                sql = sql.substring(0,
+                                    sql.length() - 2);
 
                 sql += ") VALUES (";
 
@@ -628,7 +662,8 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
                     }
                 }
 
-                sql = sql.substring(0, sql.length() - 2);
+                sql = sql.substring(0,
+                                    sql.length() - 2);
 
                 sql += ")";
             }

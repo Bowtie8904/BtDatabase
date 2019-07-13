@@ -40,10 +40,12 @@ public class BetweenConditionalClause<T extends SqlStatement> extends Conditiona
      *            The value type of the lower bound value.
      */
     public BetweenConditionalClause(T statement, String column, String keyword, String value1, String value2,
-            ValueType valueType1,
-            ValueType valueType2)
+                                    ValueType valueType1,
+                                    ValueType valueType2)
     {
-        super(statement, column, keyword);
+        super(statement,
+              column,
+              keyword);
         this.value1 = value1;
         this.value2 = value2;
         this.valueType1 = valueType1;
@@ -69,7 +71,8 @@ public class BetweenConditionalClause<T extends SqlStatement> extends Conditiona
             this.valueType = valueType1;
         }
 
-        return super.prepareValue(statement, parameterIndex);
+        return super.prepareValue(statement,
+                                  parameterIndex);
     }
 
     /**
@@ -91,11 +94,11 @@ public class BetweenConditionalClause<T extends SqlStatement> extends Conditiona
         {
             return toString();
         }
-        
+
         String clause = this.keyword + " " + this.column + " " + this.operator;
 
         if (this.valueType1 == ValueType.DATE || this.valueType1 == ValueType.TIME
-                || this.valueType1 == ValueType.TIMESTAMP)
+            || this.valueType1 == ValueType.TIMESTAMP)
         {
             clause += " '" + this.value1 + "'";
         }
@@ -105,7 +108,7 @@ public class BetweenConditionalClause<T extends SqlStatement> extends Conditiona
         }
 
         if (this.valueType2 == ValueType.DATE || this.valueType2 == ValueType.TIME
-                || this.valueType2 == ValueType.TIMESTAMP)
+            || this.valueType2 == ValueType.TIMESTAMP)
         {
             clause += " " + AND + " '" + this.value2 + "'";
         }

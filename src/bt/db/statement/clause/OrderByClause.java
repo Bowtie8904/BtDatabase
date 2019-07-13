@@ -97,7 +97,8 @@ public class OrderByClause
             sql += column + ", ";
         }
 
-        sql = sql.substring(0, sql.length() - 2);
+        sql = sql.substring(0,
+                            sql.length() - 2);
 
         sql += " " + (this.asc ? "ASC" : "DESC");
 

@@ -31,7 +31,8 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
      */
     public CreateTriggerStatement(DatabaseAccess db, String name)
     {
-        super(db, name);
+        super(db,
+              name);
         this.statementKeyword = "CREATE TRIGGER";
     }
 
@@ -144,7 +145,7 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
     {
         this.tables = new String[]
         {
-                table
+          table
         };
 
         return this;
@@ -250,7 +251,8 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
 
         try (PreparedStatement statement = this.db.getConnection().prepareStatement(sql))
         {
-            log("Executing: " + sql, printLogs);
+            log("Executing: " + sql,
+                printLogs);
             statement.executeUpdate();
             result = 1;
 
@@ -267,7 +269,8 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
                 {
                     try (PreparedStatement statement = this.db.getConnection().prepareStatement(sql))
                     {
-                        log("Replacing trigger '" + this.name + "'.", printLogs);
+                        log("Replacing trigger '" + this.name + "'.",
+                            printLogs);
                         statement.executeUpdate();
                         return 1;
                     }
@@ -275,7 +278,8 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
                     {
                         if (this.onFail != null)
                         {
-                            result = this.onFail.apply(this, ex);
+                            result = this.onFail.apply(this,
+                                                       ex);
                         }
                         else
                         {
@@ -286,11 +290,13 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
                 }
                 else
                 {
-                    log("Failed to drop trigger.", printLogs);
+                    log("Failed to drop trigger.",
+                        printLogs);
 
                     if (this.onFail != null)
                     {
-                        result = this.onFail.apply(this, e);
+                        result = this.onFail.apply(this,
+                                                   e);
                     }
                     else
                     {
@@ -303,7 +309,8 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
             {
                 if (this.onFail != null)
                 {
-                    result = this.onFail.apply(this, e);
+                    result = this.onFail.apply(this,
+                                               e);
                 }
                 else
                 {
@@ -323,7 +330,7 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
     public String toString()
     {
         String sql = this.statementKeyword + " " + this.name + " " + this.when + " " + this.triggerKeyword + " ON "
-                + this.tables[0];
+                     + this.tables[0];
 
         if (this.newAlias != null || this.oldAlias != null)
         {

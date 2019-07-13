@@ -36,7 +36,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
 
         this.tables = new String[]
         {
-                table.toUpperCase()
+          table.toUpperCase()
         };
         this.statementKeyword = "UPDATE";
     }
@@ -78,14 +78,16 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      */
     public ConditionalClause<UpdateStatement> where(String column)
     {
-        ConditionalClause<UpdateStatement> where = new ConditionalClause<UpdateStatement>(this, column, ConditionalClause.WHERE);
+        ConditionalClause<UpdateStatement> where = new ConditionalClause<UpdateStatement>(this,
+                                                                                          column,
+                                                                                          ConditionalClause.WHERE);
         addWhereClause(where);
         return where;
     }
 
     /**
-     * Creates a new conditional clause to chain with an existing where or having clause using the given column for
-     * this statement.
+     * Creates a new conditional clause to chain with an existing where or having clause using the given column for this
+     * statement.
      * 
      * @param column
      *            The column to use in this condition.
@@ -93,14 +95,16 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      */
     public ConditionalClause<UpdateStatement> and(String column)
     {
-        ConditionalClause<UpdateStatement> where = new ConditionalClause<UpdateStatement>(this, column, ConditionalClause.AND);
+        ConditionalClause<UpdateStatement> where = new ConditionalClause<UpdateStatement>(this,
+                                                                                          column,
+                                                                                          ConditionalClause.AND);
         addWhereClause(where);
         return where;
     }
 
     /**
-     * Creates a new conditional clause to chain with an existing where or having clause using the given column for
-     * this statement.
+     * Creates a new conditional clause to chain with an existing where or having clause using the given column for this
+     * statement.
      * 
      * @param column
      *            The column to use in this condition.
@@ -108,7 +112,9 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      */
     public ConditionalClause<UpdateStatement> or(String column)
     {
-        ConditionalClause<UpdateStatement> where = new ConditionalClause<UpdateStatement>(this, column, ConditionalClause.OR);
+        ConditionalClause<UpdateStatement> where = new ConditionalClause<UpdateStatement>(this,
+                                                                                          column,
+                                                                                          ConditionalClause.OR);
         addWhereClause(where);
         return where;
     }
@@ -124,7 +130,9 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      */
     public UpdateStatement setNull(String column, SqlType sqlType)
     {
-        return set(column, null, sqlType);
+        return set(column,
+                   null,
+                   sqlType);
     }
 
     /**
@@ -140,7 +148,10 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      */
     public UpdateStatement set(String column, Object value, SqlType sqlType)
     {
-        SetClause<UpdateStatement> set = new SetClause<UpdateStatement>(this, column, value, sqlType);
+        SetClause<UpdateStatement> set = new SetClause<UpdateStatement>(this,
+                                                                        column,
+                                                                        value,
+                                                                        sqlType);
         addSetClause(set);
         return this;
     }
@@ -157,7 +168,9 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      */
     public UpdateStatement set(String column, Supplier<Long> longSupplier)
     {
-        SetClause<UpdateStatement> set = new SetClause<UpdateStatement>(this, column, longSupplier);
+        SetClause<UpdateStatement> set = new SetClause<UpdateStatement>(this,
+                                                                        column,
+                                                                        longSupplier);
         addSetClause(set);
         return this;
     }
@@ -173,7 +186,9 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      */
     public UpdateStatement set(String column, int value)
     {
-        return set(column, value, SqlType.INTEGER);
+        return set(column,
+                   value,
+                   SqlType.INTEGER);
     }
 
     /**
@@ -187,7 +202,9 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      */
     public UpdateStatement set(String column, long value)
     {
-        return set(column, value, SqlType.LONG);
+        return set(column,
+                   value,
+                   SqlType.LONG);
     }
 
     /**
@@ -201,7 +218,9 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      */
     public UpdateStatement set(String column, double value)
     {
-        return set(column, value, SqlType.DOUBLE);
+        return set(column,
+                   value,
+                   SqlType.DOUBLE);
     }
 
     /**
@@ -215,7 +234,9 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      */
     public UpdateStatement set(String column, float value)
     {
-        return set(column, value, SqlType.FLOAT);
+        return set(column,
+                   value,
+                   SqlType.FLOAT);
     }
 
     /**
@@ -229,7 +250,9 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      */
     public UpdateStatement set(String column, boolean value)
     {
-        return set(column, value, SqlType.BOOLEAN);
+        return set(column,
+                   value,
+                   SqlType.BOOLEAN);
     }
 
     /**
@@ -243,7 +266,9 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      */
     public UpdateStatement set(String column, String value)
     {
-        return set(column, value, SqlType.VARCHAR);
+        return set(column,
+                   value,
+                   SqlType.VARCHAR);
     }
 
     /**
@@ -256,8 +281,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      */
     public UpdateStatement onFail(SqlModifyStatement onFail)
     {
-        this.onFail = (statement, e) ->
-        {
+        this.onFail = (statement, e) -> {
             return onFail.execute();
         };
 
@@ -295,8 +319,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     public UpdateStatement onLessThan(int lowerThreshhold, SqlModifyStatement statement)
     {
         this.lowerThreshhold = lowerThreshhold;
-        this.onLessThan = (i, set) ->
-        {
+        this.onLessThan = (i, set) -> {
             return statement.execute();
         };
         return this;
@@ -337,8 +360,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     public UpdateStatement onMoreThan(int higherThreshhold, SqlModifyStatement statement)
     {
         this.higherThreshhold = higherThreshhold;
-        this.onMoreThan = (i, set) ->
-        {
+        this.onMoreThan = (i, set) -> {
             return statement.execute();
         };
         return this;
@@ -360,7 +382,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      * @return This instance for chaining.
      */
     public UpdateStatement onMoreThan(int higherThreshhold,
-            BiFunction<Integer, UpdateStatement, Integer> onMoreThan)
+                                      BiFunction<Integer, UpdateStatement, Integer> onMoreThan)
     {
         this.higherThreshhold = higherThreshhold;
         this.onMoreThan = onMoreThan;
@@ -393,7 +415,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
         if (this.setClauses.isEmpty())
         {
             DatabaseAccess.log.print(
-                    "Can't execute update statement without any values. Please define at least one column value.");
+                                     "Can't execute update statement without any values. Please define at least one column value.");
             return -1;
         }
 
@@ -402,35 +424,42 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
         try (PreparedStatement statement = this.db.getConnection().prepareStatement(sql);)
         {
             List<ConditionalClause<UpdateStatement>> valueWhere = this.whereClauses
-                    .stream()
-                    .filter(w -> w.usesValue())
-                    .collect(Collectors.toList());
+                                                                                   .stream()
+                                                                                   .filter(w -> w.usesValue())
+                                                                                   .collect(Collectors.toList());
 
-            log("Executing: " + sql, printLogs);
+            log("Executing: " + sql,
+                printLogs);
 
             if (this.prepared)
             {
                 if (!this.setClauses.isEmpty())
                 {
-                    log("With values:", printLogs);
+                    log("With values:",
+                        printLogs);
                 }
                 int i = 0;
 
                 for (; i < this.setClauses.size(); i ++ )
                 {
                     SetClause<UpdateStatement> set = this.setClauses.get(i);
-                    log("p" + (i + 1) + " = " + set.prepareValue(statement, i + 1), printLogs);
+                    log("p" + (i + 1) + " = " + set.prepareValue(statement,
+                                                                 i + 1),
+                        printLogs);
                 }
 
                 for (; i < valueWhere.size() + this.setClauses.size(); i ++ )
                 {
                     ConditionalClause<UpdateStatement> where = valueWhere.get(i - this.setClauses.size());
-                    log("p" + (i + 1) + " = " + where.prepareValue(statement, i + 1), printLogs);
+                    log("p" + (i + 1) + " = " + where.prepareValue(statement,
+                                                                   i + 1),
+                        printLogs);
                 }
             }
 
             result = statement.executeUpdate();
-            log("Affected rows: " + result, printLogs);
+            log("Affected rows: " + result,
+                printLogs);
 
             if (this.shouldCommit)
             {
@@ -439,18 +468,21 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
 
             if (result < this.lowerThreshhold && this.onLessThan != null)
             {
-                return this.onLessThan.apply(result, this);
+                return this.onLessThan.apply(result,
+                                             this);
             }
             else if (result > this.higherThreshhold && this.onMoreThan != null)
             {
-                return this.onMoreThan.apply(result, this);
+                return this.onMoreThan.apply(result,
+                                             this);
             }
         }
         catch (SQLException e)
         {
             if (this.onFail != null)
             {
-                result = this.onFail.apply(this, e);
+                result = this.onFail.apply(this,
+                                           e);
             }
             else
             {
@@ -487,7 +519,8 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
                 sql += set.toString(this.prepared) + ", ";
             }
 
-            sql = sql.substring(0, sql.length() - 2);
+            sql = sql.substring(0,
+                                sql.length() - 2);
         }
 
         // indicates whether the klast clause was a between clause, to skip the duplicate

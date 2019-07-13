@@ -108,8 +108,11 @@ public class JoinClause
      */
     public JoinConditionalClause on(String column)
     {
-        JoinConditionalClause condition = new JoinConditionalClause(this.statement, column, this.table1, this.table2,
-                ConditionalClause.ON);
+        JoinConditionalClause condition = new JoinConditionalClause(this.statement,
+                                                                    column,
+                                                                    this.table1,
+                                                                    this.table2,
+                                                                    ConditionalClause.ON);
         addConditionalClause(condition);
         this.statement.setLastConditionalType(ConditionalClause.ON);
         return condition;
@@ -199,7 +202,8 @@ public class JoinClause
                     sql += column + ", ";
                 }
 
-                sql = sql.substring(0, sql.length() - 2);
+                sql = sql.substring(0,
+                                    sql.length() - 2);
 
                 sql += ")";
             }

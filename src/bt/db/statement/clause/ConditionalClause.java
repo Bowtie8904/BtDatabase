@@ -169,45 +169,59 @@ public class ConditionalClause<T extends SqlStatement>
     {
         try
         {
-            switch (this.valueType)
+            switch (
+                this.valueType
+            )
             {
-            case DATE:
-                statement.setDate(parameterIndex, Date.valueOf(this.value));
-                break;
-            case TIME:
-                statement.setTime(parameterIndex, Time.valueOf(this.value));
-                break;
-            case TIMESTAMP:
-                statement.setTimestamp(parameterIndex, Timestamp.valueOf(this.value));
-                break;
-            case BYTE:
-                statement.setByte(parameterIndex, Byte.parseByte(this.value));
-                break;
-            case SHORT:
-                statement.setShort(parameterIndex, Short.parseShort(this.value));
-                break;
-            case INTEGER:
-                statement.setInt(parameterIndex, Integer.parseInt(this.value));
-                break;
-            case LONG:
-                statement.setLong(parameterIndex, Long.parseLong(this.value));
-                break;
-            case DOUBLE:
-                statement.setDouble(parameterIndex, Double.parseDouble(this.value));
-                break;
-            case FLOAT:
-                statement.setFloat(parameterIndex, Float.parseFloat(this.value));
-                break;
-            case BOOLEAN:
-                statement.setBoolean(parameterIndex, Boolean.parseBoolean(this.value));
-                break;
-            default:
-                statement.setString(parameterIndex, this.value);
+                case DATE:
+                    statement.setDate(parameterIndex,
+                                      Date.valueOf(this.value));
+                    break;
+                case TIME:
+                    statement.setTime(parameterIndex,
+                                      Time.valueOf(this.value));
+                    break;
+                case TIMESTAMP:
+                    statement.setTimestamp(parameterIndex,
+                                           Timestamp.valueOf(this.value));
+                    break;
+                case BYTE:
+                    statement.setByte(parameterIndex,
+                                      Byte.parseByte(this.value));
+                    break;
+                case SHORT:
+                    statement.setShort(parameterIndex,
+                                       Short.parseShort(this.value));
+                    break;
+                case INTEGER:
+                    statement.setInt(parameterIndex,
+                                     Integer.parseInt(this.value));
+                    break;
+                case LONG:
+                    statement.setLong(parameterIndex,
+                                      Long.parseLong(this.value));
+                    break;
+                case DOUBLE:
+                    statement.setDouble(parameterIndex,
+                                        Double.parseDouble(this.value));
+                    break;
+                case FLOAT:
+                    statement.setFloat(parameterIndex,
+                                       Float.parseFloat(this.value));
+                    break;
+                case BOOLEAN:
+                    statement.setBoolean(parameterIndex,
+                                         Boolean.parseBoolean(this.value));
+                    break;
+                default:
+                    statement.setString(parameterIndex,
+                                        this.value);
             }
         }
         catch (Exception e)
         {
-            DatabaseAccess.log.print(this, e);
+            DatabaseAccess.log.print(this,
+                                     e);
         }
 
         this.lastParameterIndex = parameterIndex;
@@ -257,7 +271,7 @@ public class ConditionalClause<T extends SqlStatement>
         {
             return "Operator null";
         }
-        
+
         if (this.operator.equals(IS_NOT_NULL) || this.operator.equals(IS_NULL))
         {
             return this.keyword + " " + this.column + " " + this.operator;
@@ -290,7 +304,7 @@ public class ConditionalClause<T extends SqlStatement>
             return this.keyword + " " + this.column + " " + this.operator;
         }
         else if (this.valueType == ValueType.STRING || this.valueType == ValueType.DATE
-                || this.valueType == ValueType.TIME || this.valueType == ValueType.TIMESTAMP)
+                 || this.valueType == ValueType.TIME || this.valueType == ValueType.TIMESTAMP)
         {
             return this.keyword + " " + this.column + " " + this.operator + " '" + this.value + "'";
         }
@@ -2066,12 +2080,12 @@ public class ConditionalClause<T extends SqlStatement>
         }
 
         this.betweenClause = new BetweenConditionalClause(this.statement,
-                this.column,
-                this.keyword,
-                value1.toString(),
-                value2.toString(),
-                valueType1,
-                valueType2);
+                                                          this.column,
+                                                          this.keyword,
+                                                          value1.toString(),
+                                                          value2.toString(),
+                                                          valueType1,
+                                                          valueType2);
 
         if (this.statement.getHavingClauses().remove(this))
         {

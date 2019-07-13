@@ -27,7 +27,8 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
      */
     public AlterTableStatement(DatabaseAccess db, String name)
     {
-        super(db, name);
+        super(db,
+              name);
         this.statementKeyword = "ALTER TABLE";
     }
 
@@ -42,7 +43,9 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
      */
     public TableColumn<AlterTableStatement> column(String name, SqlType type)
     {
-        TableColumn<AlterTableStatement> column = new TableColumn<AlterTableStatement>(this, name, type);
+        TableColumn<AlterTableStatement> column = new TableColumn<AlterTableStatement>(this,
+                                                                                       name,
+                                                                                       type);
         return column;
     }
 
@@ -97,7 +100,8 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
 
         try (PreparedStatement statement = this.db.getConnection().prepareStatement(sql))
         {
-            log("Executing: " + sql, printLogs);
+            log("Executing: " + sql,
+                printLogs);
             statement.executeUpdate();
             result = 1;
 
@@ -106,11 +110,14 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
                 if (this.newColumn.getComment() != null)
                 {
                     db.insert()
-                            .into("column_comments")
-                            .set("table_name", this.name.toUpperCase())
-                            .set("column_name", this.newColumn.getName().toUpperCase())
-                            .set("column_comment", this.newColumn.getComment())
-                            .execute(printLogs);
+                      .into("column_comments")
+                      .set("table_name",
+                           this.name.toUpperCase())
+                      .set("column_name",
+                           this.newColumn.getName().toUpperCase())
+                      .set("column_comment",
+                           this.newColumn.getComment())
+                      .execute(printLogs);
                 }
                 else
                 {
@@ -137,33 +144,39 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
                             comment.append("default ");
                         }
                         comment.append("generated, incremented by ")
-                                .append(this.newColumn.getAutoIncrement())
-                                .append(", ");
+                               .append(this.newColumn.getAutoIncrement())
+                               .append(", ");
                     }
 
                     if (this.newColumn.getDefaultValue() != null)
                     {
                         comment.append("default = ")
-                                .append(this.newColumn.getDefaultValue())
-                                .append(", ");
+                               .append(this.newColumn.getDefaultValue())
+                               .append(", ");
                     }
 
                     if (comment.length() != 0)
                     {
                         db.insert()
-                                .into("column_comments")
-                                .set("table_name", this.name.toUpperCase())
-                                .set("column_name", this.newColumn.getName().toUpperCase())
-                                .set("column_comment", comment.substring(0, comment.length() - 2))
-                                .execute(printLogs);
+                          .into("column_comments")
+                          .set("table_name",
+                               this.name.toUpperCase())
+                          .set("column_name",
+                               this.newColumn.getName().toUpperCase())
+                          .set("column_comment",
+                               comment.substring(0,
+                                                 comment.length() - 2))
+                          .execute(printLogs);
                     }
                     else
                     {
                         db.insert()
-                                .into("column_comments")
-                                .set("table_name", this.name.toUpperCase())
-                                .set("column_name", this.newColumn.getName().toUpperCase())
-                                .execute(printLogs);
+                          .into("column_comments")
+                          .set("table_name",
+                               this.name.toUpperCase())
+                          .set("column_name",
+                               this.newColumn.getName().toUpperCase())
+                          .execute(printLogs);
                     }
                 }
             }
@@ -177,7 +190,8 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
         {
             if (this.onFail != null)
             {
-                result = this.onFail.apply(this, e);
+                result = this.onFail.apply(this,
+                                           e);
             }
             else
             {

@@ -36,6 +36,7 @@ public class SqlEntryException extends RuntimeException
      */
     public SqlEntryException(String message, Throwable cause)
     {
-        super(message, cause);
+        super(message,
+              cause);
     }
 }

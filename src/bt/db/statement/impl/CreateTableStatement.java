@@ -45,7 +45,8 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
      */
     public CreateTableStatement(DatabaseAccess db, String name)
     {
-        super(db, name);
+        super(db,
+              name);
         this.statementKeyword = "CREATE TABLE";
         this.tableColumns = new ArrayList<>();
     }
@@ -61,7 +62,9 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
      */
     public TableColumn<CreateTableStatement> column(String name, SqlType type)
     {
-        TableColumn<CreateTableStatement> column = new TableColumn<CreateTableStatement>(this, name, type);
+        TableColumn<CreateTableStatement> column = new TableColumn<CreateTableStatement>(this,
+                                                                                         name,
+                                                                                         type);
         return column;
     }
 
@@ -136,11 +139,12 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
     public CreateTableStatement asCopyOf(String table)
     {
         this.asCopySelect = this.db.select()
-                .from(table)
-                .unprepared()
-                .onLessThan(1, (i, set) -> {
-                    return set;
-                });
+                                   .from(table)
+                                   .unprepared()
+                                   .onLessThan(1,
+                                               (i, set) -> {
+                                                   return set;
+                                               });
         this.createDefaultTriggers = false;
         return this;
     }
@@ -181,76 +185,94 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
     {
         if (db instanceof EmbeddedDatabase)
         {
-            db.create().trigger(this.name + "_t_delete")
-                    .after("delete")
-                    .on(this.name)
-                    .oldAs("oldRow")
-                    .forEachRow()
-                    .call("onDelete")
-                    .with(db.getInstanceID(), this.name.toUpperCase(), this.identity, new ColumnEntry("oldRow", this.identity))
-                    .replace()
-                    .execute(printLogs);
+            db.create()
+              .trigger(this.name + "_t_delete")
+              .after("delete")
+              .on(this.name)
+              .oldAs("oldRow")
+              .forEachRow()
+              .call("onDelete")
+              .with(db.getInstanceID(),
+                    this.name.toUpperCase(),
+                    this.identity,
+                    new ColumnEntry("oldRow",
+                                    this.identity))
+              .replace()
+              .execute(printLogs);
 
-            db.create().trigger(this.name + "_t_insert")
-                    .after("insert")
-                    .on(this.name)
-                    .newAs("newRow")
-                    .forEachRow()
-                    .call("onInsert")
-                    .with(db.getInstanceID(), this.name.toUpperCase(), this.identity, new ColumnEntry("newRow", this.identity))
-                    .replace()
-                    .execute(printLogs);
+            db.create()
+              .trigger(this.name + "_t_insert")
+              .after("insert")
+              .on(this.name)
+              .newAs("newRow")
+              .forEachRow()
+              .call("onInsert")
+              .with(db.getInstanceID(),
+                    this.name.toUpperCase(),
+                    this.identity,
+                    new ColumnEntry("newRow",
+                                    this.identity))
+              .replace()
+              .execute(printLogs);
 
-            db.create().trigger(this.name + "_t_update")
-                    .after("update")
-                    .on(this.name)
-                    .newAs("newRow")
-                    .forEachRow()
-                    .call("onUpdate")
-                    .with(db.getInstanceID(), this.name.toUpperCase(), this.identity, new ColumnEntry("newRow", this.identity))
-                    .replace()
-                    .execute(printLogs);
+            db.create()
+              .trigger(this.name + "_t_update")
+              .after("update")
+              .on(this.name)
+              .newAs("newRow")
+              .forEachRow()
+              .call("onUpdate")
+              .with(db.getInstanceID(),
+                    this.name.toUpperCase(),
+                    this.identity,
+                    new ColumnEntry("newRow",
+                                    this.identity))
+              .replace()
+              .execute(printLogs);
         }
         else if (db instanceof RemoteDatabase)
         {
-            db.create().trigger(this.name + "_t_delete")
-                    .after("delete")
-                    .on(this.name)
-                    .oldAs("oldRow")
-                    .forEachRow()
-                    .execute(
-                            "INSERT INTO recent_triggers (triggerType, tableName, rowIdFieldName, idRow) values ('delete', '"
-                                    + this.name.toUpperCase() + "', '" + this.identity + "', oldRow."
-                                    + this.identity
-                                    + ")")
-                    .replace()
-                    .execute(printLogs);
+            db.create()
+              .trigger(this.name + "_t_delete")
+              .after("delete")
+              .on(this.name)
+              .oldAs("oldRow")
+              .forEachRow()
+              .execute(
+                       "INSERT INTO recent_triggers (triggerType, tableName, rowIdFieldName, idRow) values ('delete', '"
+                       + this.name.toUpperCase() + "', '" + this.identity + "', oldRow."
+                       + this.identity
+                       + ")")
+              .replace()
+              .execute(printLogs);
 
-            db.create().trigger(this.name + "_t_insert")
-                    .after("insert")
-                    .on(this.name)
-                    .newAs("newRow")
-                    .forEachRow()
-                    .execute(
-                            "INSERT INTO recent_triggers (triggerType, tableName, rowIdFieldName, idRow) values ('insert', '"
-                                    + this.name.toUpperCase() + "', '" + this.identity + "', newRow."
-                                    + this.identity
-                                    + ")")
-                    .replace()
-                    .execute(printLogs);
+            db.create()
+              .trigger(this.name + "_t_insert")
+              .after("insert")
+              .on(this.name)
+              .newAs("newRow")
+              .forEachRow()
+              .execute(
+                       "INSERT INTO recent_triggers (triggerType, tableName, rowIdFieldName, idRow) values ('insert', '"
+                       + this.name.toUpperCase() + "', '" + this.identity + "', newRow."
+                       + this.identity
+                       + ")")
+              .replace()
+              .execute(printLogs);
 
-            db.create().trigger(this.name + "_t_update")
-                    .after("update")
-                    .on(this.name)
-                    .newAs("newRow")
-                    .forEachRow()
-                    .execute(
-                            "INSERT INTO recent_triggers (triggerType, tableName, rowIdFieldName, idRow) values ('update', '"
-                                    + this.name.toUpperCase() + "', '" + this.identity + "', newRow."
-                                    + this.identity
-                                    + ")")
-                    .replace()
-                    .execute(printLogs);
+            db.create()
+              .trigger(this.name + "_t_update")
+              .after("update")
+              .on(this.name)
+              .newAs("newRow")
+              .forEachRow()
+              .execute(
+                       "INSERT INTO recent_triggers (triggerType, tableName, rowIdFieldName, idRow) values ('update', '"
+                       + this.name.toUpperCase() + "', '" + this.identity + "', newRow."
+                       + this.identity
+                       + ")")
+              .replace()
+              .execute(printLogs);
         }
     }
 
@@ -275,7 +297,8 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
 
         try (PreparedStatement statement = this.db.getConnection().prepareStatement(sql))
         {
-            log("Executing: " + sql, printLogs);
+            log("Executing: " + sql,
+                printLogs);
             statement.executeUpdate();
 
             if (this.createDefaultTriggers)
@@ -290,11 +313,14 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                     if (col.getComment() != null)
                     {
                         db.insert()
-                                .into("column_comments")
-                                .set("table_name", this.name.toUpperCase())
-                                .set("column_name", col.getName().toUpperCase())
-                                .set("column_comment", col.getComment())
-                                .execute(printLogs);
+                          .into("column_comments")
+                          .set("table_name",
+                               this.name.toUpperCase())
+                          .set("column_name",
+                               col.getName().toUpperCase())
+                          .set("column_comment",
+                               col.getComment())
+                          .execute(printLogs);
                     }
                     else
                     {
@@ -335,22 +361,28 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
 
                         if (!comment.isEmpty())
                         {
-                            comment = comment.substring(0, comment.length() - 2);
+                            comment = comment.substring(0,
+                                                        comment.length() - 2);
 
                             db.insert()
-                                    .into("column_comments")
-                                    .set("table_name", this.name.toUpperCase())
-                                    .set("column_name", col.getName().toUpperCase())
-                                    .set("column_comment", comment)
-                                    .execute(printLogs);
+                              .into("column_comments")
+                              .set("table_name",
+                                   this.name.toUpperCase())
+                              .set("column_name",
+                                   col.getName().toUpperCase())
+                              .set("column_comment",
+                                   comment)
+                              .execute(printLogs);
                         }
                         else
                         {
                             db.insert()
-                                    .into("column_comments")
-                                    .set("table_name", this.name.toUpperCase())
-                                    .set("column_name", col.getName().toUpperCase())
-                                    .execute(printLogs);
+                              .into("column_comments")
+                              .set("table_name",
+                                   this.name.toUpperCase())
+                              .set("column_name",
+                                   col.getName().toUpperCase())
+                              .execute(printLogs);
                         }
                     }
                 }
@@ -371,7 +403,8 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
         {
             if (this.onFail != null)
             {
-                result = this.onFail.apply(this, e);
+                result = this.onFail.apply(this,
+                                           e);
             }
             else
             {
@@ -404,7 +437,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                 if (col.isIdentity() && col.getGenerationType() == Generated.ALWAYS)
                 {
                     if (this.identity == null
-                            && (col.getType() == SqlType.LONG))
+                        && (col.getType() == SqlType.LONG))
                     {
                         this.identity = col.getName();
                     }
@@ -413,21 +446,24 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                 sql += col.toString() + ", ";
             }
 
-            sql = sql.substring(0, sql.length() - 2);
+            sql = sql.substring(0,
+                                sql.length() - 2);
 
             if (primary.length() != 0)
             {
-                primary = primary.substring(0, primary.length() - 2);
+                primary = primary.substring(0,
+                                            primary.length() - 2);
                 sql += ", PRIMARY KEY (" + primary + ")";
             }
 
             if (this.identity == null)
             {
                 // we always need a unique identity of type long for default triggers and automated persisting
-                TableColumn defaultPrimary = column("DEFAULT_ID", SqlType.LONG)
-                        .notNull()
-                        .asIdentity(Generated.ALWAYS)
-                        .autoIncrement(1);
+                TableColumn defaultPrimary = column("DEFAULT_ID",
+                                                    SqlType.LONG)
+                                                                 .notNull()
+                                                                 .asIdentity(Generated.ALWAYS)
+                                                                 .autoIncrement(1);
 
                 this.identity = "DEFAULT_ID";
 

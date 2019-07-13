@@ -12,7 +12,7 @@ public class SqlFunction<T extends SqlFunction>
     protected String name;
     protected String asName;
     protected List<Object> elements;
-    
+
     public SqlFunction(String name)
     {
         this.name = name.toUpperCase();
@@ -23,7 +23,7 @@ public class SqlFunction<T extends SqlFunction>
     {
         this.elements.add(element);
     }
-    
+
     public SqlFunction<T> as(String asName)
     {
         this.asName = asName;

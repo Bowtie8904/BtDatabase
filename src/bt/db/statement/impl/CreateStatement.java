@@ -13,7 +13,7 @@ import bt.db.statement.clause.TableColumn;
  * @author &#8904
  */
 public abstract class CreateStatement<T extends CreateStatement, K extends CreateStatement>
-        extends SqlModifyStatement<T, K>
+                                     extends SqlModifyStatement<T, K>
 {
     /** The name that is used in this create statement. This would be the name of the table, trigger, ... */
     protected String name;
@@ -41,11 +41,10 @@ public abstract class CreateStatement<T extends CreateStatement, K extends Creat
      */
     public CreateStatement<T, K> onFail(SqlModifyStatement onFail)
     {
-        this.onFail = (statement, e) ->
-        {
+        this.onFail = (statement, e) -> {
             return onFail.execute();
         };
-        
+
         return this;
     }
 

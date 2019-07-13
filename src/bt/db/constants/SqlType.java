@@ -7,7 +7,7 @@ import java.sql.Types;
 
 /**
  * Defines sql types that are usable within this library.
- * 
+ *
  * @author &#8904
  */
 public enum SqlType
@@ -59,7 +59,7 @@ public enum SqlType
 
     /**
      * Returns the name of the Apache Derby type represented by the specific {@link SqlType}.
-     * 
+     *
      * @see java.lang.Enum#toString()
      */
     @Override
@@ -70,7 +70,7 @@ public enum SqlType
 
     /**
      * Gets the integer constant based on {@link Types} that represents this sql type.
-     * 
+     *
      * @return The int constant.
      */
     public int getIntType()
@@ -80,57 +80,59 @@ public enum SqlType
 
     /**
      * Converts the given type name to a SqlType.
-     * 
+     *
      * @param type
      * @return
      */
     public static SqlType convert(String type)
     {
         SqlType sqlType = null;
-        switch (type.toUpperCase())
+        switch (
+            type.toUpperCase()
+        )
         {
-        case "BOOLEAN":
-            sqlType = BOOLEAN;
-            break;
-        case "VARCHAR":
-            sqlType = VARCHAR;
-            break;
-        case "INTEGER":
-            sqlType = INTEGER;
-            break;
-        case "BIGINT":
-            sqlType = LONG;
-            break;
-        case "FLOAT":
-            sqlType = FLOAT;
-            break;
-        case "DOUBLE":
-            sqlType = DOUBLE;
-            break;
-        case "DATE":
-            sqlType = DATE;
-            break;
-        case "TIME":
-            sqlType = TIME;
-            break;
-        case "TIMESTAMP":
-            sqlType = TIMESTAMP;
-            break;
-        case "CLOB":
-            sqlType = CLOB;
-            break;
-        case "BLOB":
-            sqlType = BLOB;
-            break;
-        default:
-            sqlType = UNKNOWN;
+            case "BOOLEAN":
+                sqlType = BOOLEAN;
+                break;
+            case "VARCHAR":
+                sqlType = VARCHAR;
+                break;
+            case "INTEGER":
+                sqlType = INTEGER;
+                break;
+            case "BIGINT":
+                sqlType = LONG;
+                break;
+            case "FLOAT":
+                sqlType = FLOAT;
+                break;
+            case "DOUBLE":
+                sqlType = DOUBLE;
+                break;
+            case "DATE":
+                sqlType = DATE;
+                break;
+            case "TIME":
+                sqlType = TIME;
+                break;
+            case "TIMESTAMP":
+                sqlType = TIMESTAMP;
+                break;
+            case "CLOB":
+                sqlType = CLOB;
+                break;
+            case "BLOB":
+                sqlType = BLOB;
+                break;
+            default:
+                sqlType = UNKNOWN;
         }
         return sqlType;
     }
 
     /**
      * Converts the int constant of {@link Types} to a known {@link SqlType}.
-     * 
+     *
      * @param type
      *            The integer constant.
      * @return The sql type or null if the type is unknown.
@@ -138,66 +140,68 @@ public enum SqlType
     public static SqlType convert(int type)
     {
         SqlType sqlType = null;
-        switch (type)
+        switch (
+            type
+        )
         {
-        case Types.BOOLEAN:
-            sqlType = BOOLEAN;
-            break;
-        case Types.CHAR:
-            sqlType = VARCHAR;
-            break;
-        case Types.VARCHAR:
-            sqlType = VARCHAR;
-            break;
-        case Types.LONGVARCHAR:
-            sqlType = VARCHAR;
-            break;
-        case Types.INTEGER:
-            sqlType = INTEGER;
-            break;
-        case Types.BIGINT:
-            sqlType = LONG;
-            break;
-        case Types.FLOAT:
-            sqlType = FLOAT;
-            break;
-        case Types.DOUBLE:
-            sqlType = DOUBLE;
-            break;
-        case Types.DATE:
-            sqlType = DATE;
-            break;
-        case Types.TIME:
-            sqlType = TIME;
-            break;
-        case Types.TIMESTAMP:
-            sqlType = TIMESTAMP;
-            break;
-        case Types.CLOB:
-            sqlType = CLOB;
-            break;
-        case Types.BLOB:
-            sqlType = BLOB;
-            break;
-        default:
-            sqlType = UNKNOWN;
+            case Types.BOOLEAN:
+                sqlType = BOOLEAN;
+                break;
+            case Types.CHAR:
+                sqlType = VARCHAR;
+                break;
+            case Types.VARCHAR:
+                sqlType = VARCHAR;
+                break;
+            case Types.LONGVARCHAR:
+                sqlType = VARCHAR;
+                break;
+            case Types.INTEGER:
+                sqlType = INTEGER;
+                break;
+            case Types.BIGINT:
+                sqlType = LONG;
+                break;
+            case Types.FLOAT:
+                sqlType = FLOAT;
+                break;
+            case Types.DOUBLE:
+                sqlType = DOUBLE;
+                break;
+            case Types.DATE:
+                sqlType = DATE;
+                break;
+            case Types.TIME:
+                sqlType = TIME;
+                break;
+            case Types.TIMESTAMP:
+                sqlType = TIMESTAMP;
+                break;
+            case Types.CLOB:
+                sqlType = CLOB;
+                break;
+            case Types.BLOB:
+                sqlType = BLOB;
+                break;
+            default:
+                sqlType = UNKNOWN;
         }
         return sqlType;
     }
 
     /**
      * Returns a String representation of the given array.
-     * 
+     *
      * <p>
      * The returned String will have the following format: <br>
      * <code>( value1, value2, value3, ... )</code>
      * </p>
-     * 
+     *
      * <p>
      * Values of the type {@link String}, {@link Date}, {@link Time} and {@link Timestamp} will have ' attached on both
      * sides to make the String representation usable for sql statements.
      * </p>
-     * 
+     *
      * @param array
      *            The array to convert to a String.
      * @return The String representation.
@@ -220,7 +224,8 @@ public enum SqlType
 
         if (array.length > 0)
         {
-            strArray = strArray.substring(0, strArray.length() - 2);
+            strArray = strArray.substring(0,
+                                          strArray.length() - 2);
         }
 
         strArray += " )";
@@ -230,12 +235,12 @@ public enum SqlType
 
     /**
      * Returns a String representation of the given array.
-     * 
+     *
      * <p>
      * The returned String will have the following format: <br>
      * <code>( value1, value2, value3, ... )</code>
      * </p>
-     * 
+     *
      * @param array
      *            The array to convert to a String.
      * @return The String representation.
@@ -251,7 +256,8 @@ public enum SqlType
 
         if (array.length > 0)
         {
-            strArray = strArray.substring(0, strArray.length() - 2);
+            strArray = strArray.substring(0,
+                                          strArray.length() - 2);
         }
 
         strArray += " )";
@@ -261,12 +267,12 @@ public enum SqlType
 
     /**
      * Returns a String representation of the given array.
-     * 
+     *
      * <p>
      * The returned String will have the following format: <br>
      * <code>( value1, value2, value3, ... )</code>
      * </p>
-     * 
+     *
      * @param array
      *            The array to convert to a String.
      * @return The String representation.
@@ -282,7 +288,8 @@ public enum SqlType
 
         if (array.length > 0)
         {
-            strArray = strArray.substring(0, strArray.length() - 2);
+            strArray = strArray.substring(0,
+                                          strArray.length() - 2);
         }
 
         strArray += " )";
@@ -292,12 +299,12 @@ public enum SqlType
 
     /**
      * Returns a String representation of the given array.
-     * 
+     *
      * <p>
      * The returned String will have the following format: <br>
      * <code>( value1, value2, value3, ... )</code>
      * </p>
-     * 
+     *
      * @param array
      *            The array to convert to a String.
      * @return The String representation.
@@ -313,7 +320,8 @@ public enum SqlType
 
         if (array.length > 0)
         {
-            strArray = strArray.substring(0, strArray.length() - 2);
+            strArray = strArray.substring(0,
+                                          strArray.length() - 2);
         }
 
         strArray += " )";
@@ -323,12 +331,12 @@ public enum SqlType
 
     /**
      * Returns a String representation of the given array.
-     * 
+     *
      * <p>
      * The returned String will have the following format: <br>
      * <code>( value1, value2, value3, ... )</code>
      * </p>
-     * 
+     *
      * @param array
      *            The array to convert to a String.
      * @return The String representation.
@@ -344,7 +352,8 @@ public enum SqlType
 
         if (array.length > 0)
         {
-            strArray = strArray.substring(0, strArray.length() - 2);
+            strArray = strArray.substring(0,
+                                          strArray.length() - 2);
         }
 
         strArray += " )";
@@ -354,12 +363,12 @@ public enum SqlType
 
     /**
      * Returns a String representation of the given array.
-     * 
+     *
      * <p>
      * The returned String will have the following format: <br>
      * <code>( value1, value2, value3, ... )</code>
      * </p>
-     * 
+     *
      * @param array
      *            The array to convert to a String.
      * @return The String representation.
@@ -375,7 +384,8 @@ public enum SqlType
 
         if (array.length > 0)
         {
-            strArray = strArray.substring(0, strArray.length() - 2);
+            strArray = strArray.substring(0,
+                                          strArray.length() - 2);
         }
 
         strArray += " )";
@@ -385,12 +395,12 @@ public enum SqlType
 
     /**
      * Returns a String representation of the given array.
-     * 
+     *
      * <p>
      * The returned String will have the following format: <br>
      * <code>( value1, value2, value3, ... )</code>
      * </p>
-     * 
+     *
      * @param array
      *            The array to convert to a String.
      * @return The String representation.
@@ -406,7 +416,8 @@ public enum SqlType
 
         if (array.length > 0)
         {
-            strArray = strArray.substring(0, strArray.length() - 2);
+            strArray = strArray.substring(0,
+                                          strArray.length() - 2);
         }
 
         strArray += " )";
@@ -416,12 +427,12 @@ public enum SqlType
 
     /**
      * Returns a String representation of the given array.
-     * 
+     *
      * <p>
      * The returned String will have the following format: <br>
      * <code>( value1, value2, value3, ... )</code>
      * </p>
-     * 
+     *
      * @param array
      *            The array to convert to a String.
      * @return The String representation.
@@ -437,7 +448,8 @@ public enum SqlType
 
         if (array.length > 0)
         {
-            strArray = strArray.substring(0, strArray.length() - 2);
+            strArray = strArray.substring(0,
+                                          strArray.length() - 2);
         }
 
         strArray += " )";

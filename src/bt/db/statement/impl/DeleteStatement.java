@@ -59,7 +59,7 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
     {
         this.tables = new String[]
         {
-                table.toUpperCase()
+          table.toUpperCase()
         };
         return this;
     }
@@ -83,14 +83,16 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
      */
     public ConditionalClause<DeleteStatement> where(String column)
     {
-        ConditionalClause<DeleteStatement> where = new ConditionalClause<DeleteStatement>(this, column, ConditionalClause.WHERE);
+        ConditionalClause<DeleteStatement> where = new ConditionalClause<DeleteStatement>(this,
+                                                                                          column,
+                                                                                          ConditionalClause.WHERE);
         addWhereClause(where);
         return where;
     }
 
     /**
-     * Creates a new conditional clause to chain with an existing where or having clause using the given column for
-     * this statement.
+     * Creates a new conditional clause to chain with an existing where or having clause using the given column for this
+     * statement.
      * 
      * @param column
      *            The column to use in this condition.
@@ -98,14 +100,16 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
      */
     public ConditionalClause<DeleteStatement> and(String column)
     {
-        ConditionalClause<DeleteStatement> where = new ConditionalClause<DeleteStatement>(this, column, ConditionalClause.AND);
+        ConditionalClause<DeleteStatement> where = new ConditionalClause<DeleteStatement>(this,
+                                                                                          column,
+                                                                                          ConditionalClause.AND);
         addWhereClause(where);
         return where;
     }
 
     /**
-     * Creates a new conditional clause to chain with an existing where or having clause using the given column for
-     * this statement.
+     * Creates a new conditional clause to chain with an existing where or having clause using the given column for this
+     * statement.
      * 
      * @param column
      *            The column to use in this condition.
@@ -113,7 +117,9 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
      */
     public ConditionalClause<DeleteStatement> or(String column)
     {
-        ConditionalClause<DeleteStatement> where = new ConditionalClause<DeleteStatement>(this, column, ConditionalClause.OR);
+        ConditionalClause<DeleteStatement> where = new ConditionalClause<DeleteStatement>(this,
+                                                                                          column,
+                                                                                          ConditionalClause.OR);
         addWhereClause(where);
         return where;
     }
@@ -128,8 +134,7 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
      */
     public DeleteStatement onFail(SqlModifyStatement onFail)
     {
-        this.onFail = (statement, e) ->
-        {
+        this.onFail = (statement, e) -> {
             return onFail.execute();
         };
 
@@ -167,8 +172,7 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
     public DeleteStatement onLessThan(int lowerThreshhold, SqlModifyStatement statement)
     {
         this.lowerThreshhold = lowerThreshhold;
-        this.onLessThan = (i, set) ->
-        {
+        this.onLessThan = (i, set) -> {
             return statement.execute();
         };
         return this;
@@ -209,8 +213,7 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
     public DeleteStatement onMoreThan(int higherThreshhold, SqlModifyStatement statement)
     {
         this.higherThreshhold = higherThreshhold;
-        this.onMoreThan = (i, set) ->
-        {
+        this.onMoreThan = (i, set) -> {
             return statement.execute();
         };
         return this;
@@ -232,7 +235,7 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
      * @return This instance for chaining.
      */
     public DeleteStatement onMoreThan(int higherThreshhold,
-            BiFunction<Integer, DeleteStatement, Integer> onMoreThan)
+                                      BiFunction<Integer, DeleteStatement, Integer> onMoreThan)
     {
         this.higherThreshhold = higherThreshhold;
         this.onMoreThan = onMoreThan;
@@ -261,28 +264,33 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
         try (PreparedStatement statement = this.db.getConnection().prepareStatement(sql))
         {
             List<ConditionalClause<DeleteStatement>> valueWhere = this.whereClauses
-                    .stream()
-                    .filter(w -> w.usesValue())
-                    .collect(Collectors.toList());
+                                                                                   .stream()
+                                                                                   .filter(w -> w.usesValue())
+                                                                                   .collect(Collectors.toList());
 
-            log("Executing: " + sql, printLogs);
+            log("Executing: " + sql,
+                printLogs);
 
             if (this.prepared)
             {
                 if (!valueWhere.isEmpty())
                 {
-                    log("With values:", printLogs);
+                    log("With values:",
+                        printLogs);
                 }
 
                 for (int i = 0; i < valueWhere.size(); i ++ )
                 {
                     ConditionalClause<DeleteStatement> where = valueWhere.get(i);
-                    log("p" + (i + 1) + " = " + where.prepareValue(statement, i + 1), printLogs);
+                    log("p" + (i + 1) + " = " + where.prepareValue(statement,
+                                                                   i + 1),
+                        printLogs);
                 }
             }
 
             result = statement.executeUpdate();
-            log("Affected rows: " + result, printLogs);
+            log("Affected rows: " + result,
+                printLogs);
 
             if (this.shouldCommit)
             {
@@ -291,18 +299,21 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
 
             if (result < this.lowerThreshhold && this.onLessThan != null)
             {
-                return this.onLessThan.apply(result, this);
+                return this.onLessThan.apply(result,
+                                             this);
             }
             else if (result > this.higherThreshhold && this.onMoreThan != null)
             {
-                return this.onMoreThan.apply(result, this);
+                return this.onMoreThan.apply(result,
+                                             this);
             }
         }
         catch (SQLException e)
         {
             if (this.onFail != null)
             {
-                result = this.onFail.apply(this, e);
+                result = this.onFail.apply(this,
+                                           e);
             }
             else
             {

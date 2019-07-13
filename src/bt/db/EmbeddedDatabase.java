@@ -39,7 +39,8 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
         setDerbyHome();
         addJarToDerby();
         setup();
-        setProperty("derby_home", derbyHome);
+        setProperty("derby_home",
+                    derbyHome);
         createTables();
     }
 
@@ -61,59 +62,80 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
     {
         boolean created = false;
         int success = create().procedure("onInsert")
-                .parameter("instanceID", SqlType.VARCHAR).size(40)
-                .parameter("tableName", SqlType.VARCHAR).size(40)
-                .parameter("rowIdFieldName", SqlType.VARCHAR).size(40)
-                .parameter("newRowID", SqlType.LONG)
-                .call(this.getClass().getName() + ".onInsert")
-                .replace()
-                .onFail((s, e) ->
-                {
-                    return 0;
-                })
-                .execute();
+                              .parameter("instanceID",
+                                         SqlType.VARCHAR)
+                              .size(40)
+                              .parameter("tableName",
+                                         SqlType.VARCHAR)
+                              .size(40)
+                              .parameter("rowIdFieldName",
+                                         SqlType.VARCHAR)
+                              .size(40)
+                              .parameter("newRowID",
+                                         SqlType.LONG)
+                              .call(this.getClass().getName() + ".onInsert")
+                              .replace()
+                              .onFail((s, e) -> {
+                                  return 0;
+                              })
+                              .execute();
 
         if (success == 1)
         {
-            log.print(this, "Created onInsert procedure.");
+            log.print(this,
+                      "Created onInsert procedure.");
             created = true;
         }
 
         success = create().procedure("onDelete")
-                .parameter("instanceID", SqlType.VARCHAR).size(40)
-                .parameter("tableName", SqlType.VARCHAR).size(40)
-                .parameter("rowIdFieldName", SqlType.VARCHAR).size(40)
-                .parameter("oldRowID", SqlType.LONG)
-                .call(this.getClass().getName() + ".onDelete")
-                .replace()
-                .onFail((s, e) ->
-                {
-                    return 0;
-                })
-                .execute();
+                          .parameter("instanceID",
+                                     SqlType.VARCHAR)
+                          .size(40)
+                          .parameter("tableName",
+                                     SqlType.VARCHAR)
+                          .size(40)
+                          .parameter("rowIdFieldName",
+                                     SqlType.VARCHAR)
+                          .size(40)
+                          .parameter("oldRowID",
+                                     SqlType.LONG)
+                          .call(this.getClass().getName() + ".onDelete")
+                          .replace()
+                          .onFail((s, e) -> {
+                              return 0;
+                          })
+                          .execute();
 
         if (success == 1)
         {
-            log.print(this, "Created onDelete procedure.");
+            log.print(this,
+                      "Created onDelete procedure.");
             created = true;
         }
 
         success = create().procedure("onUpdate")
-                .parameter("instanceID", SqlType.VARCHAR).size(40)
-                .parameter("tableName", SqlType.VARCHAR).size(40)
-                .parameter("rowIdFieldName", SqlType.VARCHAR).size(40)
-                .parameter("newRowID", SqlType.LONG)
-                .call(this.getClass().getName() + ".onUpdate")
-                .replace()
-                .onFail((s, e) ->
-                {
-                    return 0;
-                })
-                .execute();
+                          .parameter("instanceID",
+                                     SqlType.VARCHAR)
+                          .size(40)
+                          .parameter("tableName",
+                                     SqlType.VARCHAR)
+                          .size(40)
+                          .parameter("rowIdFieldName",
+                                     SqlType.VARCHAR)
+                          .size(40)
+                          .parameter("newRowID",
+                                     SqlType.LONG)
+                          .call(this.getClass().getName() + ".onUpdate")
+                          .replace()
+                          .onFail((s, e) -> {
+                              return 0;
+                          })
+                          .execute();
 
         if (success == 1)
         {
-            log.print(this, "Created onUpdate procedure.");
+            log.print(this,
+                      "Created onUpdate procedure.");
             created = true;
         }
 
@@ -139,18 +161,23 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
             else
             {
                 String path = getClass().getResource(getClass().getSimpleName() + ".class")
-                        .getPath();
-                String jarFilePath = path.substring(path.indexOf(":") + 1, path.indexOf("!"));
-                jarFilePath = URLDecoder.decode(jarFilePath, "UTF-8");
+                                        .getPath();
+                String jarFilePath = path.substring(path.indexOf(":") + 1,
+                                                    path.indexOf("!"));
+                jarFilePath = URLDecoder.decode(jarFilePath,
+                                                "UTF-8");
                 jarFile = new File(jarFilePath);
             }
             derbyHome = jarFile.getParentFile().getAbsolutePath();
-            System.setProperty("derby.system.home", derbyHome);
-            log.print(this, "Set derby home to " + derbyHome);
+            System.setProperty("derby.system.home",
+                               derbyHome);
+            log.print(this,
+                      "Set derby home to " + derbyHome);
         }
         catch (Exception e)
         {
-            log.print(this, e);
+            log.print(this,
+                      e);
         }
     }
 
@@ -167,9 +194,11 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
             else
             {
                 String path = getClass().getResource(getClass().getSimpleName() + ".class")
-                        .getPath();
-                String jarFilePath = path.substring(path.indexOf(":") + 1, path.indexOf("!"));
-                jarFilePath = URLDecoder.decode(jarFilePath, "UTF-8");
+                                        .getPath();
+                String jarFilePath = path.substring(path.indexOf(":") + 1,
+                                                    path.indexOf("!"));
+                jarFilePath = URLDecoder.decode(jarFilePath,
+                                                "UTF-8");
                 jarFile = new File(jarFilePath);
             }
 
@@ -177,7 +206,8 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
         }
         catch (Exception e)
         {
-            log.print(this, e);
+            log.print(this,
+                      e);
         }
         return null;
     }
@@ -192,7 +222,8 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
             try (CallableStatement statement = getConnection().prepareCall(sql))
             {
                 statement.executeUpdate();
-                log.print(this, "Added " + path + " to the database.");
+                log.print(this,
+                          "Added " + path + " to the database.");
             }
             catch (SQLException e)
             {
@@ -201,11 +232,11 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
                 try (CallableStatement statement = getConnection().prepareCall(sql))
                 {
                     statement.executeUpdate();
-                    log.print(this, "Replaced " + path + " in the database.");
+                    log.print(this,
+                              "Replaced " + path + " in the database.");
                 }
                 catch (SQLException e1)
-                {
-                }
+                {}
             }
 
             sql = "CALL syscs_util.syscs_set_database_property('derby.database.classpath', 'APP.BowtieDatabase')";
@@ -213,11 +244,11 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
             try (CallableStatement statement = getConnection().prepareCall(sql))
             {
                 statement.executeUpdate();
-                log.print(this, "Added classpath to the database.");
+                log.print(this,
+                          "Added classpath to the database.");
             }
             catch (SQLException e1)
-            {
-            }
+            {}
         }
         catch (Exception ex)
         {

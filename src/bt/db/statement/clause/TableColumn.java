@@ -41,8 +41,7 @@ public class TableColumn<T extends CreateStatement>
     private Generated generated;
 
     /**
-     * Indicates whether a value in this column can ever be NULL. true = value can't be null, false = value can be
-     * null.
+     * Indicates whether a value in this column can ever be NULL. true = value can't be null, false = value can be null.
      */
     private boolean notNull;
 
@@ -102,7 +101,8 @@ public class TableColumn<T extends CreateStatement>
     {
         if (text.length() > COMMENT_SIZE)
         {
-            text = text.substring(0, COMMENT_SIZE);
+            text = text.substring(0,
+                                  COMMENT_SIZE);
         }
 
         this.comment = text;
@@ -372,16 +372,17 @@ public class TableColumn<T extends CreateStatement>
         if (this.size.length > 0)
         {
             sql += "(";
-            
+
             for (int i : this.size)
             {
                 sql += i + ", ";
             }
-            
-            sql = sql.substring(0, sql.length() - 2);
+
+            sql = sql.substring(0,
+                                sql.length() - 2);
             sql += ")";
         }
-        
+
         if (this.defaultValue != null)
         {
             sql += " DEFAULT " + this.defaultValue;

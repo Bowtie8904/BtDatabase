@@ -89,7 +89,8 @@ public class SqlResultSet implements Iterable<SqlResult>
         }
         catch (SQLException e)
         {
-            DatabaseAccess.log.print(this, e);
+            DatabaseAccess.log.print(this,
+                                     e);
         }
     }
 
@@ -127,7 +128,8 @@ public class SqlResultSet implements Iterable<SqlResult>
 
         for (String col : this.colOrder)
         {
-            columns.add(new SimpleEntry(col, this.valueTypes.get(col)));
+            columns.add(new SimpleEntry(col,
+                                        this.valueTypes.get(col)));
         }
 
         return columns;
@@ -182,11 +184,12 @@ public class SqlResultSet implements Iterable<SqlResult>
     {
         return this.results.size();
     }
-    
+
     /**
      * Gets the result at the given index.
      * 
-     * @param index The index of the desired result.
+     * @param index
+     *            The index of the desired result.
      * @return The requested result.
      */
     public SqlResult get(int index)
@@ -239,7 +242,8 @@ public class SqlResultSet implements Iterable<SqlResult>
         {
             int valueType = meta.getColumnType(i);
             this.colOrder.add(meta.getColumnName(i));
-            this.valueTypes.put(meta.getColumnName(i), SqlType.convert(valueType).toString());
+            this.valueTypes.put(meta.getColumnName(i),
+                                SqlType.convert(valueType).toString());
             int width = meta.getColumnDisplaySize(i) + 4 > 50 ? 50 : meta.getColumnDisplaySize(i) + 4;
 
             if (width < meta.getColumnName(i).length() + 2)
@@ -254,128 +258,142 @@ public class SqlResultSet implements Iterable<SqlResult>
 
             this.defaultFormat[i - 1] = width;
 
-            switch (valueType)
+            switch (
+                valueType
+            )
             {
-            case Types.BOOLEAN:
-                booleanResults.add(meta.getColumnName(i));
-                break;
-            case Types.CHAR:
-                stringResults.add(meta.getColumnName(i));
-                break;
-            case Types.VARCHAR:
-                stringResults.add(meta.getColumnName(i));
-                break;
-            case Types.BIT:
-                booleanResults.add(meta.getColumnName(i));
-                break;
-            case Types.TINYINT:
-                byteResults.add(meta.getColumnName(i));
-                break;
-            case Types.SMALLINT:
-                shortResults.add(meta.getColumnName(i));
-                break;
-            case Types.INTEGER:
-                intResults.add(meta.getColumnName(i));
-                break;
-            case Types.BIGINT:
-                longResults.add(meta.getColumnName(i));
-                break;
-            case Types.REAL:
-                floatResults.add(meta.getColumnName(i));
-                break;
-            case Types.FLOAT:
-                doubleResults.add(meta.getColumnName(i));
-                break;
-            case Types.DOUBLE:
-                doubleResults.add(meta.getColumnName(i));
-                break;
-            case Types.DATE:
-                dateResults.add(meta.getColumnName(i));
-                break;
-            case Types.TIME:
-                timeResults.add(meta.getColumnName(i));
-                break;
-            case Types.TIMESTAMP:
-                timestampResults.add(meta.getColumnName(i));
-                break;
-            case Types.CLOB:
-                clobResults.add(meta.getColumnName(i));
-                break;
-            case Types.BLOB:
-                blobResults.add(meta.getColumnName(i));
-                break;
-            case Types.JAVA_OBJECT:
-                objectResults.add(meta.getColumnName(i));
-                break;
-            default:
-                objectResults.add(meta.getColumnName(i));
+                case Types.BOOLEAN:
+                    booleanResults.add(meta.getColumnName(i));
+                    break;
+                case Types.CHAR:
+                    stringResults.add(meta.getColumnName(i));
+                    break;
+                case Types.VARCHAR:
+                    stringResults.add(meta.getColumnName(i));
+                    break;
+                case Types.BIT:
+                    booleanResults.add(meta.getColumnName(i));
+                    break;
+                case Types.TINYINT:
+                    byteResults.add(meta.getColumnName(i));
+                    break;
+                case Types.SMALLINT:
+                    shortResults.add(meta.getColumnName(i));
+                    break;
+                case Types.INTEGER:
+                    intResults.add(meta.getColumnName(i));
+                    break;
+                case Types.BIGINT:
+                    longResults.add(meta.getColumnName(i));
+                    break;
+                case Types.REAL:
+                    floatResults.add(meta.getColumnName(i));
+                    break;
+                case Types.FLOAT:
+                    doubleResults.add(meta.getColumnName(i));
+                    break;
+                case Types.DOUBLE:
+                    doubleResults.add(meta.getColumnName(i));
+                    break;
+                case Types.DATE:
+                    dateResults.add(meta.getColumnName(i));
+                    break;
+                case Types.TIME:
+                    timeResults.add(meta.getColumnName(i));
+                    break;
+                case Types.TIMESTAMP:
+                    timestampResults.add(meta.getColumnName(i));
+                    break;
+                case Types.CLOB:
+                    clobResults.add(meta.getColumnName(i));
+                    break;
+                case Types.BLOB:
+                    blobResults.add(meta.getColumnName(i));
+                    break;
+                case Types.JAVA_OBJECT:
+                    objectResults.add(meta.getColumnName(i));
+                    break;
+                default:
+                    objectResults.add(meta.getColumnName(i));
             }
         }
 
         while (set.next())
         {
             SqlResult result = new SqlResult(colOrder);
-            
+
             for (String name : stringResults)
             {
-                result.put(name, set.getString(name));
+                result.put(name,
+                           set.getString(name));
             }
 
             for (String name : byteResults)
             {
-                result.put(name, set.getByte(name));
+                result.put(name,
+                           set.getByte(name));
             }
 
             for (String name : shortResults)
             {
-                result.put(name, set.getShort(name));
+                result.put(name,
+                           set.getShort(name));
             }
 
             for (String name : intResults)
             {
-                result.put(name, set.getInt(name));
+                result.put(name,
+                           set.getInt(name));
             }
 
             for (String name : longResults)
             {
-                result.put(name, set.getLong(name));
+                result.put(name,
+                           set.getLong(name));
             }
 
             for (String name : floatResults)
             {
-                result.put(name, set.getFloat(name));
+                result.put(name,
+                           set.getFloat(name));
             }
 
             for (String name : doubleResults)
             {
-                result.put(name, set.getDouble(name));
+                result.put(name,
+                           set.getDouble(name));
             }
 
             for (String name : dateResults)
             {
-                result.put(name, set.getDate(name));
+                result.put(name,
+                           set.getDate(name));
             }
 
             for (String name : timeResults)
             {
-                result.put(name, set.getTime(name));
+                result.put(name,
+                           set.getTime(name));
             }
 
             for (String name : timestampResults)
             {
-                result.put(name, set.getTimestamp(name));
+                result.put(name,
+                           set.getTimestamp(name));
             }
 
             for (String name : booleanResults)
             {
-                result.put(name, set.getBoolean(name));
+                result.put(name,
+                           set.getBoolean(name));
             }
 
             for (String name : clobResults)
             {
                 try
                 {
-                    result.put(name, set.getClob(name));
+                    result.put(name,
+                               set.getClob(name));
                 }
                 catch (Exception e)
                 {
@@ -387,7 +405,8 @@ public class SqlResultSet implements Iterable<SqlResult>
             {
                 try
                 {
-                    result.put(name, set.getBlob(name));
+                    result.put(name,
+                               set.getBlob(name));
                 }
                 catch (Exception e)
                 {
@@ -397,7 +416,8 @@ public class SqlResultSet implements Iterable<SqlResult>
 
             for (String name : objectResults)
             {
-                result.putObject(name, set.getObject(name));
+                result.putObject(name,
+                                 set.getObject(name));
             }
 
             result.setColumnTypes(this.valueTypes);
@@ -475,11 +495,13 @@ public class SqlResultSet implements Iterable<SqlResult>
             consoleRows = new ConsoleTable(columnFormat);
         }
 
-        consoleRows.setTitle(true, this.colOrder.toArray(new Object[] {}));
+        consoleRows.setTitle(true,
+                             this.colOrder.toArray(new Object[] {}));
 
         for (SqlResult result : this.results)
         {
-            consoleRows.addRow(true, result.getValueArray());
+            consoleRows.addRow(true,
+                               result.getValueArray());
         }
 
         return consoleRows.toString();

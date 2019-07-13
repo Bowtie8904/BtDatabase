@@ -128,8 +128,10 @@ public abstract class DatabaseAccess implements Killable
     protected DatabaseAccess(String dbURL)
     {
         this.dbConnectionString = dbURL;
-        log.registerSource(this, getClass().getName());
-        InstanceKiller.killOnShutdown(this, 1);
+        log.registerSource(this,
+                           getClass().getName());
+        InstanceKiller.killOnShutdown(this,
+                                      1);
         this.triggerDispatcher = new Dispatcher();
     }
 
@@ -175,11 +177,14 @@ public abstract class DatabaseAccess implements Killable
         checkID();
         synchronized (DatabaseAccess.class)
         {
-            instances.put(this.instanceID, this);
+            instances.put(this.instanceID,
+                          this);
         }
         createDefaultProcedures();
-        log.print(this, "Setup database instance " + this.instanceID);
-        log.print(this, "Using connection string: " + this.dbConnectionString);
+        log.print(this,
+                  "Setup database instance " + this.instanceID);
+        log.print(this,
+                  "Using connection string: " + this.dbConnectionString);
     }
 
     /**
@@ -206,7 +211,8 @@ public abstract class DatabaseAccess implements Killable
         if (this.instanceID == null)
         {
             this.instanceID = StringID.uniqueID();
-            setProperty("instanceID", this.instanceID);
+            setProperty("instanceID",
+                        this.instanceID);
         }
     }
 
@@ -222,11 +228,13 @@ public abstract class DatabaseAccess implements Killable
     {
         try (Connection connection = DriverManager.getConnection(this.dbConnectionString))
         {
-            log.print(this, "Loaded database.");
+            log.print(this,
+                      "Loaded database.");
         }
         catch (SQLException e)
         {
-            log.print(this, e);
+            log.print(this,
+                      e);
         }
     }
 
@@ -254,12 +262,16 @@ public abstract class DatabaseAccess implements Killable
      * 
      * <pre>
      * // will be called for every dispatched InsertEvent
-     * registerListener(InsertEvent.class, myListener::onInsert);
+     * registerListener(InsertEvent.class,
+     *                  myListener::onInsert);
      * </pre>
      * 
      * <pre>
      * // will be called only for inserts in the tables with the names 'myTable' or 'myTable2'
-     * registerListener(InsertEvent.class, myListener::onInsert, "myTable", "myTable2");
+     * registerListener(InsertEvent.class,
+     *                  myListener::onInsert,
+     *                  "myTable",
+     *                  "myTable2");
      * </pre>
      * </p>
      * 
@@ -274,10 +286,9 @@ public abstract class DatabaseAccess implements Killable
      *         listener.
      */
     public <T extends DatabaseChangeEvent> Consumer<T> registerListener(Class<T> listenFor, Runnable listener,
-            String... tables)
+                                                                        String... tables)
     {
-        var cons = new Consumer<T>()
-        {
+        var cons = new Consumer<T>() {
             @Override
             public void accept(T event)
             {
@@ -285,7 +296,9 @@ public abstract class DatabaseAccess implements Killable
             }
         };
 
-        return registerListener(listenFor, cons, tables);
+        return registerListener(listenFor,
+                                cons,
+                                tables);
     }
 
     /**
@@ -302,12 +315,16 @@ public abstract class DatabaseAccess implements Killable
      * 
      * <pre>
      * // will be called for every dispatched InsertEvent
-     * registerListener(InsertEvent.class, myListener::onInsert);
+     * registerListener(InsertEvent.class,
+     *                  myListener::onInsert);
      * </pre>
      * 
      * <pre>
      * // will be called only for inserts in the tables with the names 'myTable' or 'myTable2'
-     * registerListener(InsertEvent.class, myListener::onInsert, "myTable", "myTable2");
+     * registerListener(InsertEvent.class,
+     *                  myListener::onInsert,
+     *                  "myTable",
+     *                  "myTable2");
      * </pre>
      * </p>
      * 
@@ -322,10 +339,9 @@ public abstract class DatabaseAccess implements Killable
      *         listener.
      */
     public <T extends DatabaseChangeEvent> Consumer<T> registerListener(Class<T> listenFor, Consumer<T> listener,
-            String... tables)
+                                                                        String... tables)
     {
-        var cons = new Consumer<T>()
-        {
+        var cons = new Consumer<T>() {
             @Override
             public void accept(T event)
             {
@@ -350,10 +366,11 @@ public abstract class DatabaseAccess implements Killable
             }
         };
 
-        this.triggerDispatcher.subscribeTo(listenFor, cons);
+        this.triggerDispatcher.subscribeTo(listenFor,
+                                           cons);
 
         log.print(this,
-                "Registered database listener of type '" + listener.getClass().getName() + "' for '"
+                  "Registered database listener of type '" + listener.getClass().getName() + "' for '"
                         + listenFor.getName() + "' to instance "
                         + this.getInstanceID() + ".");
 
@@ -372,10 +389,11 @@ public abstract class DatabaseAccess implements Killable
      */
     public <T extends DatabaseChangeEvent> void unregisterListener(Class<T> type, Consumer<T> listener)
     {
-        if (this.triggerDispatcher.unsubscribeFrom(type, listener))
+        if (this.triggerDispatcher.unsubscribeFrom(type,
+                                                   listener))
         {
             log.print(this,
-                    "Unregistered database listener of type '" + listener.getClass().getName() + "' for '"
+                      "Unregistered database listener of type '" + listener.getClass().getName() + "' for '"
                             + type.getName() + "' to instance "
                             + this.getInstanceID() + ".");
         }
@@ -401,13 +419,15 @@ public abstract class DatabaseAccess implements Killable
                 }
                 catch (SQLException e)
                 {
-                    log.print(this, e);
+                    log.print(this,
+                              e);
                 }
             }
         }
         catch (SQLException e)
         {
-            log.print(this, e);
+            log.print(this,
+                      e);
         }
 
         return this.connection;
@@ -447,12 +467,14 @@ public abstract class DatabaseAccess implements Killable
                 {
                     instances.remove(this.instanceID);
                 }
-                log.print(this, "Closed database.");
+                log.print(this,
+                          "Closed database.");
             }
         }
         catch (SQLException e)
         {
-            log.print(this, e);
+            log.print(this,
+                      e);
         }
     }
 
@@ -467,13 +489,17 @@ public abstract class DatabaseAccess implements Killable
     public void setProperty(String key, String value)
     {
         insert().into(PROPERTIES_TABLE)
-                .set("property_key", key)
-                .set("property_value", value)
+                .set("property_key",
+                     key)
+                .set("property_value",
+                     value)
                 .onDuplicateKey(
-                        update(PROPERTIES_TABLE)
-                                .set("property_value", value)
-                                .where("property_key").equals(key)
-                                .commit())
+                                update(PROPERTIES_TABLE)
+                                                        .set("property_value",
+                                                             value)
+                                                        .where("property_key")
+                                                        .equals(key)
+                                                        .commit())
                 .commit()
                 .execute();
     }
@@ -493,13 +519,14 @@ public abstract class DatabaseAccess implements Killable
         }
 
         SqlResultSet result = select(Sql.column("property_value").as("value"))
-                .from(PROPERTIES_TABLE)
-                .where("property_key").equals(key)
-                .onLessThan(1, (i, set) ->
-                {
-                    return null;
-                })
-                .execute();
+                                                                              .from(PROPERTIES_TABLE)
+                                                                              .where("property_key")
+                                                                              .equals(key)
+                                                                              .onLessThan(1,
+                                                                                          (i, set) -> {
+                                                                                              return null;
+                                                                                          })
+                                                                              .execute();
 
         if (result != null && result.size() > 0)
         {
@@ -515,22 +542,30 @@ public abstract class DatabaseAccess implements Killable
     protected void createPropertiesTable()
     {
         int success = create().table(PROPERTIES_TABLE)
-                .column("property_key", SqlType.VARCHAR).size(200).notNull().unique()
-                .comment("The unique key of the key-value mapping.").add()
+                              .column("property_key",
+                                      SqlType.VARCHAR)
+                              .size(200)
+                              .notNull()
+                              .unique()
+                              .comment("The unique key of the key-value mapping.")
+                              .add()
 
-                .column("property_value", SqlType.VARCHAR).size(500)
-                .comment("The value of the key-value mapping.").add()
+                              .column("property_value",
+                                      SqlType.VARCHAR)
+                              .size(500)
+                              .comment("The value of the key-value mapping.")
+                              .add()
 
-                .createDefaultTriggers(false)
-                .onFail((s, e) ->
-                {
-                    return 0;
-                })
-                .execute();
+                              .createDefaultTriggers(false)
+                              .onFail((s, e) -> {
+                                  return 0;
+                              })
+                              .execute();
 
         if (success == 1)
         {
-            log.print(this, "Created properties table.");
+            log.print(this,
+                      "Created properties table.");
             commit();
         }
     }
@@ -541,25 +576,38 @@ public abstract class DatabaseAccess implements Killable
     protected void createCommentTable()
     {
         int success = create().table(COMMENT_TABLE)
-                .column("table_Name", SqlType.VARCHAR).size(50).primaryKey().notNull().comment("The name of the table.")
-                .add()
+                              .column("table_Name",
+                                      SqlType.VARCHAR)
+                              .size(50)
+                              .primaryKey()
+                              .notNull()
+                              .comment("The name of the table.")
+                              .add()
 
-                .column("column_Name", SqlType.VARCHAR).size(50).primaryKey().notNull()
-                .comment("The name of the column that this comment is for.").add()
+                              .column("column_Name",
+                                      SqlType.VARCHAR)
+                              .size(50)
+                              .primaryKey()
+                              .notNull()
+                              .comment("The name of the column that this comment is for.")
+                              .add()
 
-                .column("column_Comment", SqlType.VARCHAR).size(TableColumn.COMMENT_SIZE)
-                .comment("The comment for this column.").add()
+                              .column("column_Comment",
+                                      SqlType.VARCHAR)
+                              .size(TableColumn.COMMENT_SIZE)
+                              .comment("The comment for this column.")
+                              .add()
 
-                .createDefaultTriggers(false)
-                .onFail((s, e) ->
-                {
-                    return 0;
-                })
-                .execute();
+                              .createDefaultTriggers(false)
+                              .onFail((s, e) -> {
+                                  return 0;
+                              })
+                              .execute();
 
         if (success == 1)
         {
-            log.print(this, "Created comment table.");
+            log.print(this,
+                      "Created comment table.");
             commit();
         }
     }
@@ -579,7 +627,8 @@ public abstract class DatabaseAccess implements Killable
         }
         catch (SQLException e)
         {
-            log.print(this, e);
+            log.print(this,
+                      e);
             return -1;
         }
     }
@@ -594,13 +643,15 @@ public abstract class DatabaseAccess implements Killable
     public SqlResultSet executeQuery(String sql)
     {
         try (Statement statement = getConnection().createStatement(
-                ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY))
+                                                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                                                   ResultSet.CONCUR_READ_ONLY))
         {
             return new SqlResultSet(statement.executeQuery(sql));
         }
         catch (SQLException e)
         {
-            log.print(this, e);
+            log.print(this,
+                      e);
             return null;
         }
     }
@@ -619,12 +670,14 @@ public abstract class DatabaseAccess implements Killable
             if (this.connection != null && !this.connection.getAutoCommit())
             {
                 this.connection.rollback();
-                log.print(this, "Rolled back transaction.");
+                log.print(this,
+                          "Rolled back transaction.");
             }
         }
         catch (SQLException e)
         {
-            log.print(this, e);
+            log.print(this,
+                      e);
         }
     }
 
@@ -642,15 +695,17 @@ public abstract class DatabaseAccess implements Killable
             if (this.connection != null && !this.connection.getAutoCommit())
             {
                 this.connection.commit();
-                log.print(this, "Committed transaction.");
+                log.print(this,
+                          "Committed transaction.");
             }
         }
         catch (SQLException e)
         {
-            log.print(this, e);
+            log.print(this,
+                      e);
         }
     }
-    
+
     /**
      * Imports all data formatted as insert statements inside the given file.
      * 
@@ -676,7 +731,8 @@ public abstract class DatabaseAccess implements Killable
             count += executeUpdate(statement);
         }
 
-        log.print(this, "Imported " + count + " rows from " + importFile.getAbsolutePath() + ".");
+        log.print(this,
+                  "Imported " + count + " rows from " + importFile.getAbsolutePath() + ".");
     }
 
     /**
@@ -700,11 +756,12 @@ public abstract class DatabaseAccess implements Killable
     public void exportData(String table, File exportFile, String... excludeColumns)
     {
         SqlResultSet set = select()
-                .from(table)
-                .onLessThan(1, (num, res) ->
-                {
-                    return res;
-                }).execute();
+                                   .from(table)
+                                   .onLessThan(1,
+                                               (num, res) -> {
+                                                   return res;
+                                               })
+                                   .execute();
 
         if (!exportFile.exists())
         {
@@ -715,7 +772,8 @@ public abstract class DatabaseAccess implements Killable
             }
             catch (Exception e)
             {
-                log.print(this, e);
+                log.print(this,
+                          e);
                 return;
             }
         }
@@ -724,14 +782,17 @@ public abstract class DatabaseAccess implements Killable
         {
             for (SqlResult row : set)
             {
-                writer.println(row.export(table, excludeColumns));
+                writer.println(row.export(table,
+                                          excludeColumns));
             }
 
-            log.print(this, "Exported " + set.size() + " rows to " + exportFile.getAbsolutePath() + ".");
+            log.print(this,
+                      "Exported " + set.size() + " rows to " + exportFile.getAbsolutePath() + ".");
         }
         catch (IOException e)
         {
-            log.print(this, e);
+            log.print(this,
+                      e);
         }
     }
 
@@ -753,19 +814,23 @@ public abstract class DatabaseAccess implements Killable
     public void exportData(String... excludeColumns)
     {
         SqlResultSet set = select("tablename")
-                .from(SqlValue.SYSTABLE)
-                .where("tabletype").equals("T")
-                .onLessThan(1, (num, res) ->
-                {
-                    return res;
-                }).execute();
+                                              .from(SqlValue.SYSTABLE)
+                                              .where("tabletype")
+                                              .equals("T")
+                                              .onLessThan(1,
+                                                          (num, res) -> {
+                                                              return res;
+                                                          })
+                                              .execute();
 
         String tableName;
 
         for (SqlResult table : set)
         {
             tableName = table.getString("tableName");
-            exportData(tableName, new File("./DATA_EXPORT/" + tableName + ".sql"), excludeColumns);
+            exportData(tableName,
+                       new File("./DATA_EXPORT/" + tableName + ".sql"),
+                       excludeColumns);
         }
     }
 
@@ -828,7 +893,8 @@ public abstract class DatabaseAccess implements Killable
             columns[i] = values[i].toString();
         }
 
-        return new SelectStatement(this, columns);
+        return new SelectStatement(this,
+                                   columns);
     }
 
     /**
@@ -838,7 +904,8 @@ public abstract class DatabaseAccess implements Killable
      */
     public SelectStatement select(String... columns)
     {
-        return new SelectStatement(this, columns);
+        return new SelectStatement(this,
+                                   columns);
     }
 
     /**
@@ -870,7 +937,8 @@ public abstract class DatabaseAccess implements Killable
      */
     public UpdateStatement update(String table)
     {
-        return new UpdateStatement(this, table);
+        return new UpdateStatement(this,
+                                   table);
     }
 
     /**
@@ -887,7 +955,8 @@ public abstract class DatabaseAccess implements Killable
         }
         else
         {
-            SqlEntry.persist(this, entry);
+            SqlEntry.persist(this,
+                             entry);
         }
     }
 
@@ -905,7 +974,8 @@ public abstract class DatabaseAccess implements Killable
         }
         else
         {
-            SqlEntry.init(this, entry);
+            SqlEntry.init(this,
+                          entry);
         }
     }
 
@@ -927,13 +997,19 @@ public abstract class DatabaseAccess implements Killable
     {
         List<Tripple<String, String, String>> columnInfo = columnInfo(table);
 
-        ConsoleTable rows = new ConsoleTable(20, 18, TableColumn.COMMENT_SIZE + 2);
-        rows.setTitle(true, Array.of("Column", "Type", "Comment"));
+        ConsoleTable rows = new ConsoleTable(20,
+                                             18,
+                                             TableColumn.COMMENT_SIZE + 2);
+        rows.setTitle(true,
+                      Array.of("Column",
+                               "Type",
+                               "Comment"));
 
         for (Tripple<String, String, String> column : columnInfo)
         {
-            rows.addRow(column.getKey(), column.getFirstValue(),
-                    column.getSecondValue() == null ? "" : column.getSecondValue());
+            rows.addRow(column.getKey(),
+                        column.getFirstValue(),
+                        column.getSecondValue() == null ? "" : column.getSecondValue());
         }
 
         return rows.toString();
@@ -942,35 +1018,40 @@ public abstract class DatabaseAccess implements Killable
     private List<Tripple<String, String, String>> columnInfo(String table)
     {
         List<Entry<String, String>> columnTypes = select()
-                .from(table)
-                .onLessThan(1, (num, res) ->
-                {
-                    return res;
-                })
-                .execute().getColumnTypes();
+                                                          .from(table)
+                                                          .onLessThan(1,
+                                                                      (num, res) -> {
+                                                                          return res;
+                                                                      })
+                                                          .execute()
+                                                          .getColumnTypes();
         Map<String, String> typeMap = new HashMap<>();
 
         for (Entry<String, String> column : columnTypes)
         {
-            typeMap.put(column.getKey().toUpperCase(), column.getValue());
+            typeMap.put(column.getKey().toUpperCase(),
+                        column.getValue());
         }
 
         List<Tripple<String, String, String>> columnInfo = new ArrayList<>();
 
         SqlResultSet set = select()
-                .from(COMMENT_TABLE)
-                .where("table_name").equals(table.toUpperCase())
-                .onLessThan(1, (num, res) ->
-                {
-                    return res;
-                })
-                .execute();
-        
+                                   .from(COMMENT_TABLE)
+                                   .where("table_name")
+                                   .equals(table.toUpperCase())
+                                   .onLessThan(1,
+                                               (num, res) -> {
+                                                   return res;
+                                               })
+                                   .execute();
+
         for (SqlResult result : set)
         {
             String col = result.getString("column_name").toUpperCase();
             String type = typeMap.get(col);
-            columnInfo.add(new SimpleTripple<String, String, String>(col, type, result.getString("column_comment")));
+            columnInfo.add(new SimpleTripple<String, String, String>(col,
+                                                                     type,
+                                                                     result.getString("column_comment")));
         }
 
         return columnInfo;
@@ -994,7 +1075,10 @@ public abstract class DatabaseAccess implements Killable
 
         if (instance != null)
         {
-            instance.onInsert(new InsertEvent(instance, table, idFieldName, id));
+            instance.onInsert(new InsertEvent(instance,
+                                              table,
+                                              idFieldName,
+                                              id));
         }
     }
 
@@ -1012,7 +1096,8 @@ public abstract class DatabaseAccess implements Killable
     protected void onInsert(InsertEvent event)
     {
         int count = this.triggerDispatcher.dispatch(event);
-        log.print(this, "Dispatched insert event to " + count + " listeners.");
+        log.print(this,
+                  "Dispatched insert event to " + count + " listeners.");
     }
 
     /**
@@ -1033,7 +1118,10 @@ public abstract class DatabaseAccess implements Killable
 
         if (instance != null)
         {
-            instance.onUpdate(new UpdateEvent(instance, table, idFieldName, id));
+            instance.onUpdate(new UpdateEvent(instance,
+                                              table,
+                                              idFieldName,
+                                              id));
         }
     }
 
@@ -1051,7 +1139,8 @@ public abstract class DatabaseAccess implements Killable
     protected void onUpdate(UpdateEvent event)
     {
         int count = this.triggerDispatcher.dispatch(event);
-        log.print(this, "Dispatched update event to " + count + " listeners.");
+        log.print(this,
+                  "Dispatched update event to " + count + " listeners.");
     }
 
     /**
@@ -1072,7 +1161,10 @@ public abstract class DatabaseAccess implements Killable
 
         if (instance != null)
         {
-            instance.onDelete(new DeleteEvent(instance, table, idFieldName, id));
+            instance.onDelete(new DeleteEvent(instance,
+                                              table,
+                                              idFieldName,
+                                              id));
         }
     }
 
@@ -1090,7 +1182,8 @@ public abstract class DatabaseAccess implements Killable
     protected void onDelete(DeleteEvent event)
     {
         int count = this.triggerDispatcher.dispatch(event);
-        log.print(this, "Dispatched delete event to " + count + " listeners.");
+        log.print(this,
+                  "Dispatched delete event to " + count + " listeners.");
     }
 
     /**

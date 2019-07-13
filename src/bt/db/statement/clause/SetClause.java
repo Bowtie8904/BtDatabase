@@ -74,89 +74,107 @@ public class SetClause<T extends SqlModifyStatement>
 
             if (this.value == null)
             {
-                statement.setNull(parameterIndex, this.sqlValueType.getIntType());
+                statement.setNull(parameterIndex,
+                                  this.sqlValueType.getIntType());
                 strValue = "null";
             }
             else
             {
-                switch (this.sqlValueType)
+                switch (
+                    this.sqlValueType
+                )
                 {
-                case BOOLEAN:
-                    statement.setBoolean(parameterIndex, (boolean)this.value);
-                    strValue = Boolean.toString((boolean)this.value);
-                    break;
-                case VARCHAR:
-                    statement.setString(parameterIndex, (String)this.value);
-                    strValue = (String)this.value;
-                    break;
-                case INTEGER:
-                    statement.setInt(parameterIndex, (int)this.value);
-                    strValue = Integer.toString((int)this.value);
-                    break;
-                case LONG:
-                    statement.setLong(parameterIndex, (long)this.value);
-                    strValue = Long.toString((long)this.value);
-                    break;
-                case FLOAT:
-                    statement.setFloat(parameterIndex, (float)this.value);
-                    strValue = Float.toString((float)this.value);
-                    break;
-                case DOUBLE:
-                    statement.setDouble(parameterIndex, (double)this.value);
-                    strValue = Double.toString((double)this.value);
-                    break;
-                case DATE:
-                    if (this.value instanceof String)
-                    {
-                        statement.setDate(parameterIndex, Date.valueOf((String)this.value));
+                    case BOOLEAN:
+                        statement.setBoolean(parameterIndex,
+                                             (boolean)this.value);
+                        strValue = Boolean.toString((boolean)this.value);
+                        break;
+                    case VARCHAR:
+                        statement.setString(parameterIndex,
+                                            (String)this.value);
                         strValue = (String)this.value;
-                    }
-                    else if (this.value instanceof Date)
-                    {
-                        statement.setDate(parameterIndex, (Date)this.value);
-                        strValue = ((Date)this.value).toString();
-                    }
-                    break;
-                case TIME:
-                    if (this.value instanceof String)
-                    {
-                        statement.setTime(parameterIndex, Time.valueOf((String)this.value));
-                        strValue = (String)this.value;
-                    }
-                    else if (this.value instanceof Time)
-                    {
-                        statement.setTime(parameterIndex, (Time)this.value);
-                        strValue = ((Time)this.value).toString();
-                    }
-                    break;
-                case TIMESTAMP:
-                    if (this.value instanceof String)
-                    {
-                        statement.setTimestamp(parameterIndex, Timestamp.valueOf((String)this.value));
-                        strValue = (String)this.value;
-                    }
-                    else if (this.value instanceof Timestamp)
-                    {
-                        statement.setTimestamp(parameterIndex, (Timestamp)this.value);
-                        strValue = ((Timestamp)this.value).toString();
-                    }
-                    break;
-                case CLOB:
-                    statement.setClob(parameterIndex, (Clob)this.value);
-                    strValue = ((Clob)this.value).toString();
-                    break;
-                case BLOB:
-                    statement.setBlob(parameterIndex, (Blob)this.value);
-                    strValue = ((Blob)this.value).toString();
-                    break;
-                default:
-                    break;
+                        break;
+                    case INTEGER:
+                        statement.setInt(parameterIndex,
+                                         (int)this.value);
+                        strValue = Integer.toString((int)this.value);
+                        break;
+                    case LONG:
+                        statement.setLong(parameterIndex,
+                                          (long)this.value);
+                        strValue = Long.toString((long)this.value);
+                        break;
+                    case FLOAT:
+                        statement.setFloat(parameterIndex,
+                                           (float)this.value);
+                        strValue = Float.toString((float)this.value);
+                        break;
+                    case DOUBLE:
+                        statement.setDouble(parameterIndex,
+                                            (double)this.value);
+                        strValue = Double.toString((double)this.value);
+                        break;
+                    case DATE:
+                        if (this.value instanceof String)
+                        {
+                            statement.setDate(parameterIndex,
+                                              Date.valueOf((String)this.value));
+                            strValue = (String)this.value;
+                        }
+                        else if (this.value instanceof Date)
+                        {
+                            statement.setDate(parameterIndex,
+                                              (Date)this.value);
+                            strValue = ((Date)this.value).toString();
+                        }
+                        break;
+                    case TIME:
+                        if (this.value instanceof String)
+                        {
+                            statement.setTime(parameterIndex,
+                                              Time.valueOf((String)this.value));
+                            strValue = (String)this.value;
+                        }
+                        else if (this.value instanceof Time)
+                        {
+                            statement.setTime(parameterIndex,
+                                              (Time)this.value);
+                            strValue = ((Time)this.value).toString();
+                        }
+                        break;
+                    case TIMESTAMP:
+                        if (this.value instanceof String)
+                        {
+                            statement.setTimestamp(parameterIndex,
+                                                   Timestamp.valueOf((String)this.value));
+                            strValue = (String)this.value;
+                        }
+                        else if (this.value instanceof Timestamp)
+                        {
+                            statement.setTimestamp(parameterIndex,
+                                                   (Timestamp)this.value);
+                            strValue = ((Timestamp)this.value).toString();
+                        }
+                        break;
+                    case CLOB:
+                        statement.setClob(parameterIndex,
+                                          (Clob)this.value);
+                        strValue = ((Clob)this.value).toString();
+                        break;
+                    case BLOB:
+                        statement.setBlob(parameterIndex,
+                                          (Blob)this.value);
+                        strValue = ((Blob)this.value).toString();
+                        break;
+                    default:
+                        break;
                 }
             }
         }
         catch (Exception e)
         {
-            DatabaseAccess.log.print(this, e);
+            DatabaseAccess.log.print(this,
+                                     e);
         }
 
         return strValue;
@@ -230,70 +248,73 @@ public class SetClause<T extends SqlModifyStatement>
             }
             else
             {
-                switch (this.sqlValueType)
+                switch (
+                    this.sqlValueType
+                )
                 {
-                case BOOLEAN:
-                    strValue = Boolean.toString((boolean)this.value);
-                    break;
-                case VARCHAR:
-                    strValue = "'" + (String)this.value + "'";
-                    break;
-                case INTEGER:
-                    strValue = Integer.toString((int)this.value);
-                    break;
-                case LONG:
-                    strValue = Long.toString((long)this.value);
-                    break;
-                case FLOAT:
-                    strValue = Float.toString((float)this.value);
-                    break;
-                case DOUBLE:
-                    strValue = Double.toString((double)this.value);
-                    break;
-                case DATE:
-                    if (this.value instanceof String)
-                    {
+                    case BOOLEAN:
+                        strValue = Boolean.toString((boolean)this.value);
+                        break;
+                    case VARCHAR:
                         strValue = "'" + (String)this.value + "'";
-                    }
-                    else if (this.value instanceof Date)
-                    {
-                        strValue = "'" + ((Date)this.value).toString() + "'";
-                    }
-                    break;
-                case TIME:
-                    if (this.value instanceof String)
-                    {
-                        strValue = "'" + (String)this.value + "'";
-                    }
-                    else if (this.value instanceof Time)
-                    {
-                        strValue = "'" + ((Time)this.value).toString() + "'";
-                    }
-                    break;
-                case TIMESTAMP:
-                    if (this.value instanceof String)
-                    {
-                        strValue = "'" + (String)this.value + "'";
-                    }
-                    else if (this.value instanceof Timestamp)
-                    {
-                        strValue = "'" + ((Timestamp)this.value).toString() + "'";
-                    }
-                    break;
-                case CLOB:
-                    strValue = ((Clob)this.value).toString();
-                    break;
-                case BLOB:
-                    strValue = ((Blob)this.value).toString();
-                    break;
-                default:
-                    break;
+                        break;
+                    case INTEGER:
+                        strValue = Integer.toString((int)this.value);
+                        break;
+                    case LONG:
+                        strValue = Long.toString((long)this.value);
+                        break;
+                    case FLOAT:
+                        strValue = Float.toString((float)this.value);
+                        break;
+                    case DOUBLE:
+                        strValue = Double.toString((double)this.value);
+                        break;
+                    case DATE:
+                        if (this.value instanceof String)
+                        {
+                            strValue = "'" + (String)this.value + "'";
+                        }
+                        else if (this.value instanceof Date)
+                        {
+                            strValue = "'" + ((Date)this.value).toString() + "'";
+                        }
+                        break;
+                    case TIME:
+                        if (this.value instanceof String)
+                        {
+                            strValue = "'" + (String)this.value + "'";
+                        }
+                        else if (this.value instanceof Time)
+                        {
+                            strValue = "'" + ((Time)this.value).toString() + "'";
+                        }
+                        break;
+                    case TIMESTAMP:
+                        if (this.value instanceof String)
+                        {
+                            strValue = "'" + (String)this.value + "'";
+                        }
+                        else if (this.value instanceof Timestamp)
+                        {
+                            strValue = "'" + ((Timestamp)this.value).toString() + "'";
+                        }
+                        break;
+                    case CLOB:
+                        strValue = ((Clob)this.value).toString();
+                        break;
+                    case BLOB:
+                        strValue = ((Blob)this.value).toString();
+                        break;
+                    default:
+                        break;
                 }
             }
         }
         catch (Exception e)
         {
-            DatabaseAccess.log.print(this, e);
+            DatabaseAccess.log.print(this,
+                                     e);
         }
 
         return strValue;

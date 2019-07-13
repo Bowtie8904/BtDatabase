@@ -121,7 +121,8 @@ public class TriggerAction
                 action += param + ", ";
             }
 
-            action = action.substring(0, action.length() - 2);
+            action = action.substring(0,
+                                      action.length() - 2);
 
             action += ")";
         }

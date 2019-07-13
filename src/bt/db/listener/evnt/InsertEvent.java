@@ -25,6 +25,10 @@ public class InsertEvent extends DatabaseChangeEvent
      */
     public InsertEvent(DatabaseAccess sourceDB, String table, String idFieldName, long id, String... data)
     {
-        super(sourceDB, table, idFieldName, id, data);
+        super(sourceDB,
+              table,
+              idFieldName,
+              id,
+              data);
     }
 }

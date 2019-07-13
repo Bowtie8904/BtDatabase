@@ -34,7 +34,8 @@ public class ConcatenateFunction extends SqlFunction<ConcatenateFunction>
             }
         }
 
-        concatStr = concatStr.substring(0, concatStr.length() - 4);
+        concatStr = concatStr.substring(0,
+                                        concatStr.length() - 4);
 
         return concatStr;
     }

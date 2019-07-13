@@ -30,6 +30,7 @@ public class Alter extends SqlStatement<Create>
      */
     public AlterTableStatement table(String name)
     {
-        return new AlterTableStatement(this.db, name);
+        return new AlterTableStatement(this.db,
+                                       name);
     }
 }

@@ -34,7 +34,7 @@ public class SqlResult implements Iterable<Object>
     private Map<String, Object> objectResults = new HashMap<>();
     private Map<String, Clob> clobResults = new HashMap<>();
     private Map<String, Blob> blobResults = new HashMap<>();
-    
+
     private List<String> columnOrder;
     private Map<String, String> columnTypes;
 
@@ -76,64 +76,78 @@ public class SqlResult implements Iterable<Object>
         if (this.columnOrder.size() != values.length)
         {
             throw new IllegalArgumentException(
-                    "Must pass the same number of values as there is columns in the result.");
+                                               "Must pass the same number of values as there is columns in the result.");
         }
 
         for (int i = 0; i < this.columnOrder.size(); i ++ )
         {
-            putObject(this.columnOrder.get(i), values[i]);
+            putObject(this.columnOrder.get(i),
+                      values[i]);
 
             if (values[i] instanceof String)
             {
-                put(this.columnOrder.get(i), (String)values[i]);
+                put(this.columnOrder.get(i),
+                    (String)values[i]);
             }
             else if (values[i] instanceof Integer)
             {
-                put(this.columnOrder.get(i), (Integer)values[i]);
+                put(this.columnOrder.get(i),
+                    (Integer)values[i]);
             }
             else if (values[i] instanceof Short)
             {
-                put(this.columnOrder.get(i), (Short)values[i]);
+                put(this.columnOrder.get(i),
+                    (Short)values[i]);
             }
             else if (values[i] instanceof Byte)
             {
-                put(this.columnOrder.get(i), (Byte)values[i]);
+                put(this.columnOrder.get(i),
+                    (Byte)values[i]);
             }
             else if (values[i] instanceof Long)
             {
-                put(this.columnOrder.get(i), (Long)values[i]);
+                put(this.columnOrder.get(i),
+                    (Long)values[i]);
             }
             else if (values[i] instanceof Double)
             {
-                put(this.columnOrder.get(i), (Double)values[i]);
+                put(this.columnOrder.get(i),
+                    (Double)values[i]);
             }
             else if (values[i] instanceof Float)
             {
-                put(this.columnOrder.get(i), (Float)values[i]);
+                put(this.columnOrder.get(i),
+                    (Float)values[i]);
             }
             else if (values[i] instanceof Date)
             {
-                put(this.columnOrder.get(i), (Date)values[i]);
+                put(this.columnOrder.get(i),
+                    (Date)values[i]);
             }
             else if (values[i] instanceof Time)
             {
-                put(this.columnOrder.get(i), (Time)values[i]);
+                put(this.columnOrder.get(i),
+                    (Time)values[i]);
             }
             else if (values[i] instanceof Timestamp)
             {
-                put(this.columnOrder.get(i), (Timestamp)values[i]);
+                put(this.columnOrder.get(i),
+                    (Timestamp)values[i]);
             }
             else if (values[i] instanceof Boolean)
             {
-                put(this.columnOrder.get(i), (Boolean)values[i]);
+                put(this.columnOrder.get(i),
+                    (Boolean)values[i]);
             }
             else if (values[i] instanceof Clob)
             {
-                put(this.columnOrder.get(i), (Clob)values[i]);
+                put(this.columnOrder.get(i),
+                    (Clob)values[i]);
             }
             else if (values[i] instanceof Blob)
             {
-                put(this.columnOrder.get(i), (Blob)values[i]);
+                put(this.columnOrder.get(i),
+                    (Blob)values[i]);
             }
         }
     }
@@ -149,7 +163,8 @@ public class SqlResult implements Iterable<Object>
     public void putObject(String name, Object value)
     {
         name = name.toUpperCase();
-        objectResults.put(name, value);
+        objectResults.put(name,
+                          value);
     }
 
     /**
@@ -167,8 +182,10 @@ public class SqlResult implements Iterable<Object>
     public void put(String name, String value)
     {
         name = name.toUpperCase();
-        stringResults.put(name, value);
-        putObject(name, value);
+        stringResults.put(name,
+                          value);
+        putObject(name,
+                  value);
     }
 
     /**
@@ -186,8 +203,10 @@ public class SqlResult implements Iterable<Object>
     public void put(String name, Time value)
     {
         name = name.toUpperCase();
-        timeResults.put(name, value);
-        putObject(name, value);
+        timeResults.put(name,
+                        value);
+        putObject(name,
+                  value);
     }
 
     /**
@@ -205,8 +224,10 @@ public class SqlResult implements Iterable<Object>
     public void put(String name, Timestamp value)
     {
         name = name.toUpperCase();
-        timestampResults.put(name, value);
-        putObject(name, value);
+        timestampResults.put(name,
+                             value);
+        putObject(name,
+                  value);
     }
 
     /**
@@ -224,8 +245,10 @@ public class SqlResult implements Iterable<Object>
     public void put(String name, Clob value)
     {
         name = name.toUpperCase();
-        clobResults.put(name, value);
-        putObject(name, value);
+        clobResults.put(name,
+                        value);
+        putObject(name,
+                  value);
     }
 
     /**
@@ -243,8 +266,10 @@ public class SqlResult implements Iterable<Object>
     public void put(String name, Blob value)
     {
         name = name.toUpperCase();
-        blobResults.put(name, value);
-        putObject(name, value);
+        blobResults.put(name,
+                        value);
+        putObject(name,
+                  value);
     }
 
     /**
@@ -262,8 +287,10 @@ public class SqlResult implements Iterable<Object>
     public void put(String name, byte value)
     {
         name = name.toUpperCase();
-        byteResults.put(name, value);
-        putObject(name, value);
+        byteResults.put(name,
+                        value);
+        putObject(name,
+                  value);
     }
 
     /**
@@ -281,8 +308,10 @@ public class SqlResult implements Iterable<Object>
     public void put(String name, short value)
     {
         name = name.toUpperCase();
-        shortResults.put(name, value);
-        putObject(name, value);
+        shortResults.put(name,
+                         value);
+        putObject(name,
+                  value);
     }
 
     /**
@@ -300,10 +329,12 @@ public class SqlResult implements Iterable<Object>
     public void put(String name, int value)
     {
         name = name.toUpperCase();
-        intResults.put(name, value);
-        putObject(name, value);
+        intResults.put(name,
+                       value);
+        putObject(name,
+                  value);
     }
-    
+
     /**
      * Maps the given value to the given name.
      * 
@@ -319,10 +350,12 @@ public class SqlResult implements Iterable<Object>
     public void put(String name, long value)
     {
         name = name.toUpperCase();
-        longResults.put(name, value);
-        putObject(name, value);
+        longResults.put(name,
+                        value);
+        putObject(name,
+                  value);
     }
-    
+
     /**
      * Maps the given value to the given name.
      * 
@@ -338,10 +371,12 @@ public class SqlResult implements Iterable<Object>
     public void put(String name, double value)
     {
         name = name.toUpperCase();
-        doubleResults.put(name, value);
-        putObject(name, value);
+        doubleResults.put(name,
+                          value);
+        putObject(name,
+                  value);
     }
-    
+
     /**
      * Maps the given value to the given name.
      * 
@@ -357,10 +392,12 @@ public class SqlResult implements Iterable<Object>
     public void put(String name, float value)
     {
         name = name.toUpperCase();
-        floatResults.put(name, value);
-        putObject(name, value);
+        floatResults.put(name,
+                         value);
+        putObject(name,
+                  value);
     }
-    
+
     /**
      * Maps the given value to the given name.
      * 
@@ -376,10 +413,12 @@ public class SqlResult implements Iterable<Object>
     public void put(String name, Date value)
     {
         name = name.toUpperCase();
-        dateResults.put(name, value);
-        putObject(name, value);
+        dateResults.put(name,
+                        value);
+        putObject(name,
+                  value);
     }
-    
+
     /**
      * Maps the given value to the given name.
      * 
@@ -395,10 +434,12 @@ public class SqlResult implements Iterable<Object>
     public void put(String name, boolean value)
     {
         name = name.toUpperCase();
-        booleanResults.put(name, value);
-        putObject(name, value);
+        booleanResults.put(name,
+                           value);
+        putObject(name,
+                  value);
     }
-    
+
     /**
      * Gets the value mapped to the given name.
      * 
@@ -411,7 +452,7 @@ public class SqlResult implements Iterable<Object>
         name = name.toUpperCase();
         return stringResults.get(name);
     }
-    
+
     /**
      * Gets the value mapped to the given name.
      * 
@@ -450,7 +491,7 @@ public class SqlResult implements Iterable<Object>
         name = name.toUpperCase();
         return intResults.get(name);
     }
-    
+
     /**
      * Gets the value mapped to the given name.
      * 
@@ -463,7 +504,7 @@ public class SqlResult implements Iterable<Object>
         name = name.toUpperCase();
         return longResults.get(name);
     }
-    
+
     /**
      * Gets the value mapped to the given name.
      * 
@@ -476,7 +517,7 @@ public class SqlResult implements Iterable<Object>
         name = name.toUpperCase();
         return doubleResults.get(name);
     }
-    
+
     /**
      * Gets the value mapped to the given name.
      * 
@@ -489,7 +530,7 @@ public class SqlResult implements Iterable<Object>
         name = name.toUpperCase();
         return floatResults.get(name);
     }
-    
+
     /**
      * Gets the value mapped to the given name.
      * 
@@ -502,7 +543,7 @@ public class SqlResult implements Iterable<Object>
         name = name.toUpperCase();
         return dateResults.get(name);
     }
-    
+
     /**
      * Gets the value mapped to the given name.
      * 
@@ -666,7 +707,9 @@ public class SqlResult implements Iterable<Object>
                 continue;
             }
 
-            statement.set(col, this.objectResults.get(col), SqlType.convert(this.columnTypes.get(col)));
+            statement.set(col,
+                          this.objectResults.get(col),
+                          SqlType.convert(this.columnTypes.get(col)));
         }
 
         return statement.toString();

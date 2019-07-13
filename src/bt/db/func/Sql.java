@@ -28,7 +28,8 @@ public final class Sql
      */
     public static ColumnEntry column(String table, String column)
     {
-        return new ColumnEntry(table, column);
+        return new ColumnEntry(table,
+                               column);
     }
 
     /**
@@ -93,7 +94,8 @@ public final class Sql
      */
     public static AverageFunction avg(String table, String column)
     {
-        return new AverageFunction(new ColumnEntry(table, column));
+        return new AverageFunction(new ColumnEntry(table,
+                                                   column));
     }
 
     /**
@@ -157,7 +159,8 @@ public final class Sql
      */
     public static CountFunction count(String table, String column)
     {
-        return new CountFunction(new ColumnEntry(table, column));
+        return new CountFunction(new ColumnEntry(table,
+                                                 column));
     }
 
     /**
@@ -201,7 +204,8 @@ public final class Sql
      */
     public static MaxFunction max(String table, String column)
     {
-        return new MaxFunction(new ColumnEntry(table, column));
+        return new MaxFunction(new ColumnEntry(table,
+                                               column));
     }
 
     /**
@@ -242,7 +246,8 @@ public final class Sql
      */
     public static MinFunction min(String table, String column)
     {
-        return new MinFunction(new ColumnEntry(table, column));
+        return new MinFunction(new ColumnEntry(table,
+                                               column));
     }
 
     /**
@@ -283,7 +288,8 @@ public final class Sql
      */
     public static SumFunction sum(String table, String column)
     {
-        return new SumFunction(new ColumnEntry(table, column));
+        return new SumFunction(new ColumnEntry(table,
+                                               column));
     }
 
     /**
@@ -301,7 +307,8 @@ public final class Sql
      */
     public static AbsoluteFunction abs(String table, String column)
     {
-        return new AbsoluteFunction(new ColumnEntry(table, column));
+        return new AbsoluteFunction(new ColumnEntry(table,
+                                                    column));
     }
 
     /**

@@ -25,6 +25,10 @@ public class UpdateEvent extends DatabaseChangeEvent
      */
     public UpdateEvent(DatabaseAccess sourceDB, String table, String idFieldName, long id, String... data)
     {
-        super(sourceDB, table, idFieldName, id, data);
+        super(sourceDB,
+              table,
+              idFieldName,
+              id,
+              data);
     }
 }

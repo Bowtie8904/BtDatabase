@@ -28,9 +28,11 @@ public class JoinConditionalClause extends ConditionalClause<SelectStatement>
      *            The keyword used in this clause. Usually this would be ON.
      */
     public JoinConditionalClause(SelectStatement statement, String column, String table1, String table2,
-            String keyword)
+                                 String keyword)
     {
-        super(statement, column, keyword);
+        super(statement,
+              column,
+              keyword);
         this.table1 = table1;
         this.table2 = table2;
     }
@@ -54,7 +56,7 @@ public class JoinConditionalClause extends ConditionalClause<SelectStatement>
         if (this.valueType == ValueType.COLUMN)
         {
             return this.keyword + " " + this.table1 + "." + this.column + " " + this.operator + " " + this.table2 + "."
-                    + this.value;
+                   + this.value;
         }
 
         return this.keyword + " " + this.table1 + "." + this.column + " " + this.operator + " ?";
@@ -83,7 +85,7 @@ public class JoinConditionalClause extends ConditionalClause<SelectStatement>
         else if (this.valueType == ValueType.COLUMN)
         {
             return this.keyword + " " + this.table1 + "." + this.column + " " + this.operator + " " + this.table2 + "."
-                    + this.value;
+                   + this.value;
         }
         else if (this.valueType == ValueType.STRING)
         {
