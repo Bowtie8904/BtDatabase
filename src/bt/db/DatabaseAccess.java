@@ -181,12 +181,12 @@ public abstract class DatabaseAccess implements Killable
                           this);
         }
         createDefaultProcedures();
-        log.printf(this,
-                   "Setup database instance %s",
-                   this.instanceID);
-        log.printf(this,
-                   "Using connection string: %s",
-                   this.dbConnectionString);
+        log.printfSrc(this,
+                      "Setup database instance %s",
+                      this.instanceID);
+        log.printfSrc(this,
+                      "Using connection string: %s",
+                      this.dbConnectionString);
     }
 
     /**
@@ -230,9 +230,9 @@ public abstract class DatabaseAccess implements Killable
     {
         try (Connection connection = DriverManager.getConnection(this.dbConnectionString))
         {
-            log.printf(this,
-                       "Loaded database %s",
-                       this.getInstanceID());
+            log.printfSrc(this,
+                          "Loaded database %s",
+                          this.getInstanceID());
         }
         catch (SQLException e)
         {
@@ -372,11 +372,11 @@ public abstract class DatabaseAccess implements Killable
         this.triggerDispatcher.subscribeTo(listenFor,
                                            cons);
 
-        log.printf(this,
-                   "Registered database listener of type '%s' for '%s' to instance %s.",
-                   listener.getClass().getName(),
-                   listenFor.getName(),
-                   this.getInstanceID());
+        log.printfSrc(this,
+                      "Registered database listener of type '%s' for '%s' to instance %s.",
+                      listener.getClass().getName(),
+                      listenFor.getName(),
+                      this.getInstanceID());
 
         return cons;
     }
@@ -396,11 +396,11 @@ public abstract class DatabaseAccess implements Killable
         if (this.triggerDispatcher.unsubscribeFrom(type,
                                                    listener))
         {
-            log.printf(this,
-                       "Unregistered database listener of type '%s' for '%s' to instance %s.",
-                       listener.getClass().getName(),
-                       type.getName(),
-                       this.getInstanceID());
+            log.printfSrc(this,
+                          "Unregistered database listener of type '%s' for '%s' to instance %s.",
+                          listener.getClass().getName(),
+                          type.getName(),
+                          this.getInstanceID());
         }
     }
 
@@ -472,9 +472,9 @@ public abstract class DatabaseAccess implements Killable
                 {
                     instances.remove(this.instanceID);
                 }
-                log.printf(this,
-                           "Closed database %s.",
-                           this.getInstanceID());
+                log.printfSrc(this,
+                              "Closed database %s.",
+                              this.getInstanceID());
             }
         }
         catch (SQLException e)
@@ -740,10 +740,10 @@ public abstract class DatabaseAccess implements Killable
             count += executeUpdate(statement);
         }
 
-        log.printf(this,
-                   "Imported %d rows from %s.",
-                   count,
-                   importFile.getAbsolutePath());
+        log.printfSrc(this,
+                      "Imported %d rows from %s.",
+                      count,
+                      importFile.getAbsolutePath());
     }
 
     /**
@@ -798,10 +798,10 @@ public abstract class DatabaseAccess implements Killable
                                           excludeColumns));
             }
 
-            log.printf(this,
-                       "Exported %d rows to %s.",
-                       set.size(),
-                       exportFile.getAbsolutePath());
+            log.printfSrc(this,
+                          "Exported %d rows to %s.",
+                          set.size(),
+                          exportFile.getAbsolutePath());
         }
         catch (IOException e)
         {
@@ -1113,9 +1113,9 @@ public abstract class DatabaseAccess implements Killable
     protected void onInsert(InsertEvent event)
     {
         int count = this.triggerDispatcher.dispatch(event);
-        log.printf(this,
-                   "Dispatched insert event to %d listeners.",
-                   count);
+        log.printfSrc(this,
+                      "Dispatched insert event to %d listeners.",
+                      count);
     }
 
     /**
@@ -1157,9 +1157,9 @@ public abstract class DatabaseAccess implements Killable
     protected void onUpdate(UpdateEvent event)
     {
         int count = this.triggerDispatcher.dispatch(event);
-        log.printf(this,
-                   "Dispatched update event to %d listeners.",
-                   count);
+        log.printfSrc(this,
+                      "Dispatched update event to %d listeners.",
+                      count);
     }
 
     /**
@@ -1201,9 +1201,9 @@ public abstract class DatabaseAccess implements Killable
     protected void onDelete(DeleteEvent event)
     {
         int count = this.triggerDispatcher.dispatch(event);
-        log.printf(this,
-                   "Dispatched delete event to %d listeners.",
-                   count);
+        log.printfSrc(this,
+                      "Dispatched delete event to %d listeners.",
+                      count);
     }
 
     /**

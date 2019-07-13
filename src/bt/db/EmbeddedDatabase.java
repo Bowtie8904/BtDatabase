@@ -174,9 +174,9 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
             derbyHome = jarFile.getParentFile().getAbsolutePath();
             System.setProperty("derby.system.home",
                                derbyHome);
-            log.printf(this,
-                       "Set derby home to %s",
-                       derbyHome);
+            log.printfSrc(this,
+                          "Set derby home to %s",
+                          derbyHome);
         }
         catch (Exception e)
         {
@@ -226,9 +226,9 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
             try (CallableStatement statement = getConnection().prepareCall(sql))
             {
                 statement.executeUpdate();
-                log.printf(this,
-                           "Added %s to the database.",
-                           path);
+                log.printfSrc(this,
+                              "Added %s to the database.",
+                              path);
             }
             catch (SQLException e)
             {
@@ -237,9 +237,9 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
                 try (CallableStatement statement = getConnection().prepareCall(sql))
                 {
                     statement.executeUpdate();
-                    log.printf(this,
-                               "Replaced %s in the database.",
-                               path);
+                    log.printfSrc(this,
+                                  "Replaced %s in the database.",
+                                  path);
                 }
                 catch (SQLException e1)
                 {}
