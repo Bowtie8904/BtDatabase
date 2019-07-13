@@ -49,7 +49,7 @@ import bt.utils.log.Logger;
 
 /**
  * Base class for databases.
- * 
+ *
  * @author &#8904
  */
 public abstract class DatabaseAccess implements Killable
@@ -101,7 +101,7 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Gets the instance with the given ID.
-     * 
+     *
      * @param id
      *            The ID of the instance to return.
      * @return The instance that was mapped to the given ID or null if no such instance was found.
@@ -113,15 +113,15 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Creates a new instance.
-     * 
+     *
      * <p>
      * This instance is added to the {@link InstanceKiller} with a priority of 1.
      * </p>
-     * 
+     *
      * <p>
      * {@link #setup()} needs to be called to finish up the initialization.
      * </p>
-     * 
+     *
      * @param dbURL
      *            The URL for creation or connection of the database.
      */
@@ -137,15 +137,15 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Creates a new instance.
-     * 
+     *
      * <p>
      * This instance is added to the {@link InstanceKiller} with a priority of 1.
      * </p>
-     * 
+     *
      * <p>
      * {@link #setup()} needs to be called to finish up the initialization.
      * </p>
-     * 
+     *
      * @param configuration
      *            The configuration for this DB's connection.
      */
@@ -156,7 +156,7 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Sets the database up.
-     * 
+     *
      * <p>
      * The methods being called for the setup are (in order):
      * <ul>
@@ -181,15 +181,17 @@ public abstract class DatabaseAccess implements Killable
                           this);
         }
         createDefaultProcedures();
-        log.print(this,
-                  "Setup database instance " + this.instanceID);
-        log.print(this,
-                  "Using connection string: " + this.dbConnectionString);
+        log.printf(this,
+                   "Setup database instance %s",
+                   this.instanceID);
+        log.printf(this,
+                   "Using connection string: %s",
+                   this.dbConnectionString);
     }
 
     /**
      * Gets the runtime unique ID of this instance.
-     * 
+     *
      * @return The String ID.
      */
     public String getInstanceID()
@@ -199,7 +201,7 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Checks whether this instance already has an ID assigned and requests a new one if it does not.
-     * 
+     *
      * <p>
      * The assigned id will be saved to the {@link #PROPERTIES_TABLE} with the key 'instanceID'.
      * </p>
@@ -218,7 +220,7 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Creates the database if it does not exist yet.
-     * 
+     *
      * <p>
      * This will simply attempt to create a connection to the database which will create it automatically, if it does
      * not exist yet and the option was set in the configuration. This does only work with local databases.
@@ -228,8 +230,9 @@ public abstract class DatabaseAccess implements Killable
     {
         try (Connection connection = DriverManager.getConnection(this.dbConnectionString))
         {
-            log.print(this,
-                      "Loaded database.");
+            log.printf(this,
+                       "Loaded database %s",
+                       this.getInstanceID());
         }
         catch (SQLException e)
         {
@@ -240,7 +243,7 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Gets the dispatcher instance whichs subscribers are the listeners for insert, delete and update triggers.
-     * 
+     *
      * @return
      */
     protected Dispatcher getTriggerDispatcher()
@@ -251,7 +254,7 @@ public abstract class DatabaseAccess implements Killable
     /**
      * Registers the given runnable as a listener for the given event type (only {@link InsertEvent},
      * {@link DeleteEvent} and {@link UpdateEvent} are accepted.
-     * 
+     *
      * <p>
      * If no tables are specified, the given listener will be called every time the given event type is dispatched. If
      * tables are specified the listener is only called for triggers that involve one of the given tables.
@@ -259,13 +262,13 @@ public abstract class DatabaseAccess implements Killable
      * <br>
      * <p>
      * Example:<br>
-     * 
+     *
      * <pre>
      * // will be called for every dispatched InsertEvent
      * registerListener(InsertEvent.class,
      *                  myListener::onInsert);
      * </pre>
-     * 
+     *
      * <pre>
      * // will be called only for inserts in the tables with the names 'myTable' or 'myTable2'
      * registerListener(InsertEvent.class,
@@ -274,14 +277,14 @@ public abstract class DatabaseAccess implements Killable
      *                  "myTable2");
      * </pre>
      * </p>
-     * 
+     *
      * @param listenFor
      *            The event type to listen for.
      * @param listener
      *            The runnable that should be called when the given event type is dispatched.
      * @param tables
      *            The tables for which the listener should be called.
-     * 
+     *
      * @return The consumer that the given listener was wrapped in. This consumer can be used to unregister the given
      *         listener.
      */
@@ -304,7 +307,7 @@ public abstract class DatabaseAccess implements Killable
     /**
      * Registers the given consumer as a listener for the given event type (only {@link InsertEvent},
      * {@link DeleteEvent} and {@link UpdateEvent} are accepted.
-     * 
+     *
      * <p>
      * If no tables are specified, the given listener will be called every time the given event type is dispatched. If
      * tables are specified the listener is only called for triggers that involve one of the given tables.
@@ -312,13 +315,13 @@ public abstract class DatabaseAccess implements Killable
      * <br>
      * <p>
      * Example:<br>
-     * 
+     *
      * <pre>
      * // will be called for every dispatched InsertEvent
      * registerListener(InsertEvent.class,
      *                  myListener::onInsert);
      * </pre>
-     * 
+     *
      * <pre>
      * // will be called only for inserts in the tables with the names 'myTable' or 'myTable2'
      * registerListener(InsertEvent.class,
@@ -327,14 +330,14 @@ public abstract class DatabaseAccess implements Killable
      *                  "myTable2");
      * </pre>
      * </p>
-     * 
+     *
      * @param listenFor
      *            The event type to listen for.
      * @param listener
      *            The consumer method that should be called when the given event type is dispatched.
      * @param tables
      *            The tables for which the listener should be called.
-     * 
+     *
      * @return The consumer that the given listener was wrapped in. This consumer can be used to unregister the given
      *         listener.
      */
@@ -369,21 +372,22 @@ public abstract class DatabaseAccess implements Killable
         this.triggerDispatcher.subscribeTo(listenFor,
                                            cons);
 
-        log.print(this,
-                  "Registered database listener of type '" + listener.getClass().getName() + "' for '"
-                        + listenFor.getName() + "' to instance "
-                        + this.getInstanceID() + ".");
+        log.printf(this,
+                   "Registered database listener of type '%s' for '%s' to instance %s.",
+                   listener.getClass().getName(),
+                   listenFor.getName(),
+                   this.getInstanceID());
 
         return cons;
     }
 
     /**
      * Unregisters the given listener from the given event type.
-     * 
+     *
      * <p>
      * The listener will no longer be called on dispatched events of the given type.
      * </p>
-     * 
+     *
      * @param type
      * @param listener
      */
@@ -392,16 +396,17 @@ public abstract class DatabaseAccess implements Killable
         if (this.triggerDispatcher.unsubscribeFrom(type,
                                                    listener))
         {
-            log.print(this,
-                      "Unregistered database listener of type '" + listener.getClass().getName() + "' for '"
-                            + type.getName() + "' to instance "
-                            + this.getInstanceID() + ".");
+            log.printf(this,
+                       "Unregistered database listener of type '%s' for '%s' to instance %s.",
+                       listener.getClass().getName(),
+                       type.getName(),
+                       this.getInstanceID());
         }
     }
 
     /**
      * Gets a connection to the database.
-     * 
+     *
      * @param autocommit
      *            Indicates whether the returned connection should use autocommit or not.
      * @return The connection.
@@ -414,7 +419,7 @@ public abstract class DatabaseAccess implements Killable
             {
                 try
                 {
-                    this.connection = DriverManager.getConnection(dbConnectionString);
+                    this.connection = DriverManager.getConnection(this.dbConnectionString);
                     this.connection.setAutoCommit(autocommit);
                 }
                 catch (SQLException e)
@@ -435,11 +440,11 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Gets a connection to the database.
-     * 
+     *
      * <p>
      * The returned connection has auto commit turned off.
      * </p>
-     * 
+     *
      * @return The connection.
      */
     public Connection getConnection()
@@ -449,7 +454,7 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Closes the connection to the database if it exists.
-     * 
+     *
      * <p>
      * This will commit the current transaction if the connection is not in auto commit mode.
      * </p>
@@ -467,8 +472,9 @@ public abstract class DatabaseAccess implements Killable
                 {
                     instances.remove(this.instanceID);
                 }
-                log.print(this,
-                          "Closed database.");
+                log.printf(this,
+                           "Closed database %s.",
+                           this.getInstanceID());
             }
         }
         catch (SQLException e)
@@ -480,7 +486,7 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Adds or updates the given property key with the given value.
-     * 
+     *
      * @param key
      *            The unique key of the property.
      * @param value
@@ -506,7 +512,7 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Gets the property value for the given key from the {@link #PROPERTIES_TABLE}.
-     * 
+     *
      * @param key
      *            The key of the property to return.
      * @return The value bound to the given key or null if the key was not found or null.
@@ -617,7 +623,7 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Executes the given raw SQL String of a modify (update, insert, delete, alter, drop, ...) statement.
-     * 
+     *
      * @param sql
      *            The raw SQL String to execute.
      * @return The return value of the statement execution. See {@link Statement#executeUpdate(String)}.
@@ -638,7 +644,7 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Executes the given raw SQL String of a select statement.
-     * 
+     *
      * @param sql
      *            The raw SQL String to execute.
      * @return The {@link SqlResultSet} resulting from the query or null if an error occured.
@@ -661,7 +667,7 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Rolls back the current transaction.
-     * 
+     *
      * <p>
      * This method has no effect on a connection that is in auto commit mode.
      * </p>
@@ -686,7 +692,7 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Commits the current transaction.
-     * 
+     *
      * <p>
      * This method has no effect on a connection that is in auto commit mode.
      * </p>
@@ -711,16 +717,16 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Imports all data formatted as insert statements inside the given file.
-     * 
+     *
      * <p>
      * There can only be one statement in each line and a statement can not exceed over multiple lines.
      * </p>
-     * 
+     *
      * <p>
      * All lines in the file will be read and are expected to be DML statements. Invalid SQL and inserts that violate
      * unique constraints will be skipped.
      * </p>
-     * 
+     *
      * @param importFile
      *            The file from where to import.
      */
@@ -734,18 +740,20 @@ public abstract class DatabaseAccess implements Killable
             count += executeUpdate(statement);
         }
 
-        log.print(this,
-                  "Imported " + count + " rows from " + importFile.getAbsolutePath() + ".");
+        log.printf(this,
+                   "Imported %d rows from %s.",
+                   count,
+                   importFile.getAbsolutePath());
     }
 
     /**
      * Exports all entries in the given table.
-     * 
+     *
      * <p>
      * The entries are exported as insert statements and saved to the given file. The insert statements will include all
      * columns of the given table except the ones that are passed in excludeColumns (case insensitive).
      * </p>
-     * 
+     *
      * @param table
      *            The name of the table whichs data should be exported.
      * @param exportFile
@@ -790,8 +798,10 @@ public abstract class DatabaseAccess implements Killable
                                           excludeColumns));
             }
 
-            log.print(this,
-                      "Exported " + set.size() + " rows to " + exportFile.getAbsolutePath() + ".");
+            log.printf(this,
+                       "Exported %d rows to %s.",
+                       set.size(),
+                       exportFile.getAbsolutePath());
         }
         catch (IOException e)
         {
@@ -802,13 +812,13 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Exports all entries from all user table.
-     * 
+     *
      * <p>
      * The entries are exported as insert statements and saved to separate files in <i>./EXPORT_DATA</i> (Will be
      * created if it does not exist). The files will have the name '<i>NAME_OF_TABLE.sql</i>' The insert statements will
      * include all columns of the respective table except the ones that are passed in excludeColumns (case insensitive).
      * </p>
-     * 
+     *
      * @param excludeColumns
      *            An array of column names which should not be included in the exported insert statements. Keep in mind
      *            that all tables created by this library will have an id column 'DEFAULT_ID' unless a fitting id column
@@ -841,7 +851,7 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Creates a new {@link DropStatement}.
-     * 
+     *
      * @return The statement.
      */
     public DropStatement drop()
@@ -851,7 +861,7 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Creates a new {@link Create}statement.
-     * 
+     *
      * @return The statement.
      */
     public Create create()
@@ -861,7 +871,7 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Creates a new {@link Alter}statement.
-     * 
+     *
      * @return The statement.
      */
     public Alter alter()
@@ -871,7 +881,7 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Creates a select statement which selects all columns (*).
-     * 
+     *
      * @return The statement.
      */
     public SelectStatement select()
@@ -881,12 +891,12 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Creates a select statement which selects the toString() values of the given objects.
-     * 
+     *
      * <p>
      * This method is meant to be used with {@link ColumnEntry} parameters to represent table.column pairs in selects
      * from multiple tables. Call {@link Sql#column(String, String)} to create a new columnentry.
      * </p>
-     * 
+     *
      * @return The statement.
      */
     public SelectStatement select(Object... values)
@@ -904,7 +914,7 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Creates a select statement which selects the given columns.
-     * 
+     *
      * @return The statement.
      */
     public SelectStatement select(String... columns)
@@ -915,7 +925,7 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Creates a delete statement.
-     * 
+     *
      * @return The statement.
      */
     public DeleteStatement delete()
@@ -925,7 +935,7 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Creates an insert statement.
-     * 
+     *
      * @return The statement.
      */
     public InsertStatement insert()
@@ -935,7 +945,7 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Creates an update statement for the given table.
-     * 
+     *
      * @param table
      *            The table to update.
      * @return The statement.
@@ -949,7 +959,7 @@ public abstract class DatabaseAccess implements Killable
     /**
      * Persists the given object into the database by using the provided static methods of {@link SqlEntry} or by
      * calling the persist method of SqlEntry implementations.
-     * 
+     *
      * @param entry
      */
     public void persist(Object entry)
@@ -968,7 +978,7 @@ public abstract class DatabaseAccess implements Killable
     /**
      * Initializes the given object into the database by using the provided static methods of {@link SqlEntry} or by
      * calling the init method of SqlEntry implementations.
-     * 
+     *
      * @param entry
      */
     public void init(Object entry)
@@ -986,7 +996,7 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Formats a String table containing information about the columns of the table with the given name.
-     * 
+     *
      * <p>
      * The contained information are:
      * <ul>
@@ -994,7 +1004,7 @@ public abstract class DatabaseAccess implements Killable
      * <li>Data type</li>
      * <li>Comment</li>
      * </ul>
-     * 
+     *
      * @param table
      * @return
      */
@@ -1056,9 +1066,9 @@ public abstract class DatabaseAccess implements Killable
         {
             String col = result.getString("column_name").toUpperCase();
             String type = typeMap.get(col);
-            columnInfo.add(new SimpleTripple<String, String, String>(col,
-                                                                     type,
-                                                                     result.getString("column_comment")));
+            columnInfo.add(new SimpleTripple<>(col,
+                                               type,
+                                               result.getString("column_comment")));
         }
 
         return columnInfo;
@@ -1066,7 +1076,7 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Calls {@link #onInsert(InsertEvent)} of the database with the given instanceID.
-     * 
+     *
      * @param instanceID
      *            The instanceID of the database that is concerned.
      * @param table
@@ -1091,25 +1101,26 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Dispatches the given {@link InsertEvent} to all concerned listeners.
-     * 
+     *
      * <p>
      * This method exists alongside the static {@link #onInsert(String, String, String, long) onInsert} to allow
      * overriding of this logic.
      * </p>
-     * 
+     *
      * @param event
      *            The event to dispatch.
      */
     protected void onInsert(InsertEvent event)
     {
         int count = this.triggerDispatcher.dispatch(event);
-        log.print(this,
-                  "Dispatched insert event to " + count + " listeners.");
+        log.printf(this,
+                   "Dispatched insert event to %d listeners.",
+                   count);
     }
 
     /**
      * Calls {@link #onUpdate(UpdateEvent)} of the database with the given instanceID.
-     * 
+     *
      * @param instanceID
      *            The instanceID of the database that is concerned.
      * @param table
@@ -1134,25 +1145,26 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Dispatches the given {@link UpdateEvent} to all concerned listeners.
-     * 
+     *
      * <p>
      * This method exists alongside the static {@link #onUpdate(String, String, String, long) onUpdate} to allow
      * overriding of this logic.
      * </p>
-     * 
+     *
      * @param event
      *            The event to dispatch.
      */
     protected void onUpdate(UpdateEvent event)
     {
         int count = this.triggerDispatcher.dispatch(event);
-        log.print(this,
-                  "Dispatched update event to " + count + " listeners.");
+        log.printf(this,
+                   "Dispatched update event to %d listeners.",
+                   count);
     }
 
     /**
      * Calls {@link #onDelete(DeleteEvent)} of the database with the given instanceID.
-     * 
+     *
      * @param instanceID
      *            The instanceID of the database that is concerned.
      * @param table
@@ -1177,25 +1189,26 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Dispatches the given {@link DeleteEvent} to all concerned listeners.
-     * 
+     *
      * <p>
      * This method exists alongside the static {@link #onDelete(String, String, String, long) onDelete} to allow
      * overriding of this logic.
      * </p>
-     * 
+     *
      * @param event
      *            The event to dispatch.
      */
     protected void onDelete(DeleteEvent event)
     {
         int count = this.triggerDispatcher.dispatch(event);
-        log.print(this,
-                  "Dispatched delete event to " + count + " listeners.");
+        log.printf(this,
+                   "Dispatched delete event to %d listeners.",
+                   count);
     }
 
     /**
      * Defines the tables that should be created.
-     * 
+     *
      * <p>
      * This is called by the {@link #setup()} of the implementation.
      * </p>
@@ -1204,7 +1217,7 @@ public abstract class DatabaseAccess implements Killable
 
     /**
      * Defines the default procedures used by this implementation.
-     * 
+     *
      * <p>
      * Those procedures should for example be the trigger procedures for insert, delete and update triggers.
      * </p>

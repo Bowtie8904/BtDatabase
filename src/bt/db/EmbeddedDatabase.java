@@ -11,7 +11,7 @@ import bt.db.constants.SqlType;
 
 /**
  * A class which creates and keeps a connection to an embedded database.
- * 
+ *
  * @author &#8904
  */
 public abstract class EmbeddedDatabase extends DatabaseAccess
@@ -29,7 +29,7 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
 
     /**
      * Creates a new instance which uses the given connection string.
-     * 
+     *
      * @param dbURL
      *            The DB connection string.
      */
@@ -46,7 +46,7 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
 
     /**
      * Creates a new instance which uses the given configuration.
-     * 
+     *
      * @param configuration
      */
     protected EmbeddedDatabase(DatabaseConfiguration configuration)
@@ -174,8 +174,9 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
             derbyHome = jarFile.getParentFile().getAbsolutePath();
             System.setProperty("derby.system.home",
                                derbyHome);
-            log.print(this,
-                      "Set derby home to " + derbyHome);
+            log.printf(this,
+                       "Set derby home to %s",
+                       derbyHome);
         }
         catch (Exception e)
         {
@@ -225,8 +226,9 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
             try (CallableStatement statement = getConnection().prepareCall(sql))
             {
                 statement.executeUpdate();
-                log.print(this,
-                          "Added " + path + " to the database.");
+                log.printf(this,
+                           "Added %s to the database.",
+                           path);
             }
             catch (SQLException e)
             {
@@ -235,8 +237,9 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
                 try (CallableStatement statement = getConnection().prepareCall(sql))
                 {
                     statement.executeUpdate();
-                    log.print(this,
-                              "Replaced " + path + " in the database.");
+                    log.printf(this,
+                               "Replaced %s in the database.",
+                               path);
                 }
                 catch (SQLException e1)
                 {}
@@ -261,7 +264,7 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
 
     /**
      * Gets the derby home.
-     * 
+     *
      * @return The derby home path. This returns null until {@link #setDerbyHome()} was called.
      */
     public static String getDerbyHome()
