@@ -10,13 +10,14 @@ import java.util.function.Supplier;
 
 import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
+import bt.db.constants.SqlValue;
 import bt.db.statement.SqlModifyStatement;
 import bt.db.statement.impl.InsertStatement;
 import bt.db.statement.impl.UpdateStatement;
 
 /**
  * Holds data for SET caluses used in insert and update statements.
- * 
+ *
  * @author &#8904
  */
 public class SetClause<T extends SqlModifyStatement>
@@ -54,7 +55,7 @@ public class SetClause<T extends SqlModifyStatement>
 
     /**
      * Prepares the values for execution.
-     * 
+     *
      * @param statement
      *            The statement which should be prepared with this set clause.
      * @param parameterIndex
@@ -127,6 +128,21 @@ public class SetClause<T extends SqlModifyStatement>
                                               (Date)this.value);
                             strValue = ((Date)this.value).toString();
                         }
+                        else if (SqlValue.CURRENT_DATE.equals(this.value)
+                                 || SqlValue.SYSDATE.equals(this.value))
+                        {
+                            var date = new Date(new java.util.Date().getTime());
+                            statement.setDate(parameterIndex,
+                                              date);
+
+                            strValue = date.toString();
+                        }
+                        else
+                        {
+                            statement.setDate(parameterIndex,
+                                              Date.valueOf(this.value.toString()));
+                            strValue = this.value.toString();
+                        }
                         break;
                     case TIME:
                         if (this.value instanceof String)
@@ -141,6 +157,21 @@ public class SetClause<T extends SqlModifyStatement>
                                               (Time)this.value);
                             strValue = ((Time)this.value).toString();
                         }
+                        else if (SqlValue.CURRENT_TIME.equals(this.value)
+                                 || SqlValue.SYSTIME.equals(this.value))
+                        {
+                            var time = new Time(new java.util.Date().getTime());
+                            statement.setTime(parameterIndex,
+                                              time);
+
+                            strValue = time.toString();
+                        }
+                        else
+                        {
+                            statement.setTime(parameterIndex,
+                                              Time.valueOf(this.value.toString()));
+                            strValue = this.value.toString();
+                        }
                         break;
                     case TIMESTAMP:
                         if (this.value instanceof String)
@@ -154,6 +185,21 @@ public class SetClause<T extends SqlModifyStatement>
                             statement.setTimestamp(parameterIndex,
                                                    (Timestamp)this.value);
                             strValue = ((Timestamp)this.value).toString();
+                        }
+                        else if (SqlValue.CURRENT_TIMESTAMP.equals(this.value)
+                                 || SqlValue.SYSTIMESTAMP.equals(this.value))
+                        {
+                            var timestamp = new Timestamp(new java.util.Date().getTime());
+                            statement.setTimestamp(parameterIndex,
+                                                   timestamp);
+
+                            strValue = timestamp.toString();
+                        }
+                        else
+                        {
+                            statement.setTimestamp(parameterIndex,
+                                                   Timestamp.valueOf(this.value.toString()));
+                            strValue = this.value.toString();
                         }
                         break;
                     case CLOB:
@@ -182,7 +228,7 @@ public class SetClause<T extends SqlModifyStatement>
 
     /**
      * Returns the String representing this set clause.
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     @Override
@@ -202,7 +248,7 @@ public class SetClause<T extends SqlModifyStatement>
 
     /**
      * Returns the String representing this set clause.
-     * 
+     *
      * @param prepared
      *            Indicates whether values should be treated for prepared statements or inserted as plain text. true =
      *            use prepared statement, false = insert plain.
@@ -228,7 +274,7 @@ public class SetClause<T extends SqlModifyStatement>
 
     /**
      * Gets a string representation of the value used in this set clause.
-     * 
+     *
      * @return
      */
     public String getStringValue()
@@ -248,9 +294,7 @@ public class SetClause<T extends SqlModifyStatement>
             }
             else
             {
-                switch (
-                    this.sqlValueType
-                )
+                switch (this.sqlValueType)
                 {
                     case BOOLEAN:
                         strValue = Boolean.toString((boolean)this.value);
@@ -279,6 +323,10 @@ public class SetClause<T extends SqlModifyStatement>
                         {
                             strValue = "'" + ((Date)this.value).toString() + "'";
                         }
+                        else
+                        {
+                            strValue = this.value.toString();
+                        }
                         break;
                     case TIME:
                         if (this.value instanceof String)
@@ -289,6 +337,10 @@ public class SetClause<T extends SqlModifyStatement>
                         {
                             strValue = "'" + ((Time)this.value).toString() + "'";
                         }
+                        else
+                        {
+                            strValue = this.value.toString();
+                        }
                         break;
                     case TIMESTAMP:
                         if (this.value instanceof String)
@@ -298,6 +350,10 @@ public class SetClause<T extends SqlModifyStatement>
                         else if (this.value instanceof Timestamp)
                         {
                             strValue = "'" + ((Timestamp)this.value).toString() + "'";
+                        }
+                        else
+                        {
+                            strValue = this.value.toString();
                         }
                         break;
                     case CLOB:
