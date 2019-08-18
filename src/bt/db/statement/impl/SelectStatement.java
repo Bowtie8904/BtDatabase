@@ -15,13 +15,14 @@ import bt.db.statement.SqlStatement;
 import bt.db.statement.clause.BetweenConditionalClause;
 import bt.db.statement.clause.ConditionalClause;
 import bt.db.statement.clause.OrderByClause;
+import bt.db.statement.clause.UnionClause;
 import bt.db.statement.clause.join.JoinClause;
 import bt.db.statement.clause.join.JoinConditionalClause;
 import bt.db.statement.result.SqlResultSet;
 
 /**
  * Represents an SQL select statement which can be extended through method chaining.
- * 
+ *
  * @author &#8904
  */
 public class SelectStatement extends SqlStatement<SelectStatement>
@@ -59,9 +60,15 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     /** Indictaes that * is selected. */
     private boolean selectAll;
 
+    /** Holds all used UNION and UNION ALL clauses. */
+    private List<UnionClause> unions;
+
+    /** An alias used if this select is used as a subselect. */
+    private String alias;
+
     /**
      * Creates a new instance which selects all columns (*) and will log an error message if no rows are returned.
-     * 
+     *
      * @param db
      *            The database that should be used for the statement.
      */
@@ -99,7 +106,7 @@ public class SelectStatement extends SqlStatement<SelectStatement>
 
     /**
      * Creates a new instance which selects the given columns and will log an error message if no rows are returned.
-     * 
+     *
      * @param db
      *            The database that should be used for the statement.
      * @param columns
@@ -142,9 +149,20 @@ public class SelectStatement extends SqlStatement<SelectStatement>
         };
     }
 
+    public SelectStatement alias(String alias)
+    {
+        this.alias = alias;
+        return this;
+    }
+
+    public String getAlias()
+    {
+        return this.alias;
+    }
+
     /**
      * Gets the tables that were specified via {@link #from(String...)}.
-     * 
+     *
      * @return An array of the table names.
      */
     public String[] getTables()
@@ -154,7 +172,7 @@ public class SelectStatement extends SqlStatement<SelectStatement>
 
     /**
      * Changes this statement to select distinct rows.
-     * 
+     *
      * @return This instance for chaining.
      */
     public SelectStatement distinct()
@@ -178,9 +196,9 @@ public class SelectStatement extends SqlStatement<SelectStatement>
 
     /**
      * Defines the tables to select from.
-     * 
+     *
      * @param tables
-     *            The tables to select from
+     *            The tables to select from.
      * @return This instance for chaining.
      */
     public SelectStatement from(String... tables)
@@ -190,8 +208,56 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     }
 
     /**
+     * Defines the tables to select from.
+     *
+     * <p>
+     * This can be either String names of tables or SelectStatements.
+     * </p>
+     *
+     * <p>
+     * Any SelectStatement that is added via this method needs an alias and will be set to unprepared.
+     * </p>
+     *
+     * @param tables
+     *            The tables to select from.
+     * @return This instance for chaining.
+     */
+    public SelectStatement from(Object... tables)
+    {
+        this.tables = new String[tables.length];
+
+        Object tempObj;
+
+        for (int i = 0; i < tables.length; i ++ )
+        {
+            tempObj = tables[i];
+
+            if (tempObj instanceof SelectStatement)
+            {
+                SelectStatement select = (SelectStatement)tempObj;
+
+                if (select.getAlias() == null)
+                {
+                    DatabaseAccess.log.print(new SQLSyntaxErrorException("Subselects must have an alias assigned."));
+                }
+                else
+                {
+                    this.tables[i] = "(" + select.unprepared().toString() + ") "
+                                     + select.getAlias();
+                }
+            }
+            else
+            {
+                this.tables[i] = tempObj.toString();
+            }
+        }
+
+        return this;
+    }
+
+    /**
      * Creates a join with the given table.
-     * 
+     *
      * @param table
      *            The table to join with.
      * @return The created JoinClause.
@@ -207,16 +273,16 @@ public class SelectStatement extends SqlStatement<SelectStatement>
 
     /**
      * Creates a new where conditional clause using the given column for this statement.
-     * 
+     *
      * @param column
      *            The column to use in this condition.
      * @return The created ConditionalClause.
      */
     public ConditionalClause<SelectStatement> where(String column)
     {
-        ConditionalClause<SelectStatement> where = new ConditionalClause<SelectStatement>(this,
-                                                                                          column,
-                                                                                          ConditionalClause.WHERE);
+        ConditionalClause<SelectStatement> where = new ConditionalClause<>(this,
+                                                                           column,
+                                                                           ConditionalClause.WHERE);
         addWhereClause(where);
         this.lastConditionalType = ConditionalClause.WHERE;
         return where;
@@ -225,16 +291,16 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     /**
      * Creates a new conditional clause to chain with an existing where or having clause using the given column for this
      * statement.
-     * 
+     *
      * @param column
      *            The column to use in this condition.
      * @return The created ConditionalClause.
      */
     public ConditionalClause<SelectStatement> and(String column)
     {
-        ConditionalClause<SelectStatement> clause = new ConditionalClause<SelectStatement>(this,
-                                                                                           column,
-                                                                                           ConditionalClause.AND);
+        ConditionalClause<SelectStatement> clause = new ConditionalClause<>(this,
+                                                                            column,
+                                                                            ConditionalClause.AND);
 
         if (this.lastConditionalType.equals(ConditionalClause.WHERE))
         {
@@ -251,16 +317,16 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     /**
      * Creates a new conditional clause to chain with an existing where or having clause using the given column for this
      * statement.
-     * 
+     *
      * @param column
      *            The column to use in this condition.
      * @return The created ConditionalClause.
      */
     public ConditionalClause<SelectStatement> or(String column)
     {
-        ConditionalClause<SelectStatement> clause = new ConditionalClause<SelectStatement>(this,
-                                                                                           column,
-                                                                                           ConditionalClause.OR);
+        ConditionalClause<SelectStatement> clause = new ConditionalClause<>(this,
+                                                                            column,
+                                                                            ConditionalClause.OR);
 
         if (this.lastConditionalType.equals(ConditionalClause.WHERE))
         {
@@ -277,7 +343,7 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     /**
      * Creates a new join conditional clause to chain with an existing (join) on clause using the given column for this
      * statement.
-     * 
+     *
      * @param column
      *            The column to use in this condition.
      * @return The created JoinConditionalClause.
@@ -299,7 +365,7 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     /**
      * Creates a new join conditional clause to chain with an existing (join) on clause using the given column for this
      * statement.
-     * 
+     *
      * @param column
      *            The column to use in this condition.
      * @return The created JoinConditionalClause.
@@ -319,9 +385,9 @@ public class SelectStatement extends SqlStatement<SelectStatement>
 
     /**
      * Creates a new having conditional clause using the given column for this statement.
-     * 
+     *
      * A group by expression must be before this call.
-     * 
+     *
      * @param column
      *            The column to use in this condition.
      * @return The created ConditionalClause.
@@ -341,9 +407,9 @@ public class SelectStatement extends SqlStatement<SelectStatement>
             }
         }
 
-        ConditionalClause<SelectStatement> having = new ConditionalClause<SelectStatement>(this,
-                                                                                           column,
-                                                                                           ConditionalClause.HAVING);
+        ConditionalClause<SelectStatement> having = new ConditionalClause<>(this,
+                                                                            column,
+                                                                            ConditionalClause.HAVING);
         addHavingClause(having);
         this.lastConditionalType = ConditionalClause.HAVING;
         return having;
@@ -351,7 +417,7 @@ public class SelectStatement extends SqlStatement<SelectStatement>
 
     /**
      * Defines the columns to order the result by.
-     * 
+     *
      * @param columns
      *            The columns to order by.
      * @return The created OrderByClause.
@@ -366,7 +432,7 @@ public class SelectStatement extends SqlStatement<SelectStatement>
 
     /**
      * Makes this statement only return the very first row.
-     * 
+     *
      * @return This instance for chaining.
      */
     public SelectStatement first()
@@ -377,11 +443,11 @@ public class SelectStatement extends SqlStatement<SelectStatement>
 
     /**
      * Makes this statement return the first <i>n</i> rows.
-     * 
+     *
      * <p>
      * <i> n <= 0 </i> means all rows will be returned.
      * </p>
-     * 
+     *
      * @param n
      *            The number of rows to return.
      * @return This instance for chaining.
@@ -394,7 +460,7 @@ public class SelectStatement extends SqlStatement<SelectStatement>
 
     /**
      * Defines the columns to group by.
-     * 
+     *
      * @param columns
      *            The columns to group by.
      * @return This instance for chaining.
@@ -408,7 +474,7 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     /**
      * Defines a select statement which will be executed (and whichs resultset will be returned by {@link #execute()})
      * if the original select returned less rows than the given lower threshhold.
-     * 
+     *
      * @param lowerThreshhold
      *            The threshhold to check.
      * @param statement
@@ -428,7 +494,7 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     /**
      * Defines a data modifying statement (insert, update, delete) to execute if the original select returned less rows
      * than the given lower threshhold.
-     * 
+     *
      * @param lowerThreshhold
      *            The threshhold to check.
      * @param statement
@@ -449,12 +515,12 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     /**
      * Defines a BiFunction that will be executed if the original select returned less rows than the given lower
      * threshhold.
-     * 
+     *
      * <p>
      * The first parameter (int) will be the number of rows returned, the second one is the SqlResultSet from the
      * original select. The return value (SqlResultSet) will be returned by this instances {@link #execute()}.
      * </p>
-     * 
+     *
      * @param lowerThreshhold
      *            The threshhold to check.
      * @param onLessThan
@@ -471,7 +537,7 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     /**
      * Defines a select statement which will be executed (and whichs resultset will be returned by {@link #execute()})
      * if the original select returned more rows than the given higher threshhold.
-     * 
+     *
      * @param higherThreshhold
      *            The threshhold to check.
      * @param statement
@@ -491,7 +557,7 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     /**
      * Defines a data modifying statement (insert, update, delete) to execute if the original select returned more rows
      * than the given higher threshhold.
-     * 
+     *
      * @param higherThreshhold
      *            The threshhold to check.
      * @param statement
@@ -512,12 +578,12 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     /**
      * Defines a BiFunction that will be executed if the original select returned more rows than the given higher
      * threshhold.
-     * 
+     *
      * <p>
      * The first parameter (int) will be the number of rows returned, the second one is the SqlResultSet from the
      * original select. The return value (SqlResultSet) will be returned by this instances {@link #execute()}.
      * </p>
-     * 
+     *
      * @param higherThreshhold
      *            The threshhold to check.
      * @param onLessThan
@@ -533,11 +599,11 @@ public class SelectStatement extends SqlStatement<SelectStatement>
 
     /**
      * Sets the last used conditional type to correctly distribute chaining conditionals (and, or, ...).
-     * 
+     *
      * <p>
      * This method is called automatically and should not be used during the actual creation of a select statement.
      * </p>
-     * 
+     *
      * @param type
      *            The conditional type (where, having, on, ...).
      */
@@ -549,7 +615,7 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     /**
      * Defines a SelectStatement which will be executed and whichs SqlResultSet will be returned if there was an error
      * during the execution of the original select.
-     * 
+     *
      * @param onFail
      *            The SelectStatement to execute instead.
      * @return This instance for chaining.
@@ -566,12 +632,12 @@ public class SelectStatement extends SqlStatement<SelectStatement>
 
     /**
      * Defines a BiFunction that will be executed if there was an error during the execution of this statement.
-     * 
+     *
      * <p>
      * The first parameter (SelectStatement) will be this statement instance, the second one is the SQLException that
      * caused the fail. The return value (SqlResultSet) will be returned by this instances {@link #execute()}.
      * </p>
-     * 
+     *
      * @param onFail
      *            The BiFunction to execute.
      * @return This instance for chaining.
@@ -585,11 +651,11 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     /**
      * Indicates that this statement should not be executed as a prepared statement. Instead all set values will be
      * directly inserted into the raw sql string.
-     * 
+     *
      * <p>
      * <b>Note that using this method makes the statement vulnerable for sql injections.</b>
      * </p>
-     * 
+     *
      * @return This instance for chaining.
      */
     public SelectStatement unprepared()
@@ -599,9 +665,72 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     }
 
     /**
+     * Combines this select with the given one.
+     *
+     * <p>
+     * The given select will be executed unprepared.
+     * </p>
+     *
+     * <p>
+     * The SqlResultSet of this select will contain all rows out of all unioned selects.
+     * </p>
+     *
+     * @param select
+     *            The select to append to this one.
+     * @return This instance for chaining.
+     */
+    public SelectStatement unionAll(SelectStatement select)
+    {
+        createUnion(UnionClause.UNION_ALL,
+                    select);
+        return this;
+    }
+
+    /**
+     * Combines this select with the given one.
+     *
+     * <p>
+     * The given select will be executed unprepared.
+     * </p>
+     *
+     * <p>
+     * The SqlResultSet of this select will only contain unique rows out of all unioned selects.
+     * </p>
+     *
+     * @param select
+     *            The select to append to this one.
+     * @return This instance for chaining.
+     */
+    public SelectStatement union(SelectStatement select)
+    {
+        createUnion(UnionClause.UNION,
+                    select);
+        return this;
+    }
+
+    /**
+     * Creates a new UnionClause and adds it to the list.
+     *
+     * @param unionType
+     *            {@link UnionClause#UNION} or {@link UnionClause#UNION_ALL}.
+     * @param select
+     *            The select to append.
+     */
+    private void createUnion(String unionType, SelectStatement select)
+    {
+        if (this.unions == null)
+        {
+            this.unions = new ArrayList<>();
+        }
+
+        this.unions.add(new UnionClause(unionType,
+                                        select));
+    }
+
+    /**
      * Executes the select and returns the resultset. Depending on the number of rows returned, the defined onLessThan
      * or onMoreThan might be executed.
-     * 
+     *
      * @return The result.
      */
     public SqlResultSet execute()
@@ -612,7 +741,7 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     /**
      * Executes the select and returns the resultset. Depending on the number of rows returned, the defined onLessThan
      * or onMoreThan might be executed. If there is an error during this execution, the onFail function is called.
-     * 
+     *
      * @param printLogs
      *            true if information such as the full statement and paramaters should be printed.
      * @return The result.
@@ -738,11 +867,11 @@ public class SelectStatement extends SqlStatement<SelectStatement>
 
     /**
      * Formats the full select statement.
-     * 
+     *
      * <p>
      * Depending on {@link #isPrepared()} values will either be inserted into the raw sql or replaced by ? placeholders.
      * </p>
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     @Override
@@ -793,11 +922,6 @@ public class SelectStatement extends SqlStatement<SelectStatement>
             }
         }
 
-        if (this.orderBy != null)
-        {
-            sql += " " + this.orderBy.toString();
-        }
-
         if (this.groupBy != null)
         {
             sql += " GROUP BY ";
@@ -826,6 +950,19 @@ public class SelectStatement extends SqlStatement<SelectStatement>
                     lastBetween = false;
                 }
             }
+        }
+
+        if (this.unions != null)
+        {
+            for (UnionClause union : this.unions)
+            {
+                sql += " " + union.toString();
+            }
+        }
+
+        if (this.orderBy != null)
+        {
+            sql += " " + this.orderBy.toString();
         }
 
         if (this.first > 0)
