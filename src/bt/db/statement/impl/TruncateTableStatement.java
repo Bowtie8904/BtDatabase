@@ -88,9 +88,6 @@ public class TruncateTableStatement extends SqlModifyStatement<TruncateTableStat
                 printLogs);
 
             result = statement.executeUpdate();
-
-            log("Affected rows: " + result,
-                printLogs);
         }
         catch (SQLException e)
         {
