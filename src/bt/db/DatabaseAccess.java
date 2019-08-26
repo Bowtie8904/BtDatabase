@@ -32,6 +32,7 @@ import bt.db.statement.impl.DeleteStatement;
 import bt.db.statement.impl.DropStatement;
 import bt.db.statement.impl.InsertStatement;
 import bt.db.statement.impl.SelectStatement;
+import bt.db.statement.impl.TruncateTableStatement;
 import bt.db.statement.impl.UpdateStatement;
 import bt.db.statement.result.SqlResult;
 import bt.db.statement.result.SqlResultSet;
@@ -954,6 +955,19 @@ public abstract class DatabaseAccess implements Killable
     {
         return new UpdateStatement(this,
                                    table);
+    }
+
+    /**
+     * Creates a truncate table statement for the given table.
+     *
+     * @param table
+     *            The table to truncate.
+     * @return The statement.
+     */
+    public TruncateTableStatement truncate(String table)
+    {
+        return new TruncateTableStatement(this,
+                                          table);
     }
 
     /**
