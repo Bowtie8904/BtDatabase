@@ -335,7 +335,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
 
             if (this.createDefaultUpdateTrigger)
             {
-            this.db.create()
+                this.db.create()
                        .trigger(this.name + "_t_update")
                        .after("update")
                        .on(this.name)

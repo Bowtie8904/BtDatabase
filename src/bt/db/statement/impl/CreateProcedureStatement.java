@@ -52,9 +52,9 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
     public CreateProcedureStatement parameter(String name, SqlType type)
     {
         this.parameters.add(new String[]
-        {
-          name, type.toString()
-        });
+            {
+              name, type.toString()
+            });
 
         return this;
     }
@@ -176,11 +176,11 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
                     printLogs);
 
                 DropStatement drop = this.db.drop().procedure(this.name).onFail((s, ex) ->
-                {
-                    log(ex.getMessage(),
-                        printLogs);
-                    return 0;
-                });
+                    {
+                        log(ex.getMessage(),
+                            printLogs);
+                        return 0;
+                    });
 
                 if (drop.execute(printLogs) > 0)
                 {

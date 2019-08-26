@@ -144,9 +144,9 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
     public CreateTriggerStatement on(String table)
     {
         this.tables = new String[]
-        {
-          table
-        };
+            {
+              table
+            };
 
         return this;
     }

@@ -76,9 +76,9 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
                               .call(this.getClass().getName() + ".onInsert")
                               .replace()
                               .onFail((s, e) ->
-                              {
-                                  return 0;
-                              })
+                                  {
+                                      return 0;
+                                  })
                               .execute();
 
         if (success == 1)
@@ -103,9 +103,9 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
                           .call(this.getClass().getName() + ".onDelete")
                           .replace()
                           .onFail((s, e) ->
-                          {
-                              return 0;
-                          })
+                              {
+                                  return 0;
+                              })
                           .execute();
 
         if (success == 1)
@@ -130,9 +130,9 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
                           .call(this.getClass().getName() + ".onUpdate")
                           .replace()
                           .onFail((s, e) ->
-                          {
-                              return 0;
-                          })
+                              {
+                                  return 0;
+                              })
                           .execute();
 
         if (success == 1)

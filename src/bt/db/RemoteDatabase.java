@@ -22,7 +22,8 @@ import bt.utils.thread.Threads;
  *
  * @author &#8904
  */
-public abstract class RemoteDatabase extends DatabaseAccess {
+public abstract class RemoteDatabase extends DatabaseAccess
+{
     protected ScheduledFuture triggerCheck;
     protected long triggerCheckInterval;
 
@@ -182,9 +183,9 @@ public abstract class RemoteDatabase extends DatabaseAccess {
         this.triggerCheck = Threads.get()
                                    .scheduleAtFixedRateDaemon(
                                                               () ->
-                                                              {
-                                                                  checkTriggers();
-                                                              },
+                                                                  {
+                                                                      checkTriggers();
+                                                                  },
                                                               this.triggerCheckInterval,
                                                               this.triggerCheckInterval,
                                                               TimeUnit.MILLISECONDS,
@@ -205,9 +206,9 @@ public abstract class RemoteDatabase extends DatabaseAccess {
                                                                   .unprepared())
                                        .onLessThan(1,
                                                    (num, res) ->
-                                                   {
-                                                       return res;
-                                                   })
+                                                       {
+                                                           return res;
+                                                       })
                                        .execute();
 
             long[] ids = new long[set.size()];

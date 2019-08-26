@@ -77,31 +77,31 @@ public class SelectStatement extends SqlStatement<SelectStatement>
         super(db);
         this.joins = new ArrayList<>();
         this.columns = new String[]
-        {
-          "*"
-        };
+            {
+              "*"
+            };
         this.selectAll = true;
         this.statementKeyword = "SELECT";
 
         this.lowerThreshhold = 1;
         this.onLessThan = (i, set) ->
-        {
-            DatabaseAccess.log.print("< " + set.getSql() + " > did not return any data.");
-
-            if (set.getValues().size() > 0)
             {
-                String values = "Used values:\n";
+                DatabaseAccess.log.print("< " + set.getSql() + " > did not return any data.");
 
-                for (String value : set.getValues())
+                if (set.getValues().size() > 0)
                 {
-                    values += value + "\n";
+                    String values = "Used values:\n";
+
+                    for (String value : set.getValues())
+                    {
+                        values += value + "\n";
+                    }
+
+                    DatabaseAccess.log.print(values);
                 }
 
-                DatabaseAccess.log.print(values);
-            }
-
-            return set;
-        };
+                return set;
+            };
     }
 
     /**
@@ -130,23 +130,23 @@ public class SelectStatement extends SqlStatement<SelectStatement>
 
         this.lowerThreshhold = 1;
         this.onLessThan = (i, set) ->
-        {
-            DatabaseAccess.log.print("< " + set.getSql() + " > did not return any data.");
-
-            if (set.getValues().size() > 0)
             {
-                String values = "Used values:\n";
+                DatabaseAccess.log.print("< " + set.getSql() + " > did not return any data.");
 
-                for (String value : set.getValues())
+                if (set.getValues().size() > 0)
                 {
-                    values += value + "\n";
+                    String values = "Used values:\n";
+
+                    for (String value : set.getValues())
+                    {
+                        values += value + "\n";
+                    }
+
+                    DatabaseAccess.log.print(values);
                 }
 
-                DatabaseAccess.log.print(values);
-            }
-
-            return set;
-        };
+                return set;
+            };
     }
 
     public SelectStatement alias(String alias)
@@ -485,9 +485,9 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     {
         this.lowerThreshhold = lowerThreshhold;
         this.onLessThan = (i, set) ->
-        {
-            return statement.execute();
-        };
+            {
+                return statement.execute();
+            };
         return this;
     }
 
@@ -505,10 +505,10 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     {
         this.lowerThreshhold = lowerThreshhold;
         this.onLessThan = (i, set) ->
-        {
-            statement.execute();
-            return set;
-        };
+            {
+                statement.execute();
+                return set;
+            };
         return this;
     }
 
@@ -548,9 +548,9 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     {
         this.higherThreshhold = higherThreshhold;
         this.onMoreThan = (i, set) ->
-        {
-            return statement.execute();
-        };
+            {
+                return statement.execute();
+            };
         return this;
     }
 
@@ -568,10 +568,10 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     {
         this.higherThreshhold = higherThreshhold;
         this.onMoreThan = (i, set) ->
-        {
-            statement.execute();
-            return set;
-        };
+            {
+                statement.execute();
+                return set;
+            };
         return this;
     }
 
@@ -623,9 +623,9 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     public SelectStatement onFail(SelectStatement onFail)
     {
         this.onFail = (statement, e) ->
-        {
-            return onFail.execute();
-        };
+            {
+                return onFail.execute();
+            };
 
         return this;
     }

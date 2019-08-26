@@ -87,9 +87,7 @@ public enum SqlType
     public static SqlType convert(String type)
     {
         SqlType sqlType = null;
-        switch (
-            type.toUpperCase()
-        )
+        switch (type.toUpperCase())
         {
             case "BOOLEAN":
                 sqlType = BOOLEAN;
@@ -140,9 +138,7 @@ public enum SqlType
     public static SqlType convert(int type)
     {
         SqlType sqlType = null;
-        switch (
-            type
-        )
+        switch (type)
         {
             case Types.BOOLEAN:
                 sqlType = BOOLEAN;

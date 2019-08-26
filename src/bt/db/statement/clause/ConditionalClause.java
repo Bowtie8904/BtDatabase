@@ -169,9 +169,7 @@ public class ConditionalClause<T extends SqlStatement>
     {
         try
         {
-            switch (
-                this.valueType
-            )
+            switch (this.valueType)
             {
                 case DATE:
                     statement.setDate(parameterIndex,

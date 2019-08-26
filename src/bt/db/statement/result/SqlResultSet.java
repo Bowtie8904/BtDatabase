@@ -258,9 +258,7 @@ public class SqlResultSet implements Iterable<SqlResult>
 
             this.defaultFormat[i - 1] = width;
 
-            switch (
-                valueType
-            )
+            switch (valueType)
             {
                 case Types.BOOLEAN:
                     booleanResults.add(meta.getColumnName(i));

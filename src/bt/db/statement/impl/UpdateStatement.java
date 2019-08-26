@@ -35,9 +35,9 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
         super(db);
 
         this.tables = new String[]
-        {
-          table.toUpperCase()
-        };
+            {
+              table.toUpperCase()
+            };
         this.statementKeyword = "UPDATE";
     }
 
@@ -282,9 +282,9 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     public UpdateStatement onFail(SqlModifyStatement onFail)
     {
         this.onFail = (statement, e) ->
-        {
-            return onFail.execute();
-        };
+            {
+                return onFail.execute();
+            };
 
         return this;
     }
@@ -321,9 +321,9 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     {
         this.lowerThreshhold = lowerThreshhold;
         this.onLessThan = (i, set) ->
-        {
-            return statement.execute();
-        };
+            {
+                return statement.execute();
+            };
         return this;
     }
 
@@ -363,9 +363,9 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     {
         this.higherThreshhold = higherThreshhold;
         this.onMoreThan = (i, set) ->
-        {
-            return statement.execute();
-        };
+            {
+                return statement.execute();
+            };
         return this;
     }
 

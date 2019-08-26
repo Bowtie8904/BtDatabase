@@ -58,9 +58,9 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
     public DeleteStatement from(String table)
     {
         this.tables = new String[]
-        {
-          table.toUpperCase()
-        };
+            {
+              table.toUpperCase()
+            };
         return this;
     }
 
@@ -135,9 +135,9 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
     public DeleteStatement onFail(SqlModifyStatement onFail)
     {
         this.onFail = (statement, e) ->
-        {
-            return onFail.execute();
-        };
+            {
+                return onFail.execute();
+            };
 
         return this;
     }
@@ -174,9 +174,9 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
     {
         this.lowerThreshhold = lowerThreshhold;
         this.onLessThan = (i, set) ->
-        {
-            return statement.execute();
-        };
+            {
+                return statement.execute();
+            };
         return this;
     }
 
@@ -216,9 +216,9 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
     {
         this.higherThreshhold = higherThreshhold;
         this.onMoreThan = (i, set) ->
-        {
-            return statement.execute();
-        };
+            {
+                return statement.execute();
+            };
         return this;
     }
 

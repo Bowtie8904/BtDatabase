@@ -81,9 +81,7 @@ public class SetClause<T extends SqlModifyStatement>
             }
             else
             {
-                switch (
-                    this.sqlValueType
-                )
+                switch (this.sqlValueType)
                 {
                     case BOOLEAN:
                         statement.setBoolean(parameterIndex,

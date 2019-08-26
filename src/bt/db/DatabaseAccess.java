@@ -531,9 +531,9 @@ public abstract class DatabaseAccess implements Killable
                                                                               .equals(key)
                                                                               .onLessThan(1,
                                                                                           (i, set) ->
-                                                                                          {
-                                                                                              return null;
-                                                                                          })
+                                                                                              {
+                                                                                                  return null;
+                                                                                              })
                                                                               .execute();
 
         if (result != null && result.size() > 0)
@@ -566,9 +566,9 @@ public abstract class DatabaseAccess implements Killable
 
                               .createDefaultTriggers(false)
                               .onFail((s, e) ->
-                              {
-                                  return 0;
-                              })
+                                  {
+                                      return 0;
+                                  })
                               .execute();
 
         if (success == 1)
@@ -609,9 +609,9 @@ public abstract class DatabaseAccess implements Killable
 
                               .createDefaultTriggers(false)
                               .onFail((s, e) ->
-                              {
-                                  return 0;
-                              })
+                                  {
+                                      return 0;
+                                  })
                               .execute();
 
         if (success == 1)
@@ -771,9 +771,9 @@ public abstract class DatabaseAccess implements Killable
                                    .from(table)
                                    .onLessThan(1,
                                                (num, res) ->
-                                               {
-                                                   return res;
-                                               })
+                                                   {
+                                                       return res;
+                                                   })
                                    .execute();
 
         if (!exportFile.exists())
@@ -834,9 +834,9 @@ public abstract class DatabaseAccess implements Killable
                                               .equals("T")
                                               .onLessThan(1,
                                                           (num, res) ->
-                                                          {
-                                                              return res;
-                                                          })
+                                                              {
+                                                                  return res;
+                                                              })
                                               .execute();
 
         String tableName;
@@ -1050,9 +1050,9 @@ public abstract class DatabaseAccess implements Killable
                                                           .from(table)
                                                           .onLessThan(1,
                                                                       (num, res) ->
-                                                                      {
-                                                                          return res;
-                                                                      })
+                                                                          {
+                                                                              return res;
+                                                                          })
                                                           .execute()
                                                           .getColumnTypes();
         Map<String, String> typeMap = new HashMap<>();
@@ -1071,9 +1071,9 @@ public abstract class DatabaseAccess implements Killable
                                    .equals(table.toUpperCase())
                                    .onLessThan(1,
                                                (num, res) ->
-                                               {
-                                                   return res;
-                                               })
+                                                   {
+                                                       return res;
+                                                   })
                                    .execute();
 
         for (SqlResult result : set)

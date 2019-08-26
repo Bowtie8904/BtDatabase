@@ -43,10 +43,10 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
         this.statementKeyword = "INSERT INTO";
 
         this.onDuplicateKey = (e) ->
-        {
-            System.err.println(e.getMessage());
-            return -1;
-        };
+            {
+                System.err.println(e.getMessage());
+                return -1;
+            };
     }
 
     /**
@@ -87,9 +87,9 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     public InsertStatement into(String table)
     {
         this.tables = new String[]
-        {
-          table.toUpperCase()
-        };
+            {
+              table.toUpperCase()
+            };
 
         return this;
     }
@@ -367,9 +367,9 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     public InsertStatement onDuplicateKey(SqlModifyStatement statement)
     {
         this.onDuplicateKey = (e) ->
-        {
-            return statement.execute();
-        };
+            {
+                return statement.execute();
+            };
         return this;
     }
 
@@ -398,9 +398,9 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     public InsertStatement onFail(SqlModifyStatement onFail)
     {
         this.onFail = (statement, e) ->
-        {
-            return onFail.execute();
-        };
+            {
+                return onFail.execute();
+            };
 
         return this;
     }
@@ -437,9 +437,9 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     {
         this.lowerThreshhold = lowerThreshhold;
         this.onLessThan = (i, set) ->
-        {
-            return statement.execute();
-        };
+            {
+                return statement.execute();
+            };
         return this;
     }
 
@@ -479,9 +479,9 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     {
         this.higherThreshhold = higherThreshhold;
         this.onMoreThan = (i, set) ->
-        {
-            return statement.execute();
-        };
+            {
+                return statement.execute();
+            };
         return this;
     }
 
