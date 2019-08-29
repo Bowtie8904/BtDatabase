@@ -22,9 +22,9 @@ public class TruncateTableStatement extends SqlModifyStatement<TruncateTableStat
         super(db);
         this.statementKeyword = "TRUNCATE TABLE";
         this.tables = new String[]
-            {
-              table
-            };
+        {
+          table
+        };
     }
 
     /**
@@ -38,9 +38,9 @@ public class TruncateTableStatement extends SqlModifyStatement<TruncateTableStat
     public TruncateTableStatement onFail(SqlModifyStatement onFail)
     {
         this.onFail = (statement, e) ->
-            {
-                return onFail.execute();
-            };
+        {
+            return onFail.execute();
+        };
 
         return this;
     }
