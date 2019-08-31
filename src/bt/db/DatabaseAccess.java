@@ -630,8 +630,9 @@ public abstract class DatabaseAccess implements Killable
      * @param sql
      *            The raw SQL String to execute.
      * @return The return value of the statement execution. See {@link Statement#executeUpdate(String)}.
+     * @throws SQLException
      */
-    public int executeUpdate(String sql)
+    public int executeUpdate(String sql) throws SQLException
     {
         try (Statement statement = getConnection().createStatement())
         {
@@ -639,9 +640,7 @@ public abstract class DatabaseAccess implements Killable
         }
         catch (SQLException e)
         {
-            log.print(this,
-                      e);
-            return -1;
+            throw e;
         }
     }
 
@@ -651,20 +650,18 @@ public abstract class DatabaseAccess implements Killable
      * @param sql
      *            The raw SQL String to execute.
      * @return The {@link SqlResultSet} resulting from the query or null if an error occured.
+     * @throws SQLException
      */
-    public SqlResultSet executeQuery(String sql)
+    public SqlResultSet executeQuery(String sql) throws SQLException
     {
-        try (Statement statement = getConnection().createStatement(
-                                                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+        try (Statement statement = getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
                                                                    ResultSet.CONCUR_READ_ONLY))
         {
             return new SqlResultSet(statement.executeQuery(sql));
         }
         catch (SQLException e)
         {
-            log.print(this,
-                      e);
-            return null;
+            throw e;
         }
     }
 
@@ -740,7 +737,14 @@ public abstract class DatabaseAccess implements Killable
 
         for (String statement : lines)
         {
-            count += executeUpdate(statement);
+            try
+            {
+                count += executeUpdate(statement);
+            }
+            catch (SQLException e)
+            {
+                Logger.global().print(e);
+            }
         }
 
         log.printfSrc(this,
