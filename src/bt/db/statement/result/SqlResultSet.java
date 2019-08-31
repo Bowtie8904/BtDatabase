@@ -18,7 +18,7 @@ import bt.utils.console.ConsoleTable;
 
 /**
  * Wraps the values from the given ResultSet to make them more accessible and serializable.
- * 
+ *
  * @author &#8904
  */
 public class SqlResultSet implements Iterable<SqlResult>
@@ -32,11 +32,11 @@ public class SqlResultSet implements Iterable<SqlResult>
 
     /**
      * Creates a new instance.
-     * 
+     *
      * <p>
      * {@link #parse(ResultSet)} needs to be called before this instance is usable.
      * </p>
-     * 
+     *
      * @param columnOrder
      *            A list containing the names of the columns in correct order.
      */
@@ -57,11 +57,11 @@ public class SqlResultSet implements Iterable<SqlResult>
 
     /**
      * Creates a new instance.
-     * 
+     *
      * <p>
      * {@link #parse(ResultSet)} needs to be called before this instance is usable.
      * </p>
-     * 
+     *
      * @param columnOrder
      *            An array containing the names of the columns in correct order.
      */
@@ -72,7 +72,7 @@ public class SqlResultSet implements Iterable<SqlResult>
 
     /**
      * Creates a new instance and parses the given ResultSet.
-     * 
+     *
      * @param set
      *            The ResultSet to use.
      */
@@ -96,7 +96,7 @@ public class SqlResultSet implements Iterable<SqlResult>
 
     /**
      * Sets the {@link SqlResult results} that should be wrapped by this instance.
-     * 
+     *
      * @param results
      *            A list containing all results that this instance should wrap.
      */
@@ -115,11 +115,11 @@ public class SqlResultSet implements Iterable<SqlResult>
 
     /**
      * Returns a list containing pairs of column name : column type.
-     * 
+     *
      * <p>
      * The type will be the sql type String representation.
      * </p>
-     * 
+     *
      * @return The list.
      */
     public List<Entry<String, String>> getColumnTypes()
@@ -137,7 +137,7 @@ public class SqlResultSet implements Iterable<SqlResult>
 
     /**
      * Sets the sql that was used to get this result.
-     * 
+     *
      * @param sql
      *            The sql statement.
      */
@@ -148,7 +148,7 @@ public class SqlResultSet implements Iterable<SqlResult>
 
     /**
      * Gets the sql that was used to get this result.
-     * 
+     *
      * @return The sql statement.
      */
     public String getSql()
@@ -158,7 +158,7 @@ public class SqlResultSet implements Iterable<SqlResult>
 
     /**
      * Sets a list of used values for the prepared statement that resulted in this set.
-     * 
+     *
      * @param values
      *            The list of values.
      */
@@ -177,7 +177,7 @@ public class SqlResultSet implements Iterable<SqlResult>
 
     /**
      * Gets the size of this set. This is equal to the amount of results contained.
-     * 
+     *
      * @return The size of the set.
      */
     public int size()
@@ -187,7 +187,7 @@ public class SqlResultSet implements Iterable<SqlResult>
 
     /**
      * Gets the result at the given index.
-     * 
+     *
      * @param index
      *            The index of the desired result.
      * @return The requested result.
@@ -199,7 +199,7 @@ public class SqlResultSet implements Iterable<SqlResult>
 
     /**
      * Gets a list of Strings representing the name of the columns in left to right order.
-     * 
+     *
      * @return
      */
     public List<String> getColumnOrder()
@@ -209,7 +209,7 @@ public class SqlResultSet implements Iterable<SqlResult>
 
     /**
      * Parses the given ResultSet.
-     * 
+     *
      * @param set
      *            The ResultSet whichs values should be
      * @return
@@ -318,7 +318,7 @@ public class SqlResultSet implements Iterable<SqlResult>
 
         while (set.next())
         {
-            SqlResult result = new SqlResult(colOrder);
+            SqlResult result = new SqlResult(this.colOrder);
 
             for (String name : stringResults)
             {
@@ -428,13 +428,18 @@ public class SqlResultSet implements Iterable<SqlResult>
         return this;
     }
 
+    public int[] getColumnSizes()
+    {
+        return this.defaultFormat;
+    }
+
     /**
      * Prints a formatted table of the result.
-     * 
+     *
      * <p>
      * The given values define the widths of the columns.
      * </p>
-     * 
+     *
      * @param columnFormat
      *            If only one number is given, all columns will have the same width. If more than one value is given,
      *            there needs to be the same amount of numbers as there is columns.
@@ -463,11 +468,11 @@ public class SqlResultSet implements Iterable<SqlResult>
 
     /**
      * Formats a table of the results.
-     * 
+     *
      * <p>
      * The given values define the widths of the columns.
      * </p>
-     * 
+     *
      * @param columnFormat
      *            If only one number is given, all columns will have the same width. If more than one value is given,
      *            there needs to be the same amount of numbers as there is columns.
@@ -479,7 +484,7 @@ public class SqlResultSet implements Iterable<SqlResult>
 
         if (columnFormat.length == 1)
         {
-            int[] format = new int[colOrder.size()];
+            int[] format = new int[this.colOrder.size()];
 
             for (int i = 0; i < format.length; i ++ )
             {
