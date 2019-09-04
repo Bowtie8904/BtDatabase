@@ -11,13 +11,19 @@ import bt.db.statement.clause.SetClause;
 
 /**
  * Base class for data modifying statements (insert, update, delete, ...).
- * 
+ *
  * @author &#8904
  */
 public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends SqlStatement> extends SqlStatement<K>
 {
+    /** The errorcode of the exception that occours when a foreign key constraint is violated. */
+    protected static final String FOREIGN_KEY_VIOLATION_ERROR = "23503";
+
     /** The errorcode of the exception that occours when a duplicate key is inserted into a table. */
     protected static final String DUPLICATE_KEY_ERROR = "23505";
+
+    /** The errorcode of the exception that occours when a check constraint is violated. */
+    protected static final String CHECK_CONSTRAINT_VIOLATION_ERROR = "23513";
 
     /**
      * The errorcode of the exception that occours when the program tries to create a database object (trigger,
@@ -30,6 +36,18 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
 
     /** A defined function that is called if the statement execution fails for any reason. */
     protected BiFunction<T, SQLException, Integer> onFail;
+
+    /** A defined function that is called if the statement execution fails due to a foreign key violation. */
+    protected BiFunction<T, SQLException, Integer> onForeignKeyFail;
+
+    /** A defined function that is called if the statement execution fails due to a check constraint violation. */
+    protected BiFunction<T, SQLException, Integer> onCheckFail;
+
+    /**
+     * A defined function that is called if the statement execution fails due to a duplicate primary key or unique
+     * constraint violation.
+     */
+    protected BiFunction<T, SQLException, Integer> onDuplicateKey;
 
     /** A defined function that is called if the number of affected rows is lower than {@link #lowerThreshhold}. */
     protected BiFunction<Integer, T, Integer> onLessThan;
@@ -48,7 +66,7 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
 
     /**
      * Creates a new instance.
-     * 
+     *
      * @param db
      *            The database that should be used for the statement.
      */
@@ -56,11 +74,23 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
     {
         super(db);
         this.setClauses = new ArrayList<>();
+
+        BiFunction<T, SQLException, Integer> func = (statement, e) ->
+        {
+            DatabaseAccess.log.print(statement.toString());
+            DatabaseAccess.log.print(e);
+            return -1;
+        };
+
+        this.onFail = func;
+        this.onForeignKeyFail = func;
+        this.onCheckFail = func;
+        this.onDuplicateKey = func;
     }
 
     /**
      * Adds a set clause to this statement.
-     * 
+     *
      * @param set
      *            The value setting clause.
      */
@@ -71,7 +101,7 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
 
     /**
      * Makes this statement commit changes after SUCCESSFUL execution.
-     * 
+     *
      * @return This instance for chaining.
      */
     public SqlModifyStatement<T, K> commit()
@@ -83,11 +113,11 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
     /**
      * Indicates that this statement should not be executed as a prepared statement. Instead all set values will be
      * directly inserted into the raw sql string.
-     * 
+     *
      * <p>
      * <b>Note that using this method makes the statement vulnerable for sql injections.</b>
      * </p>
-     * 
+     *
      * @return This instance for chaining.
      */
     public SqlModifyStatement<T, K> unprepared()
@@ -98,14 +128,14 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
 
     /**
      * Executes the built statement.
-     * 
+     *
      * @return The return value of {@link PreparedStatement#executeUpdate()}.
      */
     public abstract int execute();
 
     /**
      * Executes the built statement.
-     * 
+     *
      * @param printLogs
      *            true if information about the statement should be printed out.
      * @return The return value of {@link PreparedStatement#executeUpdate()}.
