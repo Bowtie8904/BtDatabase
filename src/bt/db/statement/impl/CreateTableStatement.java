@@ -529,7 +529,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
             {
                 primary = primary.substring(0,
                                             primary.length() - 2);
-                sql += ", PRIMARY KEY (" + primary + ")";
+                sql += ", CONSTRAINT " + this.name + "_PK PRIMARY KEY (" + primary + ")";
             }
 
             if (this.identity == null)
