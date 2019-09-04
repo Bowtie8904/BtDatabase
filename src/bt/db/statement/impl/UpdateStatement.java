@@ -17,14 +17,14 @@ import bt.db.statement.clause.SetClause;
 
 /**
  * Represents an SQL update statement which can be extended through method chaining.
- * 
+ *
  * @author &#8904
  */
 public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateStatement>
 {
     /**
      * Creates a new instance.
-     * 
+     *
      * @param db
      *            The database that should be used for the statement.
      * @param table
@@ -61,7 +61,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
 
     /**
      * Gets the table in which this statement will update.
-     * 
+     *
      * @return The name of the table.
      */
     public String getTable()
@@ -71,14 +71,14 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
 
     /**
      * Creates a new where conditional clause using the given column for this statement.
-     * 
+     *
      * @param column
      *            The column to use in this condition.
      * @return The created ConditionalClause.
      */
     public ConditionalClause<UpdateStatement> where(String column)
     {
-        ConditionalClause<UpdateStatement> where = new ConditionalClause<UpdateStatement>(this,
+        ConditionalClause<UpdateStatement> where = new ConditionalClause<>(this,
                                                                                           column,
                                                                                           ConditionalClause.WHERE);
         addWhereClause(where);
@@ -88,14 +88,14 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     /**
      * Creates a new conditional clause to chain with an existing where or having clause using the given column for this
      * statement.
-     * 
+     *
      * @param column
      *            The column to use in this condition.
      * @return The created ConditionalClause.
      */
     public ConditionalClause<UpdateStatement> and(String column)
     {
-        ConditionalClause<UpdateStatement> where = new ConditionalClause<UpdateStatement>(this,
+        ConditionalClause<UpdateStatement> where = new ConditionalClause<>(this,
                                                                                           column,
                                                                                           ConditionalClause.AND);
         addWhereClause(where);
@@ -105,14 +105,14 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     /**
      * Creates a new conditional clause to chain with an existing where or having clause using the given column for this
      * statement.
-     * 
+     *
      * @param column
      *            The column to use in this condition.
      * @return The created ConditionalClause.
      */
     public ConditionalClause<UpdateStatement> or(String column)
     {
-        ConditionalClause<UpdateStatement> where = new ConditionalClause<UpdateStatement>(this,
+        ConditionalClause<UpdateStatement> where = new ConditionalClause<>(this,
                                                                                           column,
                                                                                           ConditionalClause.OR);
         addWhereClause(where);
@@ -121,7 +121,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
 
     /**
      * Sets the value of the given column to <i>null</i>.
-     * 
+     *
      * @param column
      *            The column whichs value should be updated.
      * @param sqlType
@@ -137,7 +137,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
 
     /**
      * Updates the given column with the given value.
-     * 
+     *
      * @param column
      *            The column whichs value should be updated.
      * @param value
@@ -148,7 +148,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      */
     public UpdateStatement set(String column, Object value, SqlType sqlType)
     {
-        SetClause<UpdateStatement> set = new SetClause<UpdateStatement>(this,
+        SetClause<UpdateStatement> set = new SetClause<>(this,
                                                                         column,
                                                                         value,
                                                                         sqlType);
@@ -159,7 +159,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     /**
      * Uses the given supplier to retrieve a long value for the given column when this statement is prepared for
      * execution.
-     * 
+     *
      * @param column
      *            The column whichs value should be set.
      * @param idSupplier
@@ -168,7 +168,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      */
     public UpdateStatement set(String column, Supplier<Long> longSupplier)
     {
-        SetClause<UpdateStatement> set = new SetClause<UpdateStatement>(this,
+        SetClause<UpdateStatement> set = new SetClause<>(this,
                                                                         column,
                                                                         longSupplier);
         addSetClause(set);
@@ -177,7 +177,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
 
     /**
      * Updates the given column with the given value.
-     * 
+     *
      * @param column
      *            The column whichs value should be updated.
      * @param value
@@ -193,7 +193,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
 
     /**
      * Updates the given column with the given value.
-     * 
+     *
      * @param column
      *            The column whichs value should be updated.
      * @param value
@@ -209,7 +209,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
 
     /**
      * Updates the given column with the given value.
-     * 
+     *
      * @param column
      *            The column whichs value should be updated.
      * @param value
@@ -225,7 +225,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
 
     /**
      * Updates the given column with the given value.
-     * 
+     *
      * @param column
      *            The column whichs value should be updated.
      * @param value
@@ -241,7 +241,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
 
     /**
      * Updates the given column with the given value.
-     * 
+     *
      * @param column
      *            The column whichs value should be updated.
      * @param value
@@ -257,7 +257,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
 
     /**
      * Updates the given column with the given value.
-     * 
+     *
      * @param column
      *            The column whichs value should be updated.
      * @param value
@@ -272,9 +272,138 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     }
 
     /**
+     * Defines a data modifying statement (insert, update, delete) to execute if a check constraint is violated by the
+     * statement.
+     *
+     * <p>
+     * The return value of the given statements execute method will be returned by this instances {@link #execute()}.
+     * </p>
+     *
+     * @param statement
+     *            The statement to execute.
+     * @return This instance for chaining.
+     */
+    public UpdateStatement onCheckViolation(SqlModifyStatement statement)
+    {
+        this.onCheckFail = (s, e) ->
+        {
+            return statement.execute();
+        };
+        return this;
+    }
+
+    /**
+     * Defines a data modifying statement (insert, update, delete) to execute if a check constraint is violated by the
+     * statement.
+     *
+     * <p>
+     * The first parameter (UpdateStatement) will be this statement instance, the second one is the SQLException that
+     * caused the fail. The return value (Integer) will be returned by this instances {@link #execute()}.
+     * </p>
+     *
+     * @param onDuplicate
+     *            The function to execute.
+     * @return This instance for chaining.
+     */
+    public UpdateStatement onCheckViolation(BiFunction<UpdateStatement, SQLException, Integer> onDuplicate)
+    {
+        this.onCheckFail = onDuplicate;
+        return this;
+    }
+
+    /**
+     * Defines a data modifying statement (insert, update, delete) to execute if a foreign key constraint is violated by
+     * the statement.
+     *
+     * <p>
+     * The return value of the given statements execute method will be returned by this instances {@link #execute()}.
+     * </p>
+     *
+     * @param statement
+     *            The statement to execute.
+     * @return This instance for chaining.
+     */
+    public UpdateStatement onForeignKeyViolation(SqlModifyStatement statement)
+    {
+        this.onForeignKeyFail = (s, e) ->
+        {
+            return statement.execute();
+        };
+        return this;
+    }
+
+    /**
+     * Defines a data modifying statement (insert, update, delete) to execute if a foreign key constraint is violated by
+     * the statement.
+     *
+     * <p>
+     * The first parameter (UpdateStatement) will be this statement instance, the second one is the SQLException that
+     * caused the fail. The return value (Integer) will be returned by this instances {@link #execute()}.
+     * </p>
+     *
+     * @param onDuplicate
+     *            The function to execute.
+     * @return This instance for chaining.
+     */
+    public UpdateStatement onForeignKeyViolation(BiFunction<UpdateStatement, SQLException, Integer> onDuplicate)
+    {
+        this.onForeignKeyFail = onDuplicate;
+        return this;
+    }
+
+    /**
+     * Defines a data modifying statement (insert, update, delete) to execute if the primary key used in the original
+     * insert is already contained in the table or if a unique constraint is violated.
+     *
+     * <p>
+     * The return value of the given statements execute method will be returned by this instances {@link #execute()}.
+     * </p>
+     *
+     * @param statement
+     *            The statement to execute.
+     * @return This instance for chaining.
+     */
+    public UpdateStatement onDuplicateKey(SqlModifyStatement statement)
+    {
+        this.onDuplicateKey = (s, e) ->
+        {
+            return statement.execute();
+        };
+        return this;
+    }
+
+    /**
+     * Defines a function that will be executed if the primary key used in the original update is already contained in
+     * the table or if a unique constraint is violated.
+     *
+     * <p>
+     * The first parameter (UpdateStatement) will be this statement instance, the second one is the SQLException that
+     * caused the fail. The return value (Integer) will be returned by this instances {@link #execute()}.
+     * </p>
+     *
+     * @param onDuplicate
+     *            The function to execute.
+     * @return This instance for chaining.
+     */
+    public UpdateStatement onDuplicateKey(BiFunction<UpdateStatement, SQLException, Integer> onDuplicate)
+    {
+        this.onDuplicateKey = onDuplicate;
+        return this;
+    }
+
+    /**
      * Defines a data modifying statement (insert, update, delete) which will be executed if there was an error during
      * the execution of the original update statement.
-     * 
+     *
+     * <p>
+     * The given statement is only executed if the error was not handled by one of the other exception functions
+     * (onDuplicateKey, onCheckViolation, ...).
+     * </p>
+     *
+     * <p>
+     * The return value of the given statements execute method will be returned by this instances {@link #execute()}.
+     * </p>
+     *
      * @param onFail
      *            The SqlModifyStatement to execute instead.
      * @return This instance for chaining.
@@ -291,12 +420,17 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
 
     /**
      * Defines a BiFunction that will be executed if there was an error during the execution of this statement.
-     * 
+     *
      * <p>
      * The first parameter (UpdateStatement) will be this statement instance, the second one is the SQLException that
      * caused the fail. The return value (Integer) will be returned by this instances {@link #execute()}.
      * </p>
-     * 
+     *
+     * <p>
+     * The given function is only executed if the error was not handled by one of the other exception functions
+     * (onDuplicateKey, onCheckViolation, ...).
+     * </p>
+     *
      * @param onFail
      *            The BiFunction to execute.
      * @return This instance for chaining.
@@ -310,7 +444,11 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     /**
      * Defines a data modifying statement (insert, update, delete) to execute if the original update affected less rows
      * than the given lower threshhold.
-     * 
+     *
+     * <p>
+     * The return value of the given statements execute method will be returned by this instances {@link #execute()}.
+     * </p>
+     *
      * @param lowerThreshhold
      *            The threshhold to check.
      * @param statement
@@ -330,12 +468,12 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     /**
      * Defines a BiFunction that will be executed if the original update affected less rows than the given lower
      * threshhold.
-     * 
+     *
      * <p>
      * The first parameter (int) will be the number of rows affected, the second one is the UpdateStatement from the
      * original delete. The return value (Integer) will be returned by this instances {@link #execute()}.
      * </p>
-     * 
+     *
      * @param lowerThreshhold
      *            The threshhold to check.
      * @param onLessThan
@@ -352,7 +490,11 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     /**
      * Defines a data modifying statement (insert, update, delete) to execute if the original update affected more rows
      * than the given higher threshhold.
-     * 
+     *
+     * <p>
+     * The return value of the given statements execute method will be returned by this instances {@link #execute()}.
+     * </p>
+     *
      * @param higherThreshhold
      *            The threshhold to check.
      * @param statement
@@ -372,12 +514,12 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     /**
      * Defines a BiFunction that will be executed if the original update affected more rows than the given higher
      * threshhold.
-     * 
+     *
      * <p>
      * The first parameter (int) will be the number of rows affected, the second one is the UpdateStatement from the
-     * original insert. The return value (Integer) will be returned by this instances {@link #execute()}.
+     * original update. The return value (Integer) will be returned by this instances {@link #execute()}.
      * </p>
-     * 
+     *
      * @param higherThreshhold
      *            The threshhold to check.
      * @param onLessThan
@@ -395,7 +537,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     /**
      * Executes the built statement. Depending on the number of rows affected, the defined onLessThan or onMoreThan
      * might be executed. If there is an error during this execution, the onFail function is called.
-     * 
+     *
      * @see bt.db.statement.SqlModifyStatement#execute()
      */
     @Override
@@ -407,7 +549,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     /**
      * Executes the built statement. Depending on the number of rows affected, the defined onLessThan or onMoreThan
      * might be executed. If there is an error during this execution, the onFail function is called.
-     * 
+     *
      * @see bt.db.statement.SqlModifyStatement#execute(boolean)
      */
     @Override
@@ -460,24 +602,51 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
                 }
             }
 
-            result = statement.executeUpdate();
-            log("Affected rows: " + result,
-                printLogs);
+            try
+            {
+                result = statement.executeUpdate();
+                log("Affected rows: " + result,
+                    printLogs);
 
-            if (this.shouldCommit)
-            {
-                this.db.commit();
-            }
+                if (this.shouldCommit)
+                {
+                    this.db.commit();
+                }
 
-            if (result < this.lowerThreshhold && this.onLessThan != null)
-            {
-                return this.onLessThan.apply(result,
-                                             this);
+                if (result < this.lowerThreshhold && this.onLessThan != null)
+                {
+                    return this.onLessThan.apply(result,
+                                                 this);
+                }
+                else if (result > this.higherThreshhold && this.onMoreThan != null)
+                {
+                    return this.onMoreThan.apply(result,
+                                                 this);
+                }
             }
-            else if (result > this.higherThreshhold && this.onMoreThan != null)
+            catch (SQLException updateFail)
             {
-                return this.onMoreThan.apply(result,
-                                             this);
+                if (this.onDuplicateKey != null && updateFail.getSQLState().equals(DUPLICATE_KEY_ERROR))
+                {
+                    result = this.onDuplicateKey.apply(this, updateFail);
+                }
+                else if (this.onCheckFail != null && updateFail.getSQLState().equals(CHECK_CONSTRAINT_VIOLATION_ERROR))
+                {
+                    result = this.onCheckFail.apply(this, updateFail);
+                }
+                else if (this.onForeignKeyFail != null && updateFail.getSQLState().equals(FOREIGN_KEY_VIOLATION_ERROR))
+                {
+                    result = this.onForeignKeyFail.apply(this, updateFail);
+                }
+                else if (this.onFail != null)
+                {
+                    result = this.onFail.apply(this, updateFail);
+                }
+                else
+                {
+                    DatabaseAccess.log.print(updateFail);
+                    result = -1;
+                }
             }
         }
         catch (SQLException e)
@@ -499,11 +668,11 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
 
     /**
      * Formats the full select statement.
-     * 
+     *
      * <p>
      * Depending on {@link #isPrepared()} values will either be inserted into the raw sql or replaced by ? placeholders.
      * </p>
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     @Override
