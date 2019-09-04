@@ -7,7 +7,7 @@ import bt.db.statement.impl.CreateStatement;
 
 /**
  * Represents a column in a CREATE statement.
- * 
+ *
  * @author &#8904
  */
 public class TableColumn<T extends CreateStatement>
@@ -29,7 +29,7 @@ public class TableColumn<T extends CreateStatement>
 
     /**
      * Indicates whether this columns value should be generated as identity. true = generate, false = don't generate.
-     * 
+     *
      * <p>
      * The behavior is highly dependent on {@link #generated} as it defines whether the value is always uniquely
      * generated or only generated if it is not inserted explicitly.
@@ -71,7 +71,7 @@ public class TableColumn<T extends CreateStatement>
 
     /**
      * Creates a new instance and initializes the fields.
-     * 
+     *
      * @param statement
      *            The statement that created this column.
      * @param name
@@ -88,11 +88,11 @@ public class TableColumn<T extends CreateStatement>
 
     /**
      * Sets the comment of this column.
-     * 
+     *
      * <p>
      * If the given String is longer than {@link #COMMENT_SIZE} only a substring (0 - COMMENT_SIZE) will be used.
      * </p>
-     * 
+     *
      * @param text
      *            The comment.
      * @return This instance for chaining.
@@ -111,7 +111,7 @@ public class TableColumn<T extends CreateStatement>
 
     /**
      * Returns the comment that was set for this column.
-     * 
+     *
      * @return The set comment or null.
      */
     public String getComment()
@@ -121,11 +121,11 @@ public class TableColumn<T extends CreateStatement>
 
     /**
      * Sets the size of this column.
-     * 
+     *
      * <p>
      * This has to be used on VARCHAR columns to limit the length of inserted values.
      * </p>
-     * 
+     *
      * @param values
      *            The sizes. For VARCHAR only one size can be given.
      * @return This instance for chaining.
@@ -138,13 +138,13 @@ public class TableColumn<T extends CreateStatement>
 
     /**
      * Marks this column as primary key for the table.
-     * 
+     *
      * <p>
      * This means that it can never be null, needs to be unique and has to be filled on insert. Either explicitly with a
      * SET or implicitly by marking this column {@link #asIdentity(Generated)} and using {@link Generated#ALWAYS}
      * (INTEGER or BIGINT(Long) columns only).
      * </p>
-     * 
+     *
      * @return This instance for chaining.
      */
     public TableColumn<T> primaryKey()
@@ -155,7 +155,7 @@ public class TableColumn<T extends CreateStatement>
 
     /**
      * Marks this column as unique. Meaning that all values inside this column need to be column unique.
-     * 
+     *
      * @return This instance for chaining.
      */
     public TableColumn<T> unique()
@@ -167,15 +167,15 @@ public class TableColumn<T extends CreateStatement>
 
     /**
      * Marks this column as an identity which means that it can be generated on insert.
-     * 
+     *
      * <p>
      * Only INTEGER and BIGINT (Long) typed columns can be used as identity.
      * </p>
-     * 
+     *
      * <p>
      * If nothing else is specified by {@link #autoIncrement(int)} the value will be incremented by 1 each time.
      * </p>
-     * 
+     *
      * @param generated
      *            Defines the behavior of the identity as either {@link Generated#ALWAYS} or {@link Generated#DEFAULT}.
      * @return This instance for chaining.
@@ -195,12 +195,12 @@ public class TableColumn<T extends CreateStatement>
 
     /**
      * Indicates whether this columns value should be generated as identity.
-     * 
+     *
      * <p>
      * The behavior is highly dependent on {@link #generated} as it defines whether the value is always uniquely
      * generated or only generated if it is not inserted explicitly.
      * </p>
-     * 
+     *
      * @return true = generate, false = don't generate.
      */
     public boolean isIdentity()
@@ -210,7 +210,7 @@ public class TableColumn<T extends CreateStatement>
 
     /**
      * Indicates whether this column should be marked as unique.
-     * 
+     *
      * @return true = unique, false = not unique.
      */
     public boolean isUnique()
@@ -220,7 +220,7 @@ public class TableColumn<T extends CreateStatement>
 
     /**
      * Indicates whether values in this collumn can be null.
-     * 
+     *
      * @return true = can be null, false = can't be null.
      */
     public boolean isNotNull()
@@ -230,7 +230,7 @@ public class TableColumn<T extends CreateStatement>
 
     /**
      * Returns the number by which this fields value will be incremented if this collumn is marked as an identity.
-     * 
+     *
      * @return The number that is used to increment the collumns value by each time.
      */
     public int getAutoIncrement()
@@ -240,11 +240,11 @@ public class TableColumn<T extends CreateStatement>
 
     /**
      * Defines the number by which the value, that is automatically generated, should be incremented.
-     * 
+     *
      * <p>
      * This only has an effect on column marked {@link #asIdentity(Generated)}.
      * </p>
-     * 
+     *
      * @param n
      *            The number by which the identity value should be incremented each insert.
      * @return This instance for chaining.
@@ -257,7 +257,7 @@ public class TableColumn<T extends CreateStatement>
 
     /**
      * Marks this column as non nullable.
-     * 
+     *
      * @return This instance for chaining.
      */
     public TableColumn<T> notNull()
@@ -268,7 +268,7 @@ public class TableColumn<T extends CreateStatement>
 
     /**
      * Sets the default value of this column.
-     * 
+     *
      * @param defaultValue
      *            The value that should be used if nothing else is specified.
      * @return This instance for chaining.
@@ -300,7 +300,7 @@ public class TableColumn<T extends CreateStatement>
 
     /**
      * Indicates whether this column is used as a primary key.
-     * 
+     *
      * @return true = primary key, false = not primary key.
      */
     public boolean isPrimaryKey()
@@ -310,7 +310,7 @@ public class TableColumn<T extends CreateStatement>
 
     /**
      * Adds this column to the CREATE statement which created this instance.
-     * 
+     *
      * @return The statement that created this instance.
      */
     public T add()
@@ -321,7 +321,7 @@ public class TableColumn<T extends CreateStatement>
 
     /**
      * Returns the name of this column.
-     * 
+     *
      * @return The name.
      */
     public String getName()
@@ -331,7 +331,7 @@ public class TableColumn<T extends CreateStatement>
 
     /**
      * Returns the sql type of this column.
-     * 
+     *
      * @return The type.
      */
     public SqlType getType()
@@ -341,7 +341,7 @@ public class TableColumn<T extends CreateStatement>
 
     /**
      * Gets the String representation of the default value.
-     * 
+     *
      * @return The value.
      */
     public String getDefaultValue()
@@ -351,7 +351,7 @@ public class TableColumn<T extends CreateStatement>
 
     /**
      * Returnes the used generation type for identity collumns.
-     * 
+     *
      * @return The generation type.
      */
     public Generated getGenerationType()
@@ -361,7 +361,7 @@ public class TableColumn<T extends CreateStatement>
 
     /**
      * Returns the String representing this column creation query.
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     @Override
@@ -405,7 +405,7 @@ public class TableColumn<T extends CreateStatement>
 
         if (this.unique)
         {
-            sql += ", CONSTRAINT " + this.name + "_uq UNIQUE(" + this.name + ")";
+            sql += ", CONSTRAINT " + this.statement.getName() + "_" + this.name + "_UQ UNIQUE(" + this.name + ")";
         }
 
         return sql;
