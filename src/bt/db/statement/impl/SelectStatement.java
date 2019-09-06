@@ -6,10 +6,12 @@ import java.sql.SQLException;
 import java.sql.SQLSyntaxErrorException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import bt.db.DatabaseAccess;
+import bt.db.exc.SqlExecutionException;
 import bt.db.statement.SqlModifyStatement;
 import bt.db.statement.SqlStatement;
 import bt.db.statement.clause.BetweenConditionalClause;
@@ -32,6 +34,12 @@ public class SelectStatement extends SqlStatement<SelectStatement>
 
     /** Executed if the select returned more rows than specified. */
     private BiFunction<Integer, SqlResultSet, SqlResultSet> onMoreThan;
+
+    /** A defined method that is called if the statement execution finishes successfully. */
+    protected BiConsumer<SelectStatement, SqlResultSet> onSuccess;
+
+    /** A defined function that is called if the statement execution fails for any reason. */
+    protected BiFunction<SelectStatement, SqlExecutionException, SqlResultSet> onFail;
 
     /** Threshhold for {@link #onLessThan} */
     private int lowerThreshhold;
@@ -472,6 +480,23 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     }
 
     /**
+     * Defines a consumer to execute if the statement executes successfully.
+     *
+     * <p>
+     * The first parameter (SelectStatement) will be this statement instance, the second one is the resultset.
+     * </p>
+     *
+     * @param onSuccess
+     *            The function to execute.
+     * @return This instance for chaining.
+     */
+    public SelectStatement onSuccess(BiConsumer<SelectStatement, SqlResultSet> onSuccess)
+    {
+        this.onSuccess = onSuccess;
+        return this;
+    }
+
+    /**
      * Defines a select statement which will be executed (and whichs resultset will be returned by {@link #execute()})
      * if the original select returned less rows than the given lower threshhold.
      *
@@ -634,15 +659,16 @@ public class SelectStatement extends SqlStatement<SelectStatement>
      * Defines a BiFunction that will be executed if there was an error during the execution of this statement.
      *
      * <p>
-     * The first parameter (SelectStatement) will be this statement instance, the second one is the SQLException that
-     * caused the fail. The return value (SqlResultSet) will be returned by this instances {@link #execute()}.
+     * The first parameter (SelectStatement) will be this statement instance, the second one is the
+     * SqlExecutionException that caused the fail. The return value (SqlResultSet) will be returned by this instances
+     * {@link #execute()}.
      * </p>
      *
      * @param onFail
      *            The BiFunction to execute.
      * @return This instance for chaining.
      */
-    public SelectStatement onFail(BiFunction<SelectStatement, SQLException, SqlResultSet> onFail)
+    public SelectStatement onFail(BiFunction<SelectStatement, SqlExecutionException, SqlResultSet> onFail)
     {
         this.onFail = onFail;
         return this;
@@ -837,6 +863,11 @@ public class SelectStatement extends SqlStatement<SelectStatement>
             log("Returned rows: " + result.size(),
                 printLogs);
 
+            if (this.onSuccess != null)
+            {
+                this.onSuccess.accept(this, result);
+            }
+
             if (result.size() < this.lowerThreshhold && this.onLessThan != null)
             {
                 return this.onLessThan.apply(result.size(),
@@ -852,8 +883,7 @@ public class SelectStatement extends SqlStatement<SelectStatement>
         {
             if (this.onFail != null)
             {
-                result = this.onFail.apply(this,
-                                           e);
+                result = this.onFail.apply(this, new SqlExecutionException(e.getMessage(), sql, e));
             }
             else
             {
