@@ -133,7 +133,7 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
     }
 
     /**
-     * Defines a consumer to execute if a check constraint is violated by the statement.
+     * Defines a consumer to execute if the statement executes successfully.
      *
      * <p>
      * The first parameter (SqlModifyingStatement) will be this statement instance, the second one is number of affected
