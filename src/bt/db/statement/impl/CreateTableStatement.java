@@ -10,6 +10,7 @@ import bt.db.EmbeddedDatabase;
 import bt.db.RemoteDatabase;
 import bt.db.constants.Generated;
 import bt.db.constants.SqlType;
+import bt.db.exc.SqlExecutionException;
 import bt.db.statement.clause.ColumnEntry;
 import bt.db.statement.clause.TableColumn;
 
@@ -457,23 +458,11 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                 this.db.commit();
             }
 
-            if (this.onSuccess != null)
-            {
-                this.onSuccess.accept(this, result);
-            }
+            handleSuccess(result);
         }
         catch (SQLException e)
         {
-            if (this.onFail != null)
-            {
-                result = this.onFail.apply(this,
-                                           e);
-            }
-            else
-            {
-                DatabaseAccess.log.print(e);
-                result = -1;
-            }
+            result = handleFail(new SqlExecutionException(e.getMessage(), sql, e));
         }
 
         return result;

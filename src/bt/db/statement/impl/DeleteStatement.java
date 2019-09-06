@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import bt.db.DatabaseAccess;
+import bt.db.exc.SqlExecutionException;
 import bt.db.statement.SqlModifyStatement;
 import bt.db.statement.clause.BetweenConditionalClause;
 import bt.db.statement.clause.ConditionalClause;
@@ -160,34 +161,12 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
                 this.db.commit();
             }
 
-            if (this.onSuccess != null)
-            {
-                this.onSuccess.accept(this, result);
-            }
-
-            if (result < this.lowerThreshhold && this.onLessThan != null)
-            {
-                return this.onLessThan.apply(result,
-                                             this);
-            }
-            else if (result > this.higherThreshhold && this.onMoreThan != null)
-            {
-                return this.onMoreThan.apply(result,
-                                             this);
-            }
+            handleSuccess(result);
+            result = handleThreshholds(result);
         }
         catch (SQLException e)
         {
-            if (this.onFail != null)
-            {
-                result = this.onFail.apply(this,
-                                           e);
-            }
-            else
-            {
-                DatabaseAccess.log.print(e);
-                result = -1;
-            }
+            result = handleFail(new SqlExecutionException(e.getMessage(), sql, e));
         }
 
         return result;

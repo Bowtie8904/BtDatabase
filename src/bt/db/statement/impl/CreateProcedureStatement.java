@@ -8,6 +8,7 @@ import java.util.List;
 
 import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
+import bt.db.exc.SqlExecutionException;
 
 /**
  * Represents an SQL CREATE PROCEDURE statement which can be extended through method chaining.
@@ -181,25 +182,13 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
                             this.db.commit();
                         }
 
-                        if (this.onSuccess != null)
-                        {
-                            this.onSuccess.accept(this, result);
-                        }
+                        handleSuccess(result);
 
                         return result;
                     }
                     catch (SQLException ex)
                     {
-                        if (this.onFail != null)
-                        {
-                            result = this.onFail.apply(this,
-                                                       ex);
-                        }
-                        else
-                        {
-                            DatabaseAccess.log.print(ex);
-                            result = -1;
-                        }
+                        result = handleFail(new SqlExecutionException(e.getMessage(), sql, ex));
                     }
                 }
                 else
@@ -207,30 +196,12 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
                     log("Failed to drop procedure.",
                         printLogs);
 
-                    if (this.onFail != null)
-                    {
-                        result = this.onFail.apply(this,
-                                                   e);
-                    }
-                    else
-                    {
-                        DatabaseAccess.log.print(e);
-                        result = -1;
-                    }
+                    result = handleFail(new SqlExecutionException(e.getMessage(), sql, e));
                 }
             }
             else
             {
-                if (this.onFail != null)
-                {
-                    result = this.onFail.apply(this,
-                                               e);
-                }
-                else
-                {
-                    result = -1;
-                    DatabaseAccess.log.print(e);
-                }
+                result = handleFail(new SqlExecutionException(e.getMessage(), sql, e));
             }
         }
 

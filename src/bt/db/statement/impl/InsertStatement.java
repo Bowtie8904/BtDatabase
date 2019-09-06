@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 
 import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
+import bt.db.exc.SqlExecutionException;
 import bt.db.statement.SqlModifyStatement;
 import bt.db.statement.clause.SetClause;
 
@@ -408,70 +409,21 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
                 }
             }
 
-            try
+            result = statement.executeUpdate();
+            log("Affected rows: " + result,
+                printLogs);
+
+            if (this.shouldCommit)
             {
-                result = statement.executeUpdate();
-                log("Affected rows: " + result,
-                    printLogs);
-
-                if (this.shouldCommit)
-                {
-                    this.db.commit();
-                }
-
-                if (this.onSuccess != null)
-                {
-                    this.onSuccess.accept(this, result);
-                }
-
-                if (result < this.lowerThreshhold && this.onLessThan != null)
-                {
-                    return this.onLessThan.apply(result,
-                                                 this);
-                }
-                else if (result > this.higherThreshhold && this.onMoreThan != null)
-                {
-                    return this.onMoreThan.apply(result,
-                                                 this);
-                }
+                this.db.commit();
             }
-            catch (SQLException updateFail)
-            {
-                if (this.onDuplicateKey != null && updateFail.getSQLState().equals(DUPLICATE_KEY_ERROR))
-                {
-                    result = this.onDuplicateKey.apply(this, updateFail);
-                }
-                else if (this.onCheckFail != null && updateFail.getSQLState().equals(CHECK_CONSTRAINT_VIOLATION_ERROR))
-                {
-                    result = this.onCheckFail.apply(this, updateFail);
-                }
-                else if (this.onForeignKeyFail != null && updateFail.getSQLState().equals(FOREIGN_KEY_VIOLATION_ERROR))
-                {
-                    result = this.onForeignKeyFail.apply(this, updateFail);
-                }
-                else if (this.onFail != null)
-                {
-                    result = this.onFail.apply(this, updateFail);
-                }
-                else
-                {
-                    DatabaseAccess.log.print(updateFail);
-                    result = -1;
-                }
-            }
+
+            handleSuccess(result);
+            result = handleThreshholds(result);
         }
         catch (SQLException e)
         {
-            if (this.onFail != null)
-            {
-                result = this.onFail.apply(this, e);
-            }
-            else
-            {
-                DatabaseAccess.log.print(sql);
-                DatabaseAccess.log.print(e);
-                result = -1;
-            }
+            result = handleFail(new SqlExecutionException(e.getMessage(), sql, e));
         }
 
         return result;

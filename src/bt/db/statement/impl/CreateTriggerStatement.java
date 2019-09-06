@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.sql.SQLSyntaxErrorException;
 
 import bt.db.DatabaseAccess;
+import bt.db.exc.SqlExecutionException;
 import bt.db.statement.clause.TriggerAction;
 
 /**
@@ -243,10 +244,7 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
                 this.db.commit();
             }
 
-            if (this.onSuccess != null)
-            {
-                this.onSuccess.accept(this, result);
-            }
+            handleSuccess(result);
         }
         catch (SQLException e)
         {
@@ -262,24 +260,12 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
 
                         result = 1;
 
-                        if (this.onSuccess != null)
-                        {
-                            this.onSuccess.accept(this, result);
-                        }
+                        handleSuccess(result);
                         return result;
                     }
                     catch (SQLException ex)
                     {
-                        if (this.onFail != null)
-                        {
-                            result = this.onFail.apply(this,
-                                                       ex);
-                        }
-                        else
-                        {
-                            DatabaseAccess.log.print(ex);
-                            result = -1;
-                        }
+                        result = handleFail(new SqlExecutionException(e.getMessage(), sql, ex));
                     }
                 }
                 else
@@ -287,30 +273,12 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
                     log("Failed to drop trigger.",
                         printLogs);
 
-                    if (this.onFail != null)
-                    {
-                        result = this.onFail.apply(this,
-                                                   e);
-                    }
-                    else
-                    {
-                        DatabaseAccess.log.print(e);
-                        result = -1;
-                    }
+                    result = handleFail(new SqlExecutionException(e.getMessage(), sql, e));
                 }
             }
             else
             {
-                if (this.onFail != null)
-                {
-                    result = this.onFail.apply(this,
-                                               e);
-                }
-                else
-                {
-                    result = -1;
-                    DatabaseAccess.log.print(e);
-                }
+                result = handleFail(new SqlExecutionException(e.getMessage(), sql, e));
             }
         }
 

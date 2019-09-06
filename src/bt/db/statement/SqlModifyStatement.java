@@ -1,13 +1,13 @@
 package bt.db.statement;
 
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
 import bt.db.DatabaseAccess;
+import bt.db.exc.SqlExecutionException;
 import bt.db.statement.clause.SetClause;
 
 /**
@@ -39,25 +39,31 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
     protected BiConsumer<T, Integer> onSuccess;
 
     /** A defined function that is called if the statement execution fails for any reason. */
-    protected BiFunction<T, SQLException, Integer> onFail;
+    protected BiFunction<T, SqlExecutionException, Integer> onFail;
 
     /** A defined function that is called if the statement execution fails due to a foreign key violation. */
-    protected BiFunction<T, SQLException, Integer> onForeignKeyFail;
+    protected BiFunction<T, SqlExecutionException, Integer> onForeignKeyFail;
 
     /** A defined function that is called if the statement execution fails due to a check constraint violation. */
-    protected BiFunction<T, SQLException, Integer> onCheckFail;
+    protected BiFunction<T, SqlExecutionException, Integer> onCheckFail;
 
     /**
      * A defined function that is called if the statement execution fails due to a duplicate primary key or unique
      * constraint violation.
      */
-    protected BiFunction<T, SQLException, Integer> onDuplicateKey;
+    protected BiFunction<T, SqlExecutionException, Integer> onDuplicateKey;
 
     /** A defined function that is called if the number of affected rows is lower than {@link #lowerThreshhold}. */
     protected BiFunction<Integer, T, Integer> onLessThan;
 
     /** A defined function that is called if the number of affected rows is higher than {@link #higherThreshhold}. */
     protected BiFunction<Integer, T, Integer> onMoreThan;
+
+    /**
+     * A defined function that is called if tthe statement tries to create a database object (trigger, procedure, ...)
+     * eventhough it already exists.
+     */
+    protected BiFunction<T, SqlExecutionException, Integer> onAlreadyExists;
 
     /** The threshhold indicating whether {@link #onLessThan} should be executed. */
     protected int lowerThreshhold;
@@ -78,15 +84,14 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
     {
         super(db);
         this.setClauses = new ArrayList<>();
+        this.onFail = this::defaultFail;
+    }
 
-        BiFunction<T, SQLException, Integer> func = (statement, e) ->
-        {
-            DatabaseAccess.log.print(statement.toString());
-            DatabaseAccess.log.print(e);
-            return -1;
-        };
-
-        this.onFail = func;
+    private int defaultFail(T statement, SqlExecutionException e)
+    {
+        DatabaseAccess.log.print(statement.toString());
+        DatabaseAccess.log.print(e);
+        return -1;
     }
 
     /**
@@ -170,15 +175,16 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
      * Defines a function to execute if a check constraint is violated by the statement.
      *
      * <p>
-     * The first parameter (SqlModifyingStatement) will be this statement instance, the second one is the SQLException
-     * that caused the fail. The return value (Integer) will be returned by this instances {@link #execute()}.
+     * The first parameter (SqlModifyingStatement) will be this statement instance, the second one is the
+     * SqlExecutionException that caused the fail. The return value (Integer) will be returned by this instances
+     * {@link #execute()}.
      * </p>
      *
      * @param onCheckViolation
      *            The function to execute.
      * @return This instance for chaining.
      */
-    public T onCheckViolation(BiFunction<T, SQLException, Integer> onCheckViolation)
+    public T onCheckViolation(BiFunction<T, SqlExecutionException, Integer> onCheckViolation)
     {
         this.onCheckFail = onCheckViolation;
         return (T)this;
@@ -209,15 +215,16 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
      * Defines a function to execute if a foreign key constraint is violated by the statement.
      *
      * <p>
-     * The first parameter (SqlModifyingStatement) will be this statement instance, the second one is the SQLException
-     * that caused the fail. The return value (Integer) will be returned by this instances {@link #execute()}.
+     * The first parameter (SqlModifyingStatement) will be this statement instance, the second one is the
+     * SqlExecutionException that caused the fail. The return value (Integer) will be returned by this instances
+     * {@link #execute()}.
      * </p>
      *
      * @param onForeignKeyViolation
      *            The function to execute.
      * @return This instance for chaining.
      */
-    public T onForeignKeyViolation(BiFunction<T, SQLException, Integer> onForeignKeyViolation)
+    public T onForeignKeyViolation(BiFunction<T, SqlExecutionException, Integer> onForeignKeyViolation)
     {
         this.onForeignKeyFail = onForeignKeyViolation;
         return (T)this;
@@ -249,15 +256,16 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
      * in the table or if a unique constraint is violated.
      *
      * <p>
-     * The first parameter (SqlModifyingStatement) will be this statement instance, the second one is the SQLException
-     * that caused the fail. The return value (Integer) will be returned by this instances {@link #execute()}.
+     * The first parameter (SqlModifyingStatement) will be this statement instance, the second one is the
+     * SqlExecutionException that caused the fail. The return value (Integer) will be returned by this instances
+     * {@link #execute()}.
      * </p>
      *
      * @param onDuplicate
      *            The function to execute.
      * @return This instance for chaining.
      */
-    public T onDuplicateKey(BiFunction<T, SQLException, Integer> onDuplicate)
+    public T onDuplicateKey(BiFunction<T, SqlExecutionException, Integer> onDuplicate)
     {
         this.onDuplicateKey = onDuplicate;
         return (T)this;
@@ -294,8 +302,9 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
      * Defines a BiFunction that will be executed if there was an error during the execution of this statement.
      *
      * <p>
-     * The first parameter (SqlModifyingStatement) will be this statement instance, the second one is the SQLException
-     * that caused the fail. The return value (Integer) will be returned by this instances {@link #execute()}.
+     * The first parameter (SqlModifyingStatement) will be this statement instance, the second one is the
+     * SqlExecutionException that caused the fail. The return value (Integer) will be returned by this instances
+     * {@link #execute()}.
      * </p>
      *
      * <p>
@@ -307,7 +316,7 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
      *            The BiFunction to execute.
      * @return This instance for chaining.
      */
-    public T onFail(BiFunction<T, SQLException, Integer> onFail)
+    public T onFail(BiFunction<T, SqlExecutionException, Integer> onFail)
     {
         this.onFail = onFail;
         return (T)this;
@@ -404,6 +413,65 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
         this.higherThreshhold = higherThreshhold;
         this.onMoreThan = onMoreThan;
         return (T)this;
+    }
+
+    protected int handleFail(SqlExecutionException e)
+    {
+        int result = 0;
+
+        if (this.onDuplicateKey != null && e.getSQLState().equals(DUPLICATE_KEY_ERROR))
+        {
+            result = this.onDuplicateKey.apply((T)this, e);
+        }
+        else if (this.onCheckFail != null && e.getSQLState().equals(CHECK_CONSTRAINT_VIOLATION_ERROR))
+        {
+            result = this.onCheckFail.apply((T)this, e);
+        }
+        else if (this.onForeignKeyFail != null && e.getSQLState().equals(FOREIGN_KEY_VIOLATION_ERROR))
+        {
+            result = this.onForeignKeyFail.apply((T)this, e);
+        }
+        else if (this.onAlreadyExists != null && e.getSQLState().equals(ALREADY_EXISTS_ERROR))
+        {
+            result = this.onAlreadyExists.apply((T)this, e);
+        }
+        else if (this.onFail != null)
+        {
+            result = this.onFail.apply((T)this, e);
+        }
+        else
+        {
+            DatabaseAccess.log.print(e);
+            result = -1;
+        }
+
+        return result;
+    }
+
+    protected void handleSuccess(int result)
+    {
+        if (this.onSuccess != null)
+        {
+            this.onSuccess.accept((T)this, result);
+        }
+    }
+
+    protected int handleThreshholds(int reached)
+    {
+        int result = 0;
+
+        if (result < this.lowerThreshhold && this.onLessThan != null)
+        {
+            result = this.onLessThan.apply(result,
+                                           (T)this);
+        }
+        else if (result > this.higherThreshhold && this.onMoreThan != null)
+        {
+            result = this.onMoreThan.apply(result,
+                                           (T)this);
+        }
+
+        return result;
     }
 
     /**

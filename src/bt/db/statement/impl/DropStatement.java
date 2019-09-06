@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import bt.db.DatabaseAccess;
+import bt.db.exc.SqlExecutionException;
 import bt.db.statement.SqlModifyStatement;
 
 /**
@@ -224,23 +225,11 @@ public class DropStatement extends SqlModifyStatement<DropStatement, DropStateme
                 this.db.commit();
             }
 
-            if (this.onSuccess != null)
-            {
-                this.onSuccess.accept(this, result);
-            }
+            handleSuccess(result);
         }
         catch (SQLException e)
         {
-            if (this.onFail != null)
-            {
-                result = this.onFail.apply(this,
-                                           e);
-            }
-            else
-            {
-                DatabaseAccess.log.print(e);
-                result = -1;
-            }
+            result = handleFail(new SqlExecutionException(e.getMessage(), sql, e));
         }
 
         return result;

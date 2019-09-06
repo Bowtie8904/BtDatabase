@@ -6,11 +6,12 @@ import java.sql.SQLException;
 import bt.db.DatabaseAccess;
 import bt.db.constants.Generated;
 import bt.db.constants.SqlType;
+import bt.db.exc.SqlExecutionException;
 import bt.db.statement.clause.TableColumn;
 
 /**
  * Represents an SQL alter statement which can be extended through method chaining.
- * 
+ *
  * @author &#8904
  */
 public class AlterTableStatement extends CreateStatement<AlterTableStatement, AlterTableStatement>
@@ -19,7 +20,7 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
 
     /**
      * Creates a new instance.
-     * 
+     *
      * @param db
      *            The database that should be used for the statement.
      * @param name
@@ -34,7 +35,7 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
 
     /**
      * Adds a new column in this table which has the given name and the given sql type.
-     * 
+     *
      * @param name
      *            The name of the column.
      * @param type
@@ -51,7 +52,7 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
 
     /**
      * Adds the column to this table.
-     * 
+     *
      * @see bt.db.statement.impl.CreateStatement#addColumn(bt.db.statement.clause.TableColumn)
      */
     @Override
@@ -167,19 +168,12 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
             {
                 this.db.commit();
             }
+
+            handleSuccess(result);
         }
         catch (SQLException e)
         {
-            if (this.onFail != null)
-            {
-                result = this.onFail.apply(this,
-                                           e);
-            }
-            else
-            {
-                DatabaseAccess.log.print(e);
-                result = -1;
-            }
+            result = handleFail(new SqlExecutionException(e.getMessage(), sql, e));
         }
 
         return result;

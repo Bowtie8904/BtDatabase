@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import bt.db.DatabaseAccess;
+import bt.db.exc.SqlExecutionException;
 import bt.db.statement.SqlModifyStatement;
 
 /**
@@ -52,24 +53,12 @@ public class TruncateTableStatement extends SqlModifyStatement<TruncateTableStat
 
             result = statement.executeUpdate();
 
-            if (this.onSuccess != null)
-            {
-                this.onSuccess.accept(this, result);
-            }
+            handleSuccess(result);
+            result = handleThreshholds(result);
         }
         catch (SQLException e)
         {
-            if (this.onFail != null)
-            {
-                result = this.onFail.apply(this,
-                                           e);
-            }
-            else
-            {
-                DatabaseAccess.log.print(sql);
-                DatabaseAccess.log.print(e);
-                result = -1;
-            }
+            result = handleFail(new SqlExecutionException(e.getMessage(), sql, e));
         }
 
         return result;
