@@ -157,12 +157,20 @@ public class SelectStatement extends SqlStatement<SelectStatement>
         };
     }
 
+    /**
+     * Sets an alias used if this select is a subselect.
+     */
     public SelectStatement alias(String alias)
     {
         this.alias = alias;
         return this;
     }
 
+    /**
+     * Gets the set alias or null.
+     *
+     * @return
+     */
     public String getAlias()
     {
         return this.alias;
@@ -436,6 +444,18 @@ public class SelectStatement extends SqlStatement<SelectStatement>
                                                  columns);
         this.orderBy = clause;
         return clause;
+    }
+
+    /**
+     * Defines the column to order the result by.
+     *
+     * @param column
+     *            The number of the column.
+     * @return The created OrderByClause.
+     */
+    public OrderByClause orderBy(int column)
+    {
+        return orderBy(Integer.toString(column));
     }
 
     /**
