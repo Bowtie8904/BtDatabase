@@ -31,8 +31,8 @@ public class SetClause<T extends SqlModifyStatement>
     /** The value for the column. */
     private Object value;
 
-    /** A suplier that is used to retrieve the long id when this clause is prepared for execution. */
-    private Supplier<Long> idSupplier;
+    /** A suplier that is used to retrieve the value when this clause is prepared for execution. */
+    private Supplier<?> valueSupplier;
 
     /** The statement that created this clause. */
     private T statement;
@@ -45,12 +45,12 @@ public class SetClause<T extends SqlModifyStatement>
         this.value = value;
     }
 
-    public SetClause(T statement, String column, Supplier<Long> idSupplier)
+    public SetClause(T statement, String column, SqlType type, Supplier<?> valueSupplier)
     {
         this.statement = statement;
         this.column = column;
-        this.sqlValueType = SqlType.LONG;
-        this.idSupplier = idSupplier;
+        this.sqlValueType = type;
+        this.valueSupplier = valueSupplier;
     }
 
     /**
@@ -68,9 +68,9 @@ public class SetClause<T extends SqlModifyStatement>
 
         try
         {
-            if (this.idSupplier != null)
+            if (this.valueSupplier != null)
             {
-                this.value = this.idSupplier.get();
+                this.value = this.valueSupplier.get();
             }
 
             if (this.value == null)
@@ -281,9 +281,9 @@ public class SetClause<T extends SqlModifyStatement>
 
         try
         {
-            if (this.idSupplier != null)
+            if (this.valueSupplier != null)
             {
-                this.value = this.idSupplier.get();
+                this.value = this.valueSupplier.get();
             }
 
             if (this.value == null)
