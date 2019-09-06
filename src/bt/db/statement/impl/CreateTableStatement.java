@@ -90,24 +90,6 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
     }
 
     /**
-     * @see bt.db.statement.SqlModifyStatement#commit()
-     */
-    @Override
-    public CreateTableStatement commit()
-    {
-        return (CreateTableStatement)super.commit();
-    }
-
-    /**
-     * @see bt.db.statement.SqlModifyStatement#unprepared()
-     */
-    @Override
-    public CreateTableStatement unprepared()
-    {
-        return (CreateTableStatement)super.unprepared();
-    }
-
-    /**
      * Creates this table as a copy of the given select.
      *
      * <p>
@@ -473,6 +455,11 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
             if (this.shouldCommit)
             {
                 this.db.commit();
+            }
+
+            if (this.onSuccess != null)
+            {
+                this.onSuccess.accept(this, result);
             }
         }
         catch (SQLException e)

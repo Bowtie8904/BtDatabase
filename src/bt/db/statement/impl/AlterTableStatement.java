@@ -43,7 +43,7 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
      */
     public TableColumn<AlterTableStatement> column(String name, SqlType type)
     {
-        TableColumn<AlterTableStatement> column = new TableColumn<AlterTableStatement>(this,
+        TableColumn<AlterTableStatement> column = new TableColumn<>(this,
                                                                                        name,
                                                                                        type);
         return column;
@@ -59,24 +59,6 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
     {
         this.newColumn = column;
         return this;
-    }
-
-    /**
-     * @see bt.db.statement.SqlModifyStatement#commit()
-     */
-    @Override
-    public AlterTableStatement commit()
-    {
-        return (AlterTableStatement)super.commit();
-    }
-
-    /**
-     * @see bt.db.statement.SqlModifyStatement#unprepared()
-     */
-    @Override
-    public AlterTableStatement unprepared()
-    {
-        return (AlterTableStatement)super.unprepared();
     }
 
     /**
@@ -109,7 +91,7 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
             {
                 if (this.newColumn.getComment() != null)
                 {
-                    db.insert()
+                    this.db.insert()
                       .into("column_comments")
                       .set("table_name",
                            this.name.toUpperCase())
@@ -157,7 +139,7 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
 
                     if (comment.length() != 0)
                     {
-                        db.insert()
+                        this.db.insert()
                           .into("column_comments")
                           .set("table_name",
                                this.name.toUpperCase())
@@ -170,7 +152,7 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
                     }
                     else
                     {
-                        db.insert()
+                        this.db.insert()
                           .into("column_comments")
                           .set("table_name",
                                this.name.toUpperCase())

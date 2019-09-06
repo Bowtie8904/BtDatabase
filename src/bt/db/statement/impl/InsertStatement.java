@@ -8,7 +8,6 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 import bt.db.DatabaseAccess;
@@ -37,24 +36,6 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     {
         super(db);
         this.statementKeyword = "INSERT INTO";
-    }
-
-    /**
-     * @see bt.db.statement.SqlModifyStatement#commit()
-     */
-    @Override
-    public InsertStatement commit()
-    {
-        return (InsertStatement)super.commit();
-    }
-
-    /**
-     * @see bt.db.statement.SqlModifyStatement#unprepared()
-     */
-    @Override
-    public InsertStatement unprepared()
-    {
-        return (InsertStatement)super.unprepared();
     }
 
     /**
@@ -148,28 +129,28 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     public InsertStatement set(String column, Object value, SqlType sqlType)
     {
         SetClause<InsertStatement> set = new SetClause<>(this,
-                                                                        column,
-                                                                        value,
-                                                                        sqlType);
+                                                         column,
+                                                         value,
+                                                         sqlType);
         addSetClause(set);
         return this;
     }
 
     /**
-     * Uses the given supplier to retrieve a long value for the given column when this statement is prepared for
-     * execution.
+     * Uses the given supplier to retrieve a value for the given column when this statement is prepared for execution.
      *
      * @param column
      *            The column whichs value should be set.
-     * @param idSupplier
-     *            The supplier that offers a long value for the given column.
+     * @param valueSupplier
+     *            The supplier that offers a value for the given column.
      * @return This instance for chaining.
      */
-    public InsertStatement set(String column, Supplier<Long> longSupplier)
+    public InsertStatement set(String column, SqlType sqlType, Supplier<?> valueSupplier)
     {
         SetClause<InsertStatement> set = new SetClause<>(this,
-                                                                        column,
-                                                                        longSupplier);
+                                                         column,
+                                                         sqlType,
+                                                         valueSupplier);
         addSetClause(set);
         return this;
     }
@@ -351,269 +332,6 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     }
 
     /**
-     * Defines a data modifying statement (insert, update, delete) to execute if a check constraint is violated by the
-     * statement.
-     *
-     * <p>
-     * The return value of the given statements execute method will be returned by this instances {@link #execute()}.
-     * </p>
-     *
-     * @param statement
-     *            The statement to execute.
-     * @return This instance for chaining.
-     */
-    public InsertStatement onCheckViolation(SqlModifyStatement statement)
-    {
-        this.onCheckFail = (s, e) ->
-        {
-            return statement.execute();
-        };
-        return this;
-    }
-
-    /**
-     * Defines a data modifying statement (insert, update, delete) to execute if a check constraint is violated by the
-     * statement.
-     *
-     * <p>
-     * The first parameter (InsertStatement) will be this statement instance, the second one is the SQLException that
-     * caused the fail. The return value (Integer) will be returned by this instances {@link #execute()}.
-     * </p>
-     *
-     * @param onDuplicate
-     *            The function to execute.
-     * @return This instance for chaining.
-     */
-    public InsertStatement onCheckViolation(BiFunction<InsertStatement, SQLException, Integer> onDuplicate)
-    {
-        this.onCheckFail = onDuplicate;
-        return this;
-    }
-
-    /**
-     * Defines a data modifying statement (insert, update, delete) to execute if a foreign key constraint is violated by
-     * the statement.
-     *
-     * <p>
-     * The return value of the given statements execute method will be returned by this instances {@link #execute()}.
-     * </p>
-     *
-     * @param statement
-     *            The statement to execute.
-     * @return This instance for chaining.
-     */
-    public InsertStatement onForeignKeyViolation(SqlModifyStatement statement)
-    {
-        this.onForeignKeyFail = (s, e) ->
-        {
-            return statement.execute();
-        };
-        return this;
-    }
-
-    /**
-     * Defines a data modifying statement (insert, update, delete) to execute if a foreign key constraint is violated by
-     * the statement.
-     *
-     * <p>
-     * The first parameter (InsertStatement) will be this statement instance, the second one is the SQLException that
-     * caused the fail. The return value (Integer) will be returned by this instances {@link #execute()}.
-     * </p>
-     *
-     * @param onDuplicate
-     *            The function to execute.
-     * @return This instance for chaining.
-     */
-    public InsertStatement onForeignKeyViolation(BiFunction<InsertStatement, SQLException, Integer> onDuplicate)
-    {
-        this.onForeignKeyFail = onDuplicate;
-        return this;
-    }
-
-    /**
-     * Defines a data modifying statement (insert, update, delete) to execute if the primary key used in the original
-     * insert is already contained in the table or if a unique constraint is violated.
-     *
-     * <p>
-     * The return value of the given statements execute method will be returned by this instances {@link #execute()}.
-     * </p>
-     *
-     * @param statement
-     *            The statement to execute.
-     * @return This instance for chaining.
-     */
-    public InsertStatement onDuplicateKey(SqlModifyStatement statement)
-    {
-        this.onDuplicateKey = (s, e) ->
-        {
-            return statement.execute();
-        };
-        return this;
-    }
-
-    /**
-     * Defines a function that will be executed if the primary key used in the original insert is already contained in
-     * the table or if a unique constraint is violated.
-     *
-     * <p>
-     * The first parameter (InsertStatement) will be this statement instance, the second one is the SQLException that
-     * caused the fail. The return value (Integer) will be returned by this instances {@link #execute()}.
-     * </p>
-     *
-     * @param onDuplicate
-     *            The function to execute.
-     * @return This instance for chaining.
-     */
-    public InsertStatement onDuplicateKey(BiFunction<InsertStatement, SQLException, Integer> onDuplicate)
-    {
-        this.onDuplicateKey = onDuplicate;
-        return this;
-    }
-
-    /**
-     * Defines a data modifying statement (insert, update, delete) which will be executed if there was an error during
-     * the execution of the original insert statement.
-     *
-     * <p>
-     * The given statement is only executed if the error was not handled by one of the other exception functions
-     * (onDuplicateKey, onCheckViolation, ...).
-     * </p>
-     *
-     * <p>
-     * The return value of the given statements execute method will be returned by this instances {@link #execute()}.
-     * </p>
-     *
-     * @param onFail
-     *            The SqlModifyStatement to execute instead.
-     * @return This instance for chaining.
-     */
-    public InsertStatement onFail(SqlModifyStatement onFail)
-    {
-        this.onFail = (statement, e) ->
-        {
-            return onFail.execute();
-        };
-
-        return this;
-    }
-
-    /**
-     * Defines a BiFunction that will be executed if there was an error during the execution of this statement.
-     *
-     * <p>
-     * The first parameter (InsertStatement) will be this statement instance, the second one is the SQLException that
-     * caused the fail. The return value (Integer) will be returned by this instances {@link #execute()}.
-     * </p>
-     *
-     * <p>
-     * The given function is only executed if the error was not handled by one of the other exception functions
-     * (onDuplicateKey, onCheckViolation, ...).
-     * </p>
-     *
-     * @param onFail
-     *            The BiFunction to execute.
-     * @return This instance for chaining.
-     */
-    public InsertStatement onFail(BiFunction<InsertStatement, SQLException, Integer> onFail)
-    {
-        this.onFail = onFail;
-        return this;
-    }
-
-    /**
-     * Defines a data modifying statement (insert, update, delete) to execute if the original insert affected less rows
-     * than the given lower threshhold.
-     *
-     * <p>
-     * The return value of the given statements execute method will be returned by this instances {@link #execute()}.
-     * </p>
-     *
-     * @param lowerThreshhold
-     *            The threshhold to check.
-     * @param statement
-     *            The statement to execute.
-     * @return This instance for chaining.
-     */
-    public InsertStatement onLessThan(int lowerThreshhold, SqlModifyStatement statement)
-    {
-        this.lowerThreshhold = lowerThreshhold;
-        this.onLessThan = (i, set) ->
-        {
-            return statement.execute();
-        };
-        return this;
-    }
-
-    /**
-     * Defines a BiFunction that will be executed if the original insert affected less rows than the given lower
-     * threshhold.
-     *
-     * <p>
-     * The first parameter (int) will be the number of rows affected, the second one is the InsertStatement from the
-     * original insert. The return value (Integer) will be returned by this instances {@link #execute()}.
-     * </p>
-     *
-     * @param lowerThreshhold
-     *            The threshhold to check.
-     * @param onLessThan
-     *            The BiFunction to execute.
-     * @return This instance for chaining.
-     */
-    public InsertStatement onLessThan(int lowerThreshhold, BiFunction<Integer, InsertStatement, Integer> onLessThan)
-    {
-        this.lowerThreshhold = lowerThreshhold;
-        this.onLessThan = onLessThan;
-        return this;
-    }
-
-    /**
-     * Defines a data modifying statement (insert, update, delete) to execute if the original insert affected more rows
-     * than the given higher threshhold.
-     *
-     * <p>
-     * The return value of the given statements execute method will be returned by this instances {@link #execute()}.
-     * </p>
-     *
-     * @param higherThreshhold
-     *            The threshhold to check.
-     * @param statement
-     *            The statement to execute.
-     * @return This instance for chaining.
-     */
-    public InsertStatement onMoreThan(int higherThreshhold, SqlModifyStatement statement)
-    {
-        this.higherThreshhold = higherThreshhold;
-        this.onMoreThan = (i, set) ->
-        {
-            return statement.execute();
-        };
-        return this;
-    }
-
-    /**
-     * Defines a BiFunction that will be executed if the original insert affected more rows than the given higher
-     * threshhold.
-     *
-     * <p>
-     * The first parameter (int) will be the number of rows affected, the second one is the InsertStatement from the
-     * original insert. The return value (Integer) will be returned by this instances {@link #execute()}.
-     * </p>
-     *
-     * @param higherThreshhold
-     *            The threshhold to check.
-     * @param onLessThan
-     *            The BiFunction to execute.
-     * @return This instance for chaining.
-     */
-    public InsertStatement onMoreThan(int higherThreshhold,
-                                      BiFunction<Integer, InsertStatement, Integer> onMoreThan)
-    {
-        this.higherThreshhold = higherThreshhold;
-        this.onMoreThan = onMoreThan;
-        return this;
-    }
-
-    /**
      * @return The number of affected rows or an error code (usually -1, can be customized for different errors via the
      *         fail methods).
      *
@@ -699,6 +417,11 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
                 if (this.shouldCommit)
                 {
                     this.db.commit();
+                }
+
+                if (this.onSuccess != null)
+                {
+                    this.onSuccess.accept(this, result);
                 }
 
                 if (result < this.lowerThreshhold && this.onLessThan != null)

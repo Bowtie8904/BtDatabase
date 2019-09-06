@@ -1,8 +1,5 @@
 package bt.db.statement.impl;
 
-import java.sql.SQLException;
-import java.util.function.BiFunction;
-
 import bt.db.DatabaseAccess;
 import bt.db.statement.SqlModifyStatement;
 import bt.db.statement.clause.TableColumn;
@@ -30,36 +27,6 @@ public abstract class CreateStatement<T extends CreateStatement, K extends Creat
     {
         super(db);
         this.name = name.toUpperCase();
-    }
-
-    /**
-     * Defines an sql statement that will be executed if this one fails for any reason.
-     * 
-     * @param onFail
-     *            The sql statement to execute on fail.
-     * @return This instance for chaining.
-     */
-    public CreateStatement<T, K> onFail(SqlModifyStatement onFail)
-    {
-        this.onFail = (statement, e) ->
-        {
-            return onFail.execute();
-        };
-
-        return this;
-    }
-
-    /**
-     * Defines a BiFunction that will be executed if this one fails for any reason.
-     * 
-     * @param onFail
-     *            The function to execute on fail.
-     * @return This instance for chaining.
-     */
-    public CreateStatement<T, K> onFail(BiFunction<T, SQLException, Integer> onFail)
-    {
-        this.onFail = onFail;
-        return this;
     }
 
     /**

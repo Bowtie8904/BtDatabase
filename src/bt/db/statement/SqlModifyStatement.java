@@ -4,13 +4,14 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
 import bt.db.DatabaseAccess;
 import bt.db.statement.clause.SetClause;
 
 /**
- * Base class for data modifying statements (insert, update, delete, ...).
+ * Base class for data modifying statements (statement, update, delete, ...).
  *
  * @author &#8904
  */
@@ -31,8 +32,11 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
      */
     protected static final String ALREADY_EXISTS_ERROR = "X0Y32";
 
-    /** A list containing all used set clauses for insert and update statements. */
+    /** A list containing all used set clauses for statement and update statements. */
     protected List<SetClause<T>> setClauses;
+
+    /** A defined method that is called if the statement execution finishes successfully. */
+    protected BiConsumer<T, Integer> onSuccess;
 
     /** A defined function that is called if the statement execution fails for any reason. */
     protected BiFunction<T, SQLException, Integer> onFail;
@@ -83,9 +87,6 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
         };
 
         this.onFail = func;
-        this.onForeignKeyFail = func;
-        this.onCheckFail = func;
-        this.onDuplicateKey = func;
     }
 
     /**
@@ -104,10 +105,10 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
      *
      * @return This instance for chaining.
      */
-    public SqlModifyStatement<T, K> commit()
+    public T commit()
     {
         this.shouldCommit = true;
-        return this;
+        return (T)this;
     }
 
     /**
@@ -120,10 +121,289 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
      *
      * @return This instance for chaining.
      */
-    public SqlModifyStatement<T, K> unprepared()
+    public T unprepared()
     {
         this.prepared = false;
-        return this;
+        return (T)this;
+    }
+
+    /**
+     * Defines a consumer to execute if a check constraint is violated by the statement.
+     *
+     * <p>
+     * The first parameter (SqlModifyingStatement) will be this statement instance, the second one is number of affected
+     * rows.
+     * </p>
+     *
+     * @param onSuccess
+     *            The function to execute.
+     * @return This instance for chaining.
+     */
+    public T onSuccess(BiConsumer<T, Integer> onSuccess)
+    {
+        this.onSuccess = onSuccess;
+        return (T)this;
+    }
+
+    /**
+     * Defines a data modifying statement (statement, update, delete, ...) to execute if a check constraint is violated
+     * by the statement.
+     *
+     * <p>
+     * The return value of the given statements execute method will be returned by this instances {@link #execute()}.
+     * </p>
+     *
+     * @param statement
+     *            The statement to execute.
+     * @return This instance for chaining.
+     */
+    public T onCheckViolation(SqlModifyStatement statement)
+    {
+        this.onCheckFail = (s, e) ->
+        {
+            return statement.execute();
+        };
+        return (T)this;
+    }
+
+    /**
+     * Defines a function to execute if a check constraint is violated by the statement.
+     *
+     * <p>
+     * The first parameter (SqlModifyingStatement) will be this statement instance, the second one is the SQLException
+     * that caused the fail. The return value (Integer) will be returned by this instances {@link #execute()}.
+     * </p>
+     *
+     * @param onCheckViolation
+     *            The function to execute.
+     * @return This instance for chaining.
+     */
+    public T onCheckViolation(BiFunction<T, SQLException, Integer> onCheckViolation)
+    {
+        this.onCheckFail = onCheckViolation;
+        return (T)this;
+    }
+
+    /**
+     * Defines a data modifying statement (statement, update, delete) to execute if a foreign key constraint is violated
+     * by the statement.
+     *
+     * <p>
+     * The return value of the given statements execute method will be returned by this instances {@link #execute()}.
+     * </p>
+     *
+     * @param statement
+     *            The statement to execute.
+     * @return This instance for chaining.
+     */
+    public T onForeignKeyViolation(SqlModifyStatement statement)
+    {
+        this.onForeignKeyFail = (s, e) ->
+        {
+            return statement.execute();
+        };
+        return (T)this;
+    }
+
+    /**
+     * Defines a function to execute if a foreign key constraint is violated by the statement.
+     *
+     * <p>
+     * The first parameter (SqlModifyingStatement) will be this statement instance, the second one is the SQLException
+     * that caused the fail. The return value (Integer) will be returned by this instances {@link #execute()}.
+     * </p>
+     *
+     * @param onForeignKeyViolation
+     *            The function to execute.
+     * @return This instance for chaining.
+     */
+    public T onForeignKeyViolation(BiFunction<T, SQLException, Integer> onForeignKeyViolation)
+    {
+        this.onForeignKeyFail = onForeignKeyViolation;
+        return (T)this;
+    }
+
+    /**
+     * Defines a data modifying statement (statement, update, delete) to execute if the primary key used in the original
+     * statement is already contained in the table or if a unique constraint is violated.
+     *
+     * <p>
+     * The return value of the given statements execute method will be returned by this instances {@link #execute()}.
+     * </p>
+     *
+     * @param statement
+     *            The statement to execute.
+     * @return This instance for chaining.
+     */
+    public T onDuplicateKey(SqlModifyStatement statement)
+    {
+        this.onDuplicateKey = (s, e) ->
+        {
+            return statement.execute();
+        };
+        return (T)this;
+    }
+
+    /**
+     * Defines a function that will be executed if the primary key used in the original statement is already contained
+     * in the table or if a unique constraint is violated.
+     *
+     * <p>
+     * The first parameter (SqlModifyingStatement) will be this statement instance, the second one is the SQLException
+     * that caused the fail. The return value (Integer) will be returned by this instances {@link #execute()}.
+     * </p>
+     *
+     * @param onDuplicate
+     *            The function to execute.
+     * @return This instance for chaining.
+     */
+    public T onDuplicateKey(BiFunction<T, SQLException, Integer> onDuplicate)
+    {
+        this.onDuplicateKey = onDuplicate;
+        return (T)this;
+    }
+
+    /**
+     * Defines a data modifying statement (statement, update, delete) which will be executed if there was an error
+     * during the execution of the original statement statement.
+     *
+     * <p>
+     * The given statement is only executed if the error was not handled by one of the other exception functions
+     * (onDuplicateKey, onCheckViolation, ...).
+     * </p>
+     *
+     * <p>
+     * The return value of the given statements execute method will be returned by this instances {@link #execute()}.
+     * </p>
+     *
+     * @param onFail
+     *            The SqlModifyStatement to execute instead.
+     * @return This instance for chaining.
+     */
+    public T onFail(SqlModifyStatement onFail)
+    {
+        this.onFail = (statement, e) ->
+        {
+            return onFail.execute();
+        };
+
+        return (T)this;
+    }
+
+    /**
+     * Defines a BiFunction that will be executed if there was an error during the execution of this statement.
+     *
+     * <p>
+     * The first parameter (SqlModifyingStatement) will be this statement instance, the second one is the SQLException
+     * that caused the fail. The return value (Integer) will be returned by this instances {@link #execute()}.
+     * </p>
+     *
+     * <p>
+     * The given function is only executed if the error was not handled by one of the other exception functions
+     * (onDuplicateKey, onCheckViolation, ...).
+     * </p>
+     *
+     * @param onFail
+     *            The BiFunction to execute.
+     * @return This instance for chaining.
+     */
+    public T onFail(BiFunction<T, SQLException, Integer> onFail)
+    {
+        this.onFail = onFail;
+        return (T)this;
+    }
+
+    /**
+     * Defines a data modifying statement (statement, update, delete) to execute if the original statement affected less
+     * rows than the given lower threshhold.
+     *
+     * <p>
+     * The return value of the given statements execute method will be returned by this instances {@link #execute()}.
+     * </p>
+     *
+     * @param lowerThreshhold
+     *            The threshhold to check.
+     * @param statement
+     *            The statement to execute.
+     * @return This instance for chaining.
+     */
+    public T onLessThan(int lowerThreshhold, SqlModifyStatement statement)
+    {
+        this.lowerThreshhold = lowerThreshhold;
+        this.onLessThan = (i, set) ->
+        {
+            return statement.execute();
+        };
+        return (T)this;
+    }
+
+    /**
+     * Defines a BiFunction that will be executed if the original statement affected less rows than the given lower
+     * threshhold.
+     *
+     * <p>
+     * The first parameter (int) will be the number of rows affected, the second one is the SqlModifyingStatement from
+     * the original statement. The return value (Integer) will be returned by this instances {@link #execute()}.
+     * </p>
+     *
+     * @param lowerThreshhold
+     *            The threshhold to check.
+     * @param onLessThan
+     *            The BiFunction to execute.
+     * @return This instance for chaining.
+     */
+    public T onLessThan(int lowerThreshhold, BiFunction<Integer, T, Integer> onLessThan)
+    {
+        this.lowerThreshhold = lowerThreshhold;
+        this.onLessThan = onLessThan;
+        return (T)this;
+    }
+
+    /**
+     * Defines a data modifying statement (statement, update, delete) to execute if the original statement affected more
+     * rows than the given higher threshhold.
+     *
+     * <p>
+     * The return value of the given statements execute method will be returned by this instances {@link #execute()}.
+     * </p>
+     *
+     * @param higherThreshhold
+     *            The threshhold to check.
+     * @param statement
+     *            The statement to execute.
+     * @return This instance for chaining.
+     */
+    public T onMoreThan(int higherThreshhold, SqlModifyStatement statement)
+    {
+        this.higherThreshhold = higherThreshhold;
+        this.onMoreThan = (i, set) ->
+        {
+            return statement.execute();
+        };
+        return (T)this;
+    }
+
+    /**
+     * Defines a BiFunction that will be executed if the original statement affected more rows than the given higher
+     * threshhold.
+     *
+     * <p>
+     * The first parameter (int) will be the number of rows affected, the second one is the SqlModifyingStatement from
+     * the original statement. The return value (Integer) will be returned by this instances {@link #execute()}.
+     * </p>
+     *
+     * @param higherThreshhold
+     *            The threshhold to check.
+     * @param onLessThan
+     *            The BiFunction to execute.
+     * @return This instance for chaining.
+     */
+    public T onMoreThan(int higherThreshhold,
+                        BiFunction<Integer, T, Integer> onMoreThan)
+    {
+        this.higherThreshhold = higherThreshhold;
+        this.onMoreThan = onMoreThan;
+        return (T)this;
     }
 
     /**

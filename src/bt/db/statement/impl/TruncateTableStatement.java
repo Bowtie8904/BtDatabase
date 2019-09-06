@@ -2,7 +2,6 @@ package bt.db.statement.impl;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.function.BiFunction;
 
 import bt.db.DatabaseAccess;
 import bt.db.statement.SqlModifyStatement;
@@ -25,42 +24,6 @@ public class TruncateTableStatement extends SqlModifyStatement<TruncateTableStat
         {
           table
         };
-    }
-
-    /**
-     * Defines a data modifying statement (insert, update, delete, ...) which will be executed if there was an error
-     * during the execution of the original insert statement.
-     *
-     * @param onFail
-     *            The SqlModifyStatement to execute instead.
-     * @return This instance for chaining.
-     */
-    public TruncateTableStatement onFail(SqlModifyStatement onFail)
-    {
-        this.onFail = (statement, e) ->
-        {
-            return onFail.execute();
-        };
-
-        return this;
-    }
-
-    /**
-     * Defines a BiFunction that will be executed if there was an error during the execution of this statement.
-     *
-     * <p>
-     * The first parameter (TruncateTableStatement) will be this statement instance, the second one is the SQLException
-     * that caused the fail. The return value (Integer) will be returned by this instances {@link #execute()}.
-     * </p>
-     *
-     * @param onFail
-     *            The BiFunction to execute.
-     * @return This instance for chaining.
-     */
-    public TruncateTableStatement onFail(BiFunction<TruncateTableStatement, SQLException, Integer> onFail)
-    {
-        this.onFail = onFail;
-        return this;
     }
 
     /**
@@ -88,6 +51,11 @@ public class TruncateTableStatement extends SqlModifyStatement<TruncateTableStat
                 printLogs);
 
             result = statement.executeUpdate();
+
+            if (this.onSuccess != null)
+            {
+                this.onSuccess.accept(this, result);
+            }
         }
         catch (SQLException e)
         {
