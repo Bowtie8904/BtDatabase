@@ -1,17 +1,14 @@
 package bt.db.statement;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiFunction;
 
 import bt.db.DatabaseAccess;
 import bt.db.statement.clause.ConditionalClause;
-import bt.db.statement.result.SqlResultSet;
 
 /**
  * Base class for all SQL statements.
- * 
+ *
  * @author &#8904
  */
 public class SqlStatement<T extends SqlStatement>
@@ -34,15 +31,12 @@ public class SqlStatement<T extends SqlStatement>
     /** All used having conditionals for this statement. */
     protected List<ConditionalClause<T>> havingClauses;
 
-    /** A defined function that is called if the statement execution fails for any reason. */
-    protected BiFunction<T, SQLException, SqlResultSet> onFail;
-
     /** Indicates whether this statement is treated like a prepared statement or not. */
     protected boolean prepared = true;
 
     /**
      * Creates a new instance.
-     * 
+     *
      * @param db
      *            The database that should be used for the statement.
      */
@@ -57,7 +51,7 @@ public class SqlStatement<T extends SqlStatement>
 
     /**
      * Adds a where conditional clause to this statement.
-     * 
+     *
      * @param where
      *            The clause.
      */
@@ -68,7 +62,7 @@ public class SqlStatement<T extends SqlStatement>
 
     /**
      * Gets a list with all added where clauses.
-     * 
+     *
      * @return The list of where clauses.
      */
     public List<ConditionalClause<T>> getWhereClauses()
@@ -78,7 +72,7 @@ public class SqlStatement<T extends SqlStatement>
 
     /**
      * Adds a having conditional clause to this statement.
-     * 
+     *
      * @param having
      *            The clause.
      */
@@ -89,7 +83,7 @@ public class SqlStatement<T extends SqlStatement>
 
     /**
      * Gets a list with all added having clauses.
-     * 
+     *
      * @return The list of having clauses.
      */
     public List<ConditionalClause<T>> getHavingClauses()
@@ -99,7 +93,7 @@ public class SqlStatement<T extends SqlStatement>
 
     /**
      * Logs the given text to the logger instance of {@link DatabaseAccess} if shouldLog is true.
-     * 
+     *
      * @param text
      *            The text to log.
      * @param shouldLog
@@ -124,11 +118,11 @@ public class SqlStatement<T extends SqlStatement>
 
     /**
      * Indicates whether this statement is treated like a prepared statement or not.
-     * 
+     *
      * <p>
      * All statements will be treated as prepared ones unless their unprepared() method is called.
      * </p>
-     * 
+     *
      * @return true = prepared statement, false = unpreparted statement.
      */
     public boolean isPrepared()
@@ -138,7 +132,7 @@ public class SqlStatement<T extends SqlStatement>
 
     /**
      * Sets the {@link DatabseAccess} instance which should be used to execute this statement.
-     * 
+     *
      * @param db
      *            The database that should be used for the statement.
      */
