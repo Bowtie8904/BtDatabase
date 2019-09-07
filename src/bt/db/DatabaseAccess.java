@@ -66,18 +66,26 @@ public abstract class DatabaseAccess implements Killable
     /**
      * The name of the comment table used for comments on table columns.
      * <p>
-     * <b>column_comments</b>
+     * <b>bt_column_comments</b>
      * </p>
      */
-    public static final String COMMENT_TABLE = "column_comments";
+    public static final String COMMENT_TABLE = "bt_column_comments";
 
     /**
      * The name of the properties table used to store database specific key value pairs.
      * <p>
-     * <b>sys_properties</b>
+     * <b>bt_sys_properties</b>
      * </p>
      */
-    public static final String PROPERTIES_TABLE = "sys_properties";
+    public static final String PROPERTIES_TABLE = "bt_sys_properties";
+
+    /**
+     * The name of the table to store object data in.
+     * <p>
+     * <b>bt_object_data</b>
+     * </p>
+     */
+    public static final String OBJECT_DATA_TABLE = "bt_object_data";
 
     /** The map of all currently active DatabaseAccess instances, mapped by their runtime unique ID. */
     protected static Map<String, DatabaseAccess> instances = new HashMap<>();
@@ -174,6 +182,7 @@ public abstract class DatabaseAccess implements Killable
     {
         createDatabase();
         createCommentTable();
+        createTableDataTable();
         createPropertiesTable();
         checkID();
         synchronized (DatabaseAccess.class)
@@ -586,42 +595,54 @@ public abstract class DatabaseAccess implements Killable
      */
     protected void createCommentTable()
     {
-        int success = create().table(COMMENT_TABLE)
-                              .column("table_Name",
-                                      SqlType.VARCHAR)
-                              .size(50)
-                              .primaryKey()
-                              .notNull()
-                              .comment("The name of the table.")
-                              .add()
+        create().table(COMMENT_TABLE)
+                .column("table_Name", SqlType.VARCHAR).size(50).primaryKey().notNull()
+                .comment("The name of the table.")
+                .add()
 
-                              .column("column_Name",
-                                      SqlType.VARCHAR)
-                              .size(50)
-                              .primaryKey()
-                              .notNull()
-                              .comment("The name of the column that this comment is for.")
-                              .add()
+                .column("column_Name", SqlType.VARCHAR).size(50).primaryKey().notNull()
+                .comment("The name of the column that this comment is for.")
+                .add()
 
-                              .column("column_Comment",
-                                      SqlType.VARCHAR)
-                              .size(TableColumn.COMMENT_SIZE)
-                              .comment("The comment for this column.")
-                              .add()
+                .column("column_Comment", SqlType.VARCHAR).size(TableColumn.COMMENT_SIZE)
+                .comment("The comment for this column.")
+                .add()
 
-                              .createDefaultTriggers(false)
-                              .onFail((s, e) ->
-                              {
-                                  return 0;
-                              })
-                              .execute();
+                .createDefaultTriggers(false)
+                .saveObjectData(false)
+                .onFail((s, e) ->
+                {
+                    return 0;
+                })
+                .onSuccess((s, i) ->
+                {
+                    log.print(this, "Created comment table.");
+                })
+                .commit()
+                .execute();
+    }
 
-        if (success == 1)
-        {
-            log.print(this,
-                      "Created comment table.");
-            commit();
-        }
+    /**
+     * Creates the {@link #COMMENT_TABLE} if it does not exist yet.
+     */
+    protected void createTableDataTable()
+    {
+        create().table(OBJECT_DATA_TABLE)
+                .column("object_Name", SqlType.VARCHAR).size(50).primaryKey().notNull().add()
+                .column("object_ddl", SqlType.VARCHAR).size(9999).add()
+                .column("created", SqlType.TIMESTAMP).defaultValue(SqlValue.SYSTIMESTAMP).add()
+                .column("updated", SqlType.TIMESTAMP).defaultValue(SqlValue.SYSTIMESTAMP).add()
+                .createDefaultTriggers(false)
+                .onFail((s, e) ->
+                {
+                    return 0;
+                })
+                .onSuccess((s, i) ->
+                {
+                    log.print(this, "Created object data table.");
+                })
+                .commit()
+                .execute();
     }
 
     /**
