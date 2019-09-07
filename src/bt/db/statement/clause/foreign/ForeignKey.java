@@ -66,6 +66,11 @@ public class ForeignKey<T extends ForeignKey>
         return (T)this;
     }
 
+    public String getName()
+    {
+        return this.name;
+    }
+
     /**
      * Defines the referenced table and its columns.
      *

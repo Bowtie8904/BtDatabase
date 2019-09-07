@@ -45,6 +45,11 @@ public class Check extends SimpleConditionalClause<Check>
         return this;
     }
 
+    public String getName()
+    {
+        return this.name;
+    }
+
     /**
      * Creates a new conditional clause to chain this check with via an AND link using the given column for this
      * statement.
