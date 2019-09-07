@@ -362,6 +362,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
             {
                 this.db.insert()
                        .into(DatabaseAccess.OBJECT_DATA_TABLE)
+                       .set("instanceID", this.db.getInstanceID())
                        .set("object_name", this.name.toUpperCase())
                        .set("object_ddl", sql + ";")
                        .execute();

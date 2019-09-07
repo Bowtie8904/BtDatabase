@@ -235,6 +235,7 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
             {
                 this.db.insert()
                        .into(DatabaseAccess.OBJECT_DATA_TABLE)
+                       .set("instanceID", this.db.getInstanceID())
                        .set("object_name", this.name.toUpperCase())
                        .set("object_ddl", sql + ";")
                        .execute();
@@ -266,6 +267,7 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
                         {
                             this.db.insert()
                                    .into(DatabaseAccess.OBJECT_DATA_TABLE)
+                                   .set("instanceID", this.db.getInstanceID())
                                    .set("object_name", this.name.toUpperCase())
                                    .set("object_ddl", sql + ";")
                                    .execute();

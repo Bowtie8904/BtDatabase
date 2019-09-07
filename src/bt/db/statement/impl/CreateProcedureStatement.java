@@ -135,12 +135,14 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
             log("Executing: " + sql,
                 printLogs);
             statement.execute(sql);
+            endExecutionTime();
             result = 1;
 
             if (this.saveObjectData)
             {
                 this.db.insert()
                        .into(DatabaseAccess.OBJECT_DATA_TABLE)
+                       .set("instanceID", this.db.getInstanceID())
                        .set("object_name", this.name.toUpperCase())
                        .set("object_ddl", sql + ";")
                        .execute();
@@ -177,6 +179,16 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
                         statement.executeUpdate();
                         endExecutionTime();
                         result = 1;
+
+                        if (this.saveObjectData)
+                        {
+                            this.db.insert()
+                                   .into(DatabaseAccess.OBJECT_DATA_TABLE)
+                                   .set("instanceID", this.db.getInstanceID())
+                                   .set("object_name", this.name.toUpperCase())
+                                   .set("object_ddl", sql + ";")
+                                   .execute();
+                        }
 
                         if (this.shouldCommit)
                         {

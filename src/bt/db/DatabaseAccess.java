@@ -620,6 +620,7 @@ public abstract class DatabaseAccess implements Killable
     protected void createTableDataTable()
     {
         create().table(OBJECT_DATA_TABLE)
+                .column("instanceID", SqlType.VARCHAR).size(500).add()
                 .column("object_Name", SqlType.VARCHAR).size(50).primaryKey().add()
                 .column("object_ddl", SqlType.VARCHAR).size(9999).add()
                 .column("created", SqlType.TIMESTAMP).defaultValue(SqlValue.SYSTIMESTAMP).add()
