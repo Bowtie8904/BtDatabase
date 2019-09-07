@@ -507,14 +507,9 @@ public abstract class DatabaseAccess implements Killable
     public void setProperty(String key, String value)
     {
         insert().into(PROPERTIES_TABLE)
-                .set("property_key",
-                     key)
-                .set("property_value",
-                     value)
-                .onDuplicateKey(
-                                update(PROPERTIES_TABLE)
-                                                        .set("property_value",
-                                                             value)
+                .set("property_key", key)
+                .set("property_value", value)
+                .onDuplicateKey(update(PROPERTIES_TABLE).set("property_value", value)
                                                         .where("property_key")
                                                         .equals(key)
                                                         .commit())
@@ -536,8 +531,7 @@ public abstract class DatabaseAccess implements Killable
             return null;
         }
 
-        SqlResultSet result = select(Sql.column("property_value").as("value"))
-                                                                              .from(PROPERTIES_TABLE)
+        SqlResultSet result = select(Sql.column("property_value").as("value")).from(PROPERTIES_TABLE)
                                                                               .where("property_key")
                                                                               .equals(key)
                                                                               .onLessThan(1,
@@ -561,24 +555,22 @@ public abstract class DatabaseAccess implements Killable
     protected void createPropertiesTable()
     {
         int success = create().table(PROPERTIES_TABLE)
-                              .column("property_key",
-                                      SqlType.VARCHAR)
-                              .size(200)
-                              .notNull()
-                              .unique()
+                              .column("property_key", SqlType.VARCHAR).size(200).primaryKey()
                               .comment("The unique key of the key-value mapping.")
                               .add()
 
-                              .column("property_value",
-                                      SqlType.VARCHAR)
-                              .size(500)
+                              .column("property_value", SqlType.VARCHAR).size(500)
                               .comment("The value of the key-value mapping.")
                               .add()
 
                               .createDefaultTriggers(false)
-                              .onFail((s, e) ->
+                              .onAlreadyExists((s, e) ->
                               {
                                   return 0;
+                              })
+                              .onSuccess((s, i) ->
+                              {
+                                  log.print(this, "Created properties table in " + s.getExecutionTime() + "ms.");
                               })
                               .execute();
 
@@ -596,11 +588,11 @@ public abstract class DatabaseAccess implements Killable
     protected void createCommentTable()
     {
         create().table(COMMENT_TABLE)
-                .column("table_Name", SqlType.VARCHAR).size(50).primaryKey().notNull()
+                .column("table_Name", SqlType.VARCHAR).size(50).primaryKey()
                 .comment("The name of the table.")
                 .add()
 
-                .column("column_Name", SqlType.VARCHAR).size(50).primaryKey().notNull()
+                .column("column_Name", SqlType.VARCHAR).size(50).primaryKey()
                 .comment("The name of the column that this comment is for.")
                 .add()
 
@@ -610,13 +602,13 @@ public abstract class DatabaseAccess implements Killable
 
                 .createDefaultTriggers(false)
                 .saveObjectData(false)
-                .onFail((s, e) ->
+                .onAlreadyExists((s, e) ->
                 {
                     return 0;
                 })
                 .onSuccess((s, i) ->
                 {
-                    log.print(this, "Created comment table.");
+                    log.print(this, "Created comment table in " + s.getExecutionTime() + "ms.");
                 })
                 .commit()
                 .execute();
@@ -628,18 +620,18 @@ public abstract class DatabaseAccess implements Killable
     protected void createTableDataTable()
     {
         create().table(OBJECT_DATA_TABLE)
-                .column("object_Name", SqlType.VARCHAR).size(50).primaryKey().notNull().add()
+                .column("object_Name", SqlType.VARCHAR).size(50).primaryKey().add()
                 .column("object_ddl", SqlType.VARCHAR).size(9999).add()
                 .column("created", SqlType.TIMESTAMP).defaultValue(SqlValue.SYSTIMESTAMP).add()
                 .column("updated", SqlType.TIMESTAMP).defaultValue(SqlValue.SYSTIMESTAMP).add()
                 .createDefaultTriggers(false)
-                .onFail((s, e) ->
+                .onAlreadyExists((s, e) ->
                 {
                     return 0;
                 })
                 .onSuccess((s, i) ->
                 {
-                    log.print(this, "Created object data table.");
+                    log.print(this, "Created object data table in " + s.getExecutionTime() + "ms.");
                 })
                 .commit()
                 .execute();
@@ -855,8 +847,7 @@ public abstract class DatabaseAccess implements Killable
      */
     public void exportData(String... excludeColumns)
     {
-        SqlResultSet set = select("tablename")
-                                              .from(SqlValue.SYSTABLE)
+        SqlResultSet set = select("tablename").from(SqlValue.SYSTABLE)
                                               .where("tabletype")
                                               .equals("T")
                                               .onLessThan(1,
