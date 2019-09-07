@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Savepoint;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -107,6 +108,9 @@ public abstract class DatabaseAccess implements Killable
 
     /** The dispatcher used to distribute insert, update and delete trigger events to the corresponding listeners. */
     protected Dispatcher triggerDispatcher;
+
+    /** A map containing savepoint-names mapped to their savepoint objects. */
+    protected Map<String, Savepoint> savepoints;
 
     /**
      * Gets the instance with the given ID.
@@ -693,14 +697,47 @@ public abstract class DatabaseAccess implements Killable
             if (this.connection != null && !this.connection.getAutoCommit())
             {
                 this.connection.rollback();
-                log.print(this,
-                          "Rolled back transaction.");
+                log.print(this, "Rolled transaction back.");
             }
         }
         catch (SQLException e)
         {
-            log.print(this,
-                      e);
+            log.print(this, e);
+        }
+    }
+
+    /**
+     * Rolls back the current transaction to the savepoint with the given name.
+     *
+     * <p>
+     * This method has no effect on a connection that is in auto commit mode or if no savepoint with the given name has
+     * been set via {@link #savepoint(String)}.
+     * </p>
+     *
+     * @param savepoint
+     *            The case-insensitive name of the savepoint to roll back to.
+     */
+    public void rollback(String savepoint)
+    {
+        try
+        {
+            if (this.connection != null && !this.connection.getAutoCommit())
+            {
+                if (this.savepoints != null)
+                {
+                    Savepoint sp = this.savepoints.get(savepoint.toUpperCase());
+
+                    if (sp != null)
+                    {
+                        this.connection.rollback(sp);
+                        log.print(this, "Rolled transaction back to savepoint " + savepoint.toUpperCase() + ".");
+                    }
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            log.print(this, e);
         }
     }
 
@@ -718,14 +755,40 @@ public abstract class DatabaseAccess implements Killable
             if (this.connection != null && !this.connection.getAutoCommit())
             {
                 this.connection.commit();
-                log.print(this,
-                          "Committed transaction.");
+                log.print(this, "Committed transaction.");
             }
         }
         catch (SQLException e)
         {
-            log.print(this,
-                      e);
+            log.print(this, e);
+        }
+    }
+
+    /**
+     * Creates a new savepoint with the given name.
+     *
+     * <p>
+     * Use {@link #rollback(String)} to roll back to a savepoint set via this method.
+     * </p>
+     *
+     * @param name
+     *            The name of the new savepoint.
+     */
+    public void savepoint(String name)
+    {
+        if (this.savepoints == null)
+        {
+            this.savepoints = new HashMap<>();
+        }
+
+        try
+        {
+            this.savepoints.put(name.toUpperCase(), this.getConnection().setSavepoint(name.toUpperCase()));
+            log.print(this, "Created savepoint " + name.toUpperCase() + ".");
+        }
+        catch (SQLException e)
+        {
+            log.print(this, e);
         }
     }
 
