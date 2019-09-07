@@ -8,19 +8,24 @@ import bt.utils.id.StringID;
  *
  * @author &#8904
  */
-public class TableForeignKey<K extends CreateStatement> extends ForeignKey<TableForeignKey<K>, K>
+public class TableForeignKey extends ForeignKey<TableForeignKey>
 {
+    private CreateStatement statement;
+
     /**
      * Creates a new instance.
      *
-     * @param statement
-     *            The calling create statement.
      * @param childColumns
      *            The columns that are used in the table that the foreign key is created in.
      */
-    public TableForeignKey(K statement, String[] childColumns)
+    public TableForeignKey(String... childColumns)
     {
-        super(statement, childColumns);
+        super(childColumns);
+    }
+
+    public void setStatement(CreateStatement statement)
+    {
+        this.statement = statement;
     }
 
     /**

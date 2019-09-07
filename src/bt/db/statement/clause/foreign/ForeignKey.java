@@ -2,14 +2,13 @@ package bt.db.statement.clause.foreign;
 
 import bt.db.constants.Delete;
 import bt.db.constants.Update;
-import bt.db.statement.impl.CreateStatement;
 
 /**
  * The super class for foreign keys.
  *
  * @author &#8904
  */
-public class ForeignKey<T extends ForeignKey, K extends CreateStatement>
+public class ForeignKey<T extends ForeignKey>
 {
     /** The name of this foreign key. */
     protected String name;
@@ -29,31 +28,24 @@ public class ForeignKey<T extends ForeignKey, K extends CreateStatement>
     /** The on update behavior. */
     protected Update onUpdate;
 
-    /** The statement that this foreign key is created from. */
-    protected K statement;
-
-    /**
-     * Creates a new instance.
-     *
-     * @param statement
-     *            The calling statement.
-     */
-    public ForeignKey(K statement)
+    public static TableForeignKey tableForeignKey(String... childColumns)
     {
-        this.statement = statement;
+        return new TableForeignKey(childColumns);
+    }
+
+    public static ColumnForeignKey columnForeignKey()
+    {
+        return new ColumnForeignKey();
     }
 
     /**
      * Creates a new instance.
      *
-     * @param statement
-     *            The calling statement.
      * @param childColumns
      *            The columns in the table that this foreign key is created from.
      */
-    public ForeignKey(K statement, String... childColumns)
+    public ForeignKey(String... childColumns)
     {
-        this(statement);
         this.childColumns = childColumns;
     }
 
@@ -146,15 +138,5 @@ public class ForeignKey<T extends ForeignKey, K extends CreateStatement>
         this.onUpdate = onUpdate;
         this.onDelete = onDelete;
         return (T)this;
-    }
-
-    /**
-     * Finishes this foreign key and returns to the calling statement.
-     *
-     * @return The statement that created this foreign key.
-     */
-    public K add()
-    {
-        return this.statement;
     }
 }

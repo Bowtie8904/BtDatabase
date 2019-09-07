@@ -11,8 +11,8 @@ import bt.db.RemoteDatabase;
 import bt.db.constants.Generated;
 import bt.db.constants.SqlType;
 import bt.db.exc.SqlExecutionException;
+import bt.db.statement.clause.Column;
 import bt.db.statement.clause.ColumnEntry;
-import bt.db.statement.clause.TableColumn;
 import bt.db.statement.clause.foreign.ForeignKey;
 import bt.db.statement.clause.foreign.TableForeignKey;
 
@@ -39,7 +39,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
     private String identity;
 
     /** The columns that will be added to the new table. */
-    private List<TableColumn<CreateTableStatement>> tableColumns;
+    private List<Column> tableColumns;
 
     /** The select to create a copy table of. */
     private SelectStatement asCopySelect;
@@ -77,23 +77,10 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
      *            The {@link SqlType type} of the column.
      * @return The created column.
      */
-    public TableColumn<CreateTableStatement> column(String name, SqlType type)
-    {
-        TableColumn<CreateTableStatement> column = new TableColumn<>(this,
-                                                                     name,
-                                                                     type);
-        return column;
-    }
-
-    /**
-     * Adds the column to this table.
-     *
-     * @see bt.db.statement.impl.CreateStatement#addColumn(bt.db.statement.clause.TableColumn)
-     */
-    @Override
-    public CreateTableStatement addColumn(TableColumn column)
+    public CreateTableStatement column(Column column)
     {
         this.tableColumns.add(column);
+        column.setStatement(this);
         return this;
     }
 
@@ -230,17 +217,17 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
     }
 
     /**
-     * Creates a table foreign key for the given columns.
+     * Adds a table foreign key.
      *
-     * @param childColumns
-     *            The names of the columns in this table that are used by the foreign key.
-     * @return The foreign key for further modification.
+     * @param foreignKey
+     *            the foreign key.
+     * @return This instance for chaining.
      */
-    public TableForeignKey<CreateTableStatement> foreignKey(String... childColumns)
+    public CreateTableStatement foreignKey(TableForeignKey foreignKey)
     {
-        var foreignKey = new TableForeignKey<>(this, childColumns);
+        foreignKey.setStatement(this);
         this.foreignKeys.add(foreignKey);
-        return foreignKey;
+        return this;
     }
 
     private void createTriggers(boolean printLogs)
@@ -390,7 +377,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
 
             if (this.asCopySelect == null)
             {
-                for (TableColumn col : this.tableColumns)
+                for (Column col : this.tableColumns)
                 {
                     if (col.getComment() != null)
                     {
@@ -502,7 +489,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
 
         if (this.asCopySelect == null)
         {
-            for (TableColumn col : this.tableColumns)
+            for (Column col : this.tableColumns)
             {
                 if (col.isPrimaryKey())
                 {
@@ -521,13 +508,11 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                 sql += col.toString() + ", ";
             }
 
-            sql = sql.substring(0,
-                                sql.length() - 2);
+            sql = sql.substring(0, sql.length() - 2);
 
             if (primary.length() != 0)
             {
-                primary = primary.substring(0,
-                                            primary.length() - 2);
+                primary = primary.substring(0, primary.length() - 2);
                 sql += ", CONSTRAINT " + this.name + "_PK PRIMARY KEY (" + primary + ")";
             }
 
@@ -542,11 +527,11 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
             if (this.identity == null)
             {
                 // we always need a unique identity of type long for default triggers and automated persisting
-                TableColumn defaultPrimary = column("DEFAULT_ID",
-                                                    SqlType.LONG)
-                                                                 .notNull()
+                Column defaultPrimary = new Column("DEFAULT_ID",
+                                                   SqlType.LONG).notNull()
                                                                  .asIdentity(Generated.ALWAYS)
                                                                  .autoIncrement(1);
+                defaultPrimary.setStatement(this);
 
                 this.identity = "DEFAULT_ID";
 

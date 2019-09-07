@@ -7,6 +7,7 @@ import bt.db.config.DatabaseConfiguration;
 import bt.db.constants.Generated;
 import bt.db.constants.SqlType;
 import bt.db.constants.SqlValue;
+import bt.db.statement.clause.Column;
 import bt.db.statement.result.SqlResult;
 import bt.db.statement.result.SqlResultSet;
 import bt.utils.thread.Threads;
@@ -93,51 +94,22 @@ public abstract class RemoteDatabase extends DatabaseAccess
     private void createTriggerTable()
     {
         int success = create().table("recent_triggers")
-                              .column("ID",
-                                      SqlType.LONG)
-                              .asIdentity(Generated.ALWAYS)
-                              .autoIncrement(1)
-                              .add()
-                              .column("tableName",
-                                      SqlType.VARCHAR)
-                              .size(40)
-                              .add()
-                              .column("rowIdFieldName",
-                                      SqlType.VARCHAR)
-                              .size(40)
-                              .add()
-                              .column("triggerType",
-                                      SqlType.VARCHAR)
-                              .size(30)
-                              .add()
-                              .column("idRow",
-                                      SqlType.LONG)
-                              .add()
-                              .column("insertTime",
-                                      SqlType.TIMESTAMP)
-                              .defaultValue(SqlValue.CURRENT_TIMESTAMP)
-                              .add()
+                              .column(new Column("ID", SqlType.LONG).asIdentity(Generated.ALWAYS).autoIncrement(1))
+                              .column(new Column("tableName", SqlType.VARCHAR).size(40))
+                              .column(new Column("rowIdFieldName", SqlType.VARCHAR).size(40))
+                              .column(new Column("triggerType", SqlType.VARCHAR).size(30))
+                              .column(new Column("idRow", SqlType.LONG))
+                              .column(new Column("insertTime", SqlType.TIMESTAMP)
+                              .defaultValue(SqlValue.CURRENT_TIMESTAMP))
                               .createDefaultTriggers(false)
                               .commit()
                               .execute();
 
         int success2 = create().table("handled_triggers")
-                               .column("ID",
-                                       SqlType.LONG)
-                               .asIdentity(Generated.ALWAYS)
-                               .autoIncrement(1)
-                               .add()
-                               .column("trigger_id",
-                                       SqlType.LONG)
-                               .add()
-                               .column("db_id",
-                                       SqlType.VARCHAR)
-                               .size(50)
-                               .add()
-                               .column("handleTime",
-                                       SqlType.TIMESTAMP)
-                               .defaultValue(SqlValue.CURRENT_TIMESTAMP)
-                               .add()
+                               .column(new Column("ID", SqlType.LONG).asIdentity(Generated.ALWAYS).autoIncrement(1))
+                               .column(new Column("trigger_id", SqlType.LONG))
+                               .column(new Column("db_id", SqlType.VARCHAR).size(50))
+                               .column(new Column("handleTime", SqlType.TIMESTAMP).defaultValue(SqlValue.CURRENT_TIMESTAMP))
                                .createDefaultTriggers(false)
                                .commit()
                                .execute();

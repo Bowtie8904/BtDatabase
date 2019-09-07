@@ -27,8 +27,8 @@ import bt.db.listener.evnt.InsertEvent;
 import bt.db.listener.evnt.UpdateEvent;
 import bt.db.statement.Alter;
 import bt.db.statement.Create;
+import bt.db.statement.clause.Column;
 import bt.db.statement.clause.ColumnEntry;
-import bt.db.statement.clause.TableColumn;
 import bt.db.statement.impl.DeleteStatement;
 import bt.db.statement.impl.DropStatement;
 import bt.db.statement.impl.InsertStatement;
@@ -559,13 +559,11 @@ public abstract class DatabaseAccess implements Killable
     protected void createPropertiesTable()
     {
         int success = create().table(PROPERTIES_TABLE)
-                              .column("property_key", SqlType.VARCHAR).size(200).primaryKey()
-                              .comment("The unique key of the key-value mapping.")
-                              .add()
+                              .column(new Column("property_key", SqlType.VARCHAR).size(200).primaryKey()
+                                                                                 .comment("The unique key of the key-value mapping."))
 
-                              .column("property_value", SqlType.VARCHAR).size(500)
-                              .comment("The value of the key-value mapping.")
-                              .add()
+                              .column(new Column("property_value", SqlType.VARCHAR).size(500)
+                                                                                   .comment("The value of the key-value mapping."))
 
                               .createDefaultTriggers(false)
                               .onAlreadyExists((s, e) ->
@@ -592,17 +590,14 @@ public abstract class DatabaseAccess implements Killable
     protected void createCommentTable()
     {
         create().table(COMMENT_TABLE)
-                .column("table_Name", SqlType.VARCHAR).size(50).primaryKey()
-                .comment("The name of the table.")
-                .add()
+                .column(new Column("table_Name", SqlType.VARCHAR).size(50).primaryKey()
+                                                                 .comment("The name of the table."))
 
-                .column("column_Name", SqlType.VARCHAR).size(50).primaryKey()
-                .comment("The name of the column that this comment is for.")
-                .add()
+                .column(new Column("column_Name", SqlType.VARCHAR).size(50).primaryKey()
+                                                                  .comment("The name of the column that this comment is for."))
 
-                .column("column_Comment", SqlType.VARCHAR).size(TableColumn.COMMENT_SIZE)
-                .comment("The comment for this column.")
-                .add()
+                .column(new Column("column_Comment", SqlType.VARCHAR).size(Column.COMMENT_SIZE)
+                                                                     .comment("The comment for this column."))
 
                 .createDefaultTriggers(false)
                 .saveObjectData(false)
@@ -624,11 +619,11 @@ public abstract class DatabaseAccess implements Killable
     protected void createTableDataTable()
     {
         create().table(OBJECT_DATA_TABLE)
-                .column("instanceID", SqlType.VARCHAR).size(500).add()
-                .column("object_Name", SqlType.VARCHAR).size(50).primaryKey().add()
-                .column("object_ddl", SqlType.VARCHAR).size(9999).add()
-                .column("created", SqlType.TIMESTAMP).defaultValue(SqlValue.SYSTIMESTAMP).add()
-                .column("updated", SqlType.TIMESTAMP).defaultValue(SqlValue.SYSTIMESTAMP).add()
+                .column(new Column("instanceID", SqlType.VARCHAR).size(500))
+                .column(new Column("object_Name", SqlType.VARCHAR).size(50).primaryKey())
+                .column(new Column("object_ddl", SqlType.VARCHAR).size(9999))
+                .column(new Column("created", SqlType.TIMESTAMP).defaultValue(SqlValue.SYSTIMESTAMP))
+                .column(new Column("updated", SqlType.TIMESTAMP).defaultValue(SqlValue.SYSTIMESTAMP))
                 .createDefaultTriggers(false)
                 .onAlreadyExists((s, e) ->
                 {
@@ -1110,7 +1105,7 @@ public abstract class DatabaseAccess implements Killable
 
         ConsoleTable rows = new ConsoleTable(20,
                                              18,
-                                             TableColumn.COMMENT_SIZE + 2);
+                                             Column.COMMENT_SIZE + 2);
         rows.setTitle(true,
                       Array.of("Column",
                                "Type",

@@ -1,44 +1,20 @@
 package bt.db.statement.clause.foreign;
 
-import bt.db.statement.clause.TableColumn;
-import bt.db.statement.impl.CreateStatement;
+import bt.db.statement.clause.Column;
 
 /**
  * Defines a column level foreign key.
  *
  * @author &#8904
  */
-public class ColumnForeignKey<T extends TableColumn<K>, K extends CreateStatement> extends ForeignKey<ColumnForeignKey<T, K>, K>
+public class ColumnForeignKey extends ForeignKey<ColumnForeignKey>
 {
-    /** The columnd that this foreign key is for. */
-    private T column;
+    /** The column that this foreign key is for. */
+    private Column column;
 
-    /**
-     * Creates a new instance.
-     *
-     * @param column
-     *            The column that this foreign key is for.
-     */
-    public ColumnForeignKey(T column)
+    public void setColumn(Column column)
     {
-        super(column.getStatement());
         this.column = column;
-    }
-
-    /**
-     * Finishes this foreign key and returns to the calling statement.
-     *
-     * <p>
-     * This will call {@link TableColumn#add()}.
-     * </p>
-     *
-     * @see bt.db.statement.clause.foreign.ForeignKey#add()
-     */
-    @Override
-    public K add()
-    {
-        this.column.add();
-        return super.add();
     }
 
     /**

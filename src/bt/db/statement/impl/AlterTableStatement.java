@@ -8,7 +8,7 @@ import bt.db.constants.Generated;
 import bt.db.constants.SqlType;
 import bt.db.constants.SqlValue;
 import bt.db.exc.SqlExecutionException;
-import bt.db.statement.clause.TableColumn;
+import bt.db.statement.clause.Column;
 import bt.db.statement.result.SqlResult;
 
 /**
@@ -18,7 +18,7 @@ import bt.db.statement.result.SqlResult;
  */
 public class AlterTableStatement extends CreateStatement<AlterTableStatement, AlterTableStatement>
 {
-    private TableColumn newColumn;
+    private Column newColumn;
     private boolean saveObjectData = true;
 
     /**
@@ -45,23 +45,10 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
      *            The {@link SqlType type} of the column.
      * @return The created column.
      */
-    public TableColumn<AlterTableStatement> column(String name, SqlType type)
-    {
-        TableColumn<AlterTableStatement> column = new TableColumn<>(this,
-                                                                    name,
-                                                                    type);
-        return column;
-    }
-
-    /**
-     * Adds the column to this table.
-     *
-     * @see bt.db.statement.impl.CreateStatement#addColumn(bt.db.statement.clause.TableColumn)
-     */
-    @Override
-    public AlterTableStatement addColumn(TableColumn column)
+    public AlterTableStatement column(Column column)
     {
         this.newColumn = column;
+        column.setStatement(this);
         return this;
     }
 
