@@ -28,19 +28,10 @@ public class TruncateTableStatement extends SqlModifyStatement<TruncateTableStat
     }
 
     /**
-     * @see bt.db.statement.SqlModifyStatement#execute()
-     */
-    @Override
-    public int execute()
-    {
-        return execute(false);
-    }
-
-    /**
      * @see bt.db.statement.SqlModifyStatement#execute(boolean)
      */
     @Override
-    public int execute(boolean printLogs)
+    protected int executeStatement(boolean printLogs)
     {
         String sql = toString();
 
@@ -52,6 +43,7 @@ public class TruncateTableStatement extends SqlModifyStatement<TruncateTableStat
                 printLogs);
 
             result = statement.executeUpdate();
+            endExecutionTime();
 
             handleSuccess(result);
             result = handleThreshholds(result);

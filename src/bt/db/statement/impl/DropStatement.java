@@ -195,19 +195,10 @@ public class DropStatement extends SqlModifyStatement<DropStatement, DropStateme
     }
 
     /**
-     * @see bt.db.statement.SqlModifyStatement#execute()
-     */
-    @Override
-    public int execute()
-    {
-        return execute(false);
-    }
-
-    /**
      * @see bt.db.statement.SqlModifyStatement#execute(boolean)
      */
     @Override
-    public int execute(boolean printLogs)
+    protected int executeStatement(boolean printLogs)
     {
         String sql = toString();
 
@@ -218,6 +209,7 @@ public class DropStatement extends SqlModifyStatement<DropStatement, DropStateme
             log("Executing: " + sql,
                 printLogs);
             statement.executeUpdate();
+            endExecutionTime();
             result = 1;
 
             if (this.shouldCommit)

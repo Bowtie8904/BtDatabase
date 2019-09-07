@@ -336,23 +336,12 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
      * @return The number of affected rows or an error code (usually -1, can be customized for different errors via the
      *         fail methods).
      *
-     * @see bt.db.statement.SqlModifyStatement#execute()
-     */
-    @Override
-    public int execute()
-    {
-        return execute(false);
-    }
-
-    /**
-     * @return The number of affected rows or an error code (usually -1, can be customized for different errors via the
-     *         fail methods).
-     *
      * @see bt.db.statement.SqlModifyStatement#execute(boolean)
      */
     @Override
     public int execute(boolean printLogs)
     {
+        startExecutionTime();
         int result = 0;
 
         for (int i = 0; i < this.repeats; i ++ )
@@ -360,21 +349,15 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
             result += executeStatement(printLogs);
         }
 
-        if (result < this.lowerThreshhold && this.onLessThan != null)
-        {
-            return this.onLessThan.apply(result,
-                                         this);
-        }
-        else if (result > this.higherThreshhold && this.onMoreThan != null)
-        {
-            return this.onMoreThan.apply(result,
-                                         this);
-        }
+        result = handleThreshholds(result);
+
+        endExecutionTime();
 
         return result;
     }
 
-    private int executeStatement(boolean printLogs)
+    @Override
+    protected int executeStatement(boolean printLogs)
     {
         String sql = toString();
 
@@ -410,6 +393,7 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
             }
 
             result = statement.executeUpdate();
+            endExecutionTime();
             log("Affected rows: " + result,
                 printLogs);
 
@@ -419,7 +403,6 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
             }
 
             handleSuccess(result);
-            result = handleThreshholds(result);
         }
         catch (SQLException e)
         {

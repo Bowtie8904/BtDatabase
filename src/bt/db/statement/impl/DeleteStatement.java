@@ -107,19 +107,10 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
     }
 
     /**
-     * @see bt.db.statement.SqlModifyStatement#execute()
-     */
-    @Override
-    public int execute()
-    {
-        return execute(false);
-    }
-
-    /**
      * @see bt.db.statement.SqlModifyStatement#execute(boolean)
      */
     @Override
-    public int execute(boolean printLogs)
+    protected int executeStatement(boolean printLogs)
     {
         String sql = toString();
 
@@ -153,6 +144,7 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
             }
 
             result = statement.executeUpdate();
+            endExecutionTime();
             log("Affected rows: " + result,
                 printLogs);
 

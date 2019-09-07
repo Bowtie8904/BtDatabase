@@ -794,6 +794,7 @@ public class SelectStatement extends SqlStatement<SelectStatement>
      */
     public SqlResultSet execute(boolean printLogs)
     {
+        startExecutionTime();
         String sql = toString();
         SqlResultSet result = null;
 
@@ -877,6 +878,7 @@ public class SelectStatement extends SqlStatement<SelectStatement>
             }
 
             result = new SqlResultSet(statement.executeQuery());
+            endExecutionTime();
             result.setSql(sql);
             result.setValues(valueList);
 
@@ -911,7 +913,7 @@ public class SelectStatement extends SqlStatement<SelectStatement>
                 DatabaseAccess.log.print(e);
             }
         }
-
+        endExecutionTime();
         return result;
     }
 

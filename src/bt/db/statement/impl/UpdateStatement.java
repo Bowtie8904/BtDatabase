@@ -257,22 +257,10 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      * Executes the built statement. Depending on the number of rows affected, the defined onLessThan or onMoreThan
      * might be executed. If there is an error during this execution, the onFail function is called.
      *
-     * @see bt.db.statement.SqlModifyStatement#execute()
-     */
-    @Override
-    public int execute()
-    {
-        return execute(false);
-    }
-
-    /**
-     * Executes the built statement. Depending on the number of rows affected, the defined onLessThan or onMoreThan
-     * might be executed. If there is an error during this execution, the onFail function is called.
-     *
      * @see bt.db.statement.SqlModifyStatement#execute(boolean)
      */
     @Override
-    public int execute(boolean printLogs)
+    protected int executeStatement(boolean printLogs)
     {
         String sql = toString();
 
@@ -321,6 +309,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
             }
 
             result = statement.executeUpdate();
+            endExecutionTime();
             log("Affected rows: " + result,
                 printLogs);
 

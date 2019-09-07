@@ -79,19 +79,10 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
     }
 
     /**
-     * @see bt.db.statement.SqlModifyStatement#execute()
-     */
-    @Override
-    public int execute()
-    {
-        return execute(false);
-    }
-
-    /**
      * @see bt.db.statement.SqlModifyStatement#execute(boolean)
      */
     @Override
-    public int execute(boolean printLogs)
+    protected int executeStatement(boolean printLogs)
     {
         String sql = toString();
 
@@ -102,6 +93,7 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
             log("Executing: " + sql,
                 printLogs);
             statement.executeUpdate();
+            endExecutionTime();
             result = 1;
 
             if (this.saveObjectData)

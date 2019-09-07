@@ -34,6 +34,10 @@ public class SqlStatement<T extends SqlStatement>
     /** Indicates whether this statement is treated like a prepared statement or not. */
     protected boolean prepared = true;
 
+    protected long executionTime = -1;
+
+    private long startTime;
+
     /**
      * Creates a new instance.
      *
@@ -139,6 +143,21 @@ public class SqlStatement<T extends SqlStatement>
     public void setDatabase(DatabaseAccess db)
     {
         this.db = db;
+    }
+
+    protected void startExecutionTime()
+    {
+        this.startTime = System.currentTimeMillis();
+    }
+
+    protected void endExecutionTime()
+    {
+        this.executionTime = System.currentTimeMillis() - this.startTime;
+    }
+
+    public long getExecutionTime()
+    {
+        return this.executionTime;
     }
 
     /**

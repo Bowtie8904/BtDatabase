@@ -417,6 +417,7 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
 
     protected int handleFail(SqlExecutionException e)
     {
+        endExecutionTime();
         int result = 0;
 
         if (this.onDuplicateKey != null && e.getSQLState().equals(DUPLICATE_KEY_ERROR))
@@ -450,6 +451,7 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
 
     protected void handleSuccess(int result)
     {
+        endExecutionTime();
         if (this.onSuccess != null)
         {
             this.onSuccess.accept((T)this, result);
@@ -458,6 +460,7 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
 
     protected int handleThreshholds(int reached)
     {
+        endExecutionTime();
         int result = 0;
 
         if (result < this.lowerThreshhold && this.onLessThan != null)
@@ -479,7 +482,26 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
      *
      * @return The return value of {@link PreparedStatement#executeUpdate()}.
      */
-    public abstract int execute();
+    public int execute()
+    {
+        return execute(false);
+    }
+
+    /**
+     * Executes the built statement.
+     *
+     * @param printLogs
+     *            true if information about the statement should be printed out.
+     *
+     * @return The return value of {@link PreparedStatement#executeUpdate()}.
+     */
+    public int execute(boolean printLogs)
+    {
+        startExecutionTime();
+        int result = executeStatement(printLogs);
+        endExecutionTime();
+        return result;
+    }
 
     /**
      * Executes the built statement.
@@ -488,5 +510,5 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
      *            true if information about the statement should be printed out.
      * @return The return value of {@link PreparedStatement#executeUpdate()}.
      */
-    public abstract int execute(boolean printLogs);
+    protected abstract int executeStatement(boolean printLogs);
 }
