@@ -31,7 +31,7 @@ public class SqlExecutionException extends SQLException
     }
 
     /**
-     * Creates a new instance with the given message.
+     * Creates a new instance with the given message and SQL.
      *
      * @param message
      *            The message to use.
@@ -59,7 +59,7 @@ public class SqlExecutionException extends SQLException
     }
 
     /**
-     * Creates a new instance with the given message and cause.
+     * Creates a new instance with the given message, sql and cause.
      *
      * @param message
      *            The message to use.
@@ -75,11 +75,19 @@ public class SqlExecutionException extends SQLException
         this.cause = cause;
     }
 
+    /**
+     * Gets the executed SQL.
+     *
+     * @return
+     */
     public String getSql()
     {
         return this.sql;
     }
 
+    /**
+     * @see java.sql.SQLException#getSQLState()
+     */
     @Override
     public String getSQLState()
     {
