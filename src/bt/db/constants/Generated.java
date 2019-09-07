@@ -1,9 +1,9 @@
 package bt.db.constants;
 
-import bt.db.statement.clause.TableColumn;
+import bt.db.statement.clause.Column;
 
 /**
- * Offers values to define the identity generation behavior on {@link TableColumn}s.
+ * Offers values to define the identity generation behavior on {@link Column}s.
  * 
  * @author &#8904
  */

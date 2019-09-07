@@ -1,9 +1,13 @@
 package bt.db.statement.clause;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import bt.db.constants.Generated;
 import bt.db.constants.SqlType;
 import bt.db.constants.SqlValue;
 import bt.db.statement.clause.foreign.ColumnForeignKey;
+import bt.db.statement.clause.foreign.ForeignKey;
 import bt.db.statement.impl.CreateStatement;
 
 /**
@@ -11,13 +15,13 @@ import bt.db.statement.impl.CreateStatement;
  *
  * @author &#8904
  */
-public class TableColumn<T extends CreateStatement>
+public class Column
 {
     /** The maximum size of a column comment. */
     public static final int COMMENT_SIZE = 120;
 
     /** The statement that created this column. */
-    private T statement;
+    private CreateStatement statement;
 
     /** The sql value type of this column. */
     private SqlType type;
@@ -70,8 +74,13 @@ public class TableColumn<T extends CreateStatement>
     /** The comment on this column which will be added to the COLLUMN_COMMENTS table. */
     private String comment;
 
-    /** A defined foreign key for this column. */
-    private ColumnForeignKey<TableColumn<T>, T> foreignKey;
+    /** Defined foreign keys for this column. */
+    private List<ColumnForeignKey> foreignKeys;
+
+    public static Column column(String name, SqlType type)
+    {
+        return new Column(name, type);
+    }
 
     /**
      * Creates a new instance and initializes the fields.
@@ -83,11 +92,30 @@ public class TableColumn<T extends CreateStatement>
      * @param type
      *            The sql type of this column.
      */
-    public TableColumn(T statement, String name, SqlType type)
+    public Column(CreateStatement statement, String name, SqlType type)
     {
         this.statement = statement;
         this.name = name;
         this.type = type;
+    }
+
+    /**
+     * Creates a new instance and initializes the fields.
+     *
+     * @param name
+     *            The name of this column.
+     * @param type
+     *            The sql type of this column.
+     */
+    public Column(String name, SqlType type)
+    {
+        this.name = name;
+        this.type = type;
+    }
+
+    public void setStatement(CreateStatement statement)
+    {
+        this.statement = statement;
     }
 
     /**
@@ -101,7 +129,7 @@ public class TableColumn<T extends CreateStatement>
      *            The comment.
      * @return This instance for chaining.
      */
-    public TableColumn<T> comment(String text)
+    public Column comment(String text)
     {
         if (text.length() > COMMENT_SIZE)
         {
@@ -134,7 +162,7 @@ public class TableColumn<T extends CreateStatement>
      *            The sizes. For VARCHAR only one size can be given.
      * @return This instance for chaining.
      */
-    public TableColumn<T> size(int... values)
+    public Column size(int... values)
     {
         this.size = values;
         return this;
@@ -151,7 +179,7 @@ public class TableColumn<T extends CreateStatement>
      *
      * @return This instance for chaining.
      */
-    public TableColumn<T> primaryKey()
+    public Column primaryKey()
     {
         this.primaryKey = true;
         return this;
@@ -162,7 +190,7 @@ public class TableColumn<T extends CreateStatement>
      *
      * @return This instance for chaining.
      */
-    public TableColumn<T> unique()
+    public Column unique()
     {
         this.unique = true;
         this.notNull = true;
@@ -184,7 +212,7 @@ public class TableColumn<T extends CreateStatement>
      *            Defines the behavior of the identity as either {@link Generated#ALWAYS} or {@link Generated#DEFAULT}.
      * @return This instance for chaining.
      */
-    public TableColumn<T> asIdentity(Generated generated)
+    public Column asIdentity(Generated generated)
     {
         if (this.type != SqlType.INTEGER && this.type != SqlType.LONG)
         {
@@ -253,7 +281,7 @@ public class TableColumn<T extends CreateStatement>
      *            The number by which the identity value should be incremented each insert.
      * @return This instance for chaining.
      */
-    public TableColumn<T> autoIncrement(int n)
+    public Column autoIncrement(int n)
     {
         this.autoIncrement = n;
         return this;
@@ -264,7 +292,7 @@ public class TableColumn<T extends CreateStatement>
      *
      * @return This instance for chaining.
      */
-    public TableColumn<T> notNull()
+    public Column notNull()
     {
         this.notNull = true;
         return this;
@@ -277,7 +305,7 @@ public class TableColumn<T extends CreateStatement>
      *            The value that should be used if nothing else is specified.
      * @return This instance for chaining.
      */
-    public TableColumn<T> defaultValue(Object defaultValue)
+    public Column defaultValue(Object defaultValue)
     {
         if (this.type == SqlType.VARCHAR)
         {
@@ -302,7 +330,7 @@ public class TableColumn<T extends CreateStatement>
         return this;
     }
 
-    public T getStatement()
+    public CreateStatement getStatement()
     {
         return this.statement;
     }
@@ -315,17 +343,6 @@ public class TableColumn<T extends CreateStatement>
     public boolean isPrimaryKey()
     {
         return this.primaryKey;
-    }
-
-    /**
-     * Adds this column to the CREATE statement which created this instance.
-     *
-     * @return The statement that created this instance.
-     */
-    public T add()
-    {
-        this.statement.addColumn(this);
-        return this.statement;
     }
 
     /**
@@ -369,18 +386,21 @@ public class TableColumn<T extends CreateStatement>
     }
 
     /**
-     * Creates a new column foreign key.
+     * Adds a new column foreign key.
      *
-     * <p>
-     * This will overwrite any previously created column foreign keys for this column.
-     * </p>
-     *
-     * @return The foreign key for further modification.
+     * @return This instance for chaining.
      */
-    public ColumnForeignKey<TableColumn<T>, T> foreignKey()
+    public Column foreignKey(ColumnForeignKey foreignKey)
     {
-        this.foreignKey = new ColumnForeignKey<>(this);
-        return this.foreignKey;
+        if (this.foreignKeys == null)
+        {
+            this.foreignKeys = new ArrayList<>();
+        }
+
+        foreignKey.setColumn(this);
+        this.foreignKeys.add(foreignKey);
+
+        return this;
     }
 
     /**
@@ -427,9 +447,12 @@ public class TableColumn<T extends CreateStatement>
             }
         }
 
-        if (this.foreignKey != null)
+        if (this.foreignKeys != null)
         {
-            sql += " " + this.foreignKey.toString();
+            for (ForeignKey fk : this.foreignKeys)
+            {
+                sql += " " + fk.toString();
+            }
         }
 
         if (this.unique)
