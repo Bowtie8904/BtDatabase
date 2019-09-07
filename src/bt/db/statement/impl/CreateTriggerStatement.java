@@ -239,6 +239,15 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
             statement.executeUpdate();
             result = 1;
 
+            if (this.saveObjectData)
+            {
+                this.db.insert()
+                       .into(DatabaseAccess.OBJECT_DATA_TABLE)
+                       .set("object_name", this.name.toUpperCase())
+                       .set("object_ddl", sql + ";")
+                       .execute();
+            }
+
             if (this.shouldCommit)
             {
                 this.db.commit();
@@ -259,6 +268,20 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
                         statement.executeUpdate();
 
                         result = 1;
+
+                        if (this.saveObjectData)
+                        {
+                            this.db.insert()
+                                   .into(DatabaseAccess.OBJECT_DATA_TABLE)
+                                   .set("object_name", this.name.toUpperCase())
+                                   .set("object_ddl", sql + ";")
+                                   .execute();
+                        }
+
+                        if (this.shouldCommit)
+                        {
+                            this.db.commit();
+                        }
 
                         handleSuccess(result);
                         return result;

@@ -146,6 +146,15 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
             statement.execute(sql);
             result = 1;
 
+            if (this.saveObjectData)
+            {
+                this.db.insert()
+                       .into(DatabaseAccess.OBJECT_DATA_TABLE)
+                       .set("object_name", this.name.toUpperCase())
+                       .set("object_ddl", sql + ";")
+                       .execute();
+            }
+
             if (this.shouldCommit)
             {
                 this.db.commit();

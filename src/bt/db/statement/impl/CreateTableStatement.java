@@ -45,6 +45,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
     /** Indicates whether a table copy should be created with data. */
     private boolean copyData = true;
 
+
     /**
      * Creates a new instance.
      *
@@ -365,6 +366,15 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                 createTriggers(printLogs);
             }
 
+            if (this.saveObjectData)
+            {
+                this.db.insert()
+                       .into(DatabaseAccess.OBJECT_DATA_TABLE)
+                       .set("object_name", this.name.toUpperCase())
+                       .set("object_ddl", sql + ";")
+                       .execute();
+            }
+
             if (this.asCopySelect == null)
             {
                 for (TableColumn col : this.tableColumns)
@@ -372,7 +382,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                     if (col.getComment() != null)
                     {
                         this.db.insert()
-                               .into("column_comments")
+                               .into(DatabaseAccess.COMMENT_TABLE)
                                .set("table_name",
                                     this.name.toUpperCase())
                                .set("column_name",
@@ -424,7 +434,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                                                         comment.length() - 2);
 
                             this.db.insert()
-                                   .into("column_comments")
+                                   .into(DatabaseAccess.COMMENT_TABLE)
                                    .set("table_name",
                                         this.name.toUpperCase())
                                    .set("column_name",
@@ -436,7 +446,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                         else
                         {
                             this.db.insert()
-                                   .into("column_comments")
+                                   .into(DatabaseAccess.COMMENT_TABLE)
                                    .set("table_name",
                                         this.name.toUpperCase())
                                    .set("column_name",

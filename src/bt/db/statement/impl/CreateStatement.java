@@ -18,6 +18,8 @@ public abstract class CreateStatement<T extends CreateStatement, K extends Creat
     /** The name that is used in this create statement. This would be the name of the table, trigger, ... */
     protected String name;
 
+    protected boolean saveObjectData = true;
+
     /**
      * Creates a new instance and initializes the fields.
      *
@@ -72,6 +74,18 @@ public abstract class CreateStatement<T extends CreateStatement, K extends Creat
         {
             return statement.execute();
         };
+        return (T)this;
+    }
+
+    /**
+     * Indicates whether this database objects DDL should be saved in 'BT_OBJECT_DATA'.
+     *
+     * @param saveTableData
+     * @return
+     */
+    public T saveObjectData(boolean saveObjectData)
+    {
+        this.saveObjectData = saveObjectData;
         return (T)this;
     }
 

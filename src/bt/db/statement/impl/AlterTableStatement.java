@@ -6,8 +6,10 @@ import java.sql.SQLException;
 import bt.db.DatabaseAccess;
 import bt.db.constants.Generated;
 import bt.db.constants.SqlType;
+import bt.db.constants.SqlValue;
 import bt.db.exc.SqlExecutionException;
 import bt.db.statement.clause.TableColumn;
+import bt.db.statement.result.SqlResult;
 
 /**
  * Represents an SQL alter statement which can be extended through method chaining.
@@ -17,6 +19,7 @@ import bt.db.statement.clause.TableColumn;
 public class AlterTableStatement extends CreateStatement<AlterTableStatement, AlterTableStatement>
 {
     private TableColumn newColumn;
+    private boolean saveObjectData = true;
 
     /**
      * Creates a new instance.
@@ -45,8 +48,8 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
     public TableColumn<AlterTableStatement> column(String name, SqlType type)
     {
         TableColumn<AlterTableStatement> column = new TableColumn<>(this,
-                                                                                       name,
-                                                                                       type);
+                                                                    name,
+                                                                    type);
         return column;
     }
 
@@ -59,6 +62,19 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
     public AlterTableStatement addColumn(TableColumn column)
     {
         this.newColumn = column;
+        return this;
+    }
+
+    /**
+     * Indicates whether this objects DDL should be saved in 'BT_TABLE_DATA'.
+     *
+     * @param saveTableData
+     * @return
+     */
+    @Override
+    public AlterTableStatement saveObjectData(boolean saveObjectData)
+    {
+        this.saveObjectData = saveObjectData;
         return this;
     }
 
@@ -88,19 +104,45 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
             statement.executeUpdate();
             result = 1;
 
+            if (this.saveObjectData)
+            {
+                this.db.select()
+                       .from(DatabaseAccess.OBJECT_DATA_TABLE)
+                       .where("object_name").equals(this.name.toUpperCase())
+                       .first()
+                       .onLessThan(1, this.db.insert()
+                                             .into(DatabaseAccess.OBJECT_DATA_TABLE)
+                                             .set("object_name", this.name.toUpperCase())
+                                             .set("object_ddl", sql + ";"))
+                       .onMoreThan(0, (i, set) ->
+                       {
+                           SqlResult row = set.get(0);
+                           String oldDDL = row.getString("object_ddl");
+
+                           this.db.update(DatabaseAccess.OBJECT_DATA_TABLE)
+                                  .set("object_ddl", oldDDL + " " + sql + ";")
+                                  .set("updated", SqlValue.SYSTIMESTAMP, SqlType.TIMESTAMP)
+                                  .where("object_name").equals(this.name.toUpperCase())
+                                  .execute();
+
+                           return set;
+                       })
+                       .execute();
+            }
+
             if (this.newColumn != null)
             {
                 if (this.newColumn.getComment() != null)
                 {
                     this.db.insert()
-                      .into("column_comments")
-                      .set("table_name",
-                           this.name.toUpperCase())
-                      .set("column_name",
-                           this.newColumn.getName().toUpperCase())
-                      .set("column_comment",
-                           this.newColumn.getComment())
-                      .execute(printLogs);
+                           .into(DatabaseAccess.COMMENT_TABLE)
+                           .set("table_name",
+                                this.name.toUpperCase())
+                           .set("column_name",
+                                this.newColumn.getName().toUpperCase())
+                           .set("column_comment",
+                                this.newColumn.getComment())
+                           .execute(printLogs);
                 }
                 else
                 {
@@ -141,25 +183,25 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
                     if (comment.length() != 0)
                     {
                         this.db.insert()
-                          .into("column_comments")
-                          .set("table_name",
-                               this.name.toUpperCase())
-                          .set("column_name",
-                               this.newColumn.getName().toUpperCase())
-                          .set("column_comment",
-                               comment.substring(0,
-                                                 comment.length() - 2))
-                          .execute(printLogs);
+                               .into(DatabaseAccess.COMMENT_TABLE)
+                               .set("table_name",
+                                    this.name.toUpperCase())
+                               .set("column_name",
+                                    this.newColumn.getName().toUpperCase())
+                               .set("column_comment",
+                                    comment.substring(0,
+                                                      comment.length() - 2))
+                               .execute(printLogs);
                     }
                     else
                     {
                         this.db.insert()
-                          .into("column_comments")
-                          .set("table_name",
-                               this.name.toUpperCase())
-                          .set("column_name",
-                               this.newColumn.getName().toUpperCase())
-                          .execute(printLogs);
+                               .into(DatabaseAccess.COMMENT_TABLE)
+                               .set("table_name",
+                                    this.name.toUpperCase())
+                               .set("column_name",
+                                    this.newColumn.getName().toUpperCase())
+                               .execute(printLogs);
                     }
                 }
             }
