@@ -13,6 +13,8 @@ import bt.db.constants.SqlType;
 import bt.db.exc.SqlExecutionException;
 import bt.db.statement.clause.ColumnEntry;
 import bt.db.statement.clause.TableColumn;
+import bt.db.statement.clause.foreign.ForeignKey;
+import bt.db.statement.clause.foreign.TableForeignKey;
 
 /**
  * Represents an SQL create table statement which can be extended through method chaining.
@@ -45,6 +47,9 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
     /** Indicates whether a table copy should be created with data. */
     private boolean copyData = true;
 
+    /** Contains all added table foreign keys. */
+    private List<TableForeignKey> foreignKeys;
+
 
     /**
      * Creates a new instance.
@@ -60,6 +65,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
               name);
         this.statementKeyword = "CREATE TABLE";
         this.tableColumns = new ArrayList<>();
+        this.foreignKeys = new ArrayList<>();
     }
 
     /**
@@ -221,6 +227,20 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
     {
         this.createDefaultUpdateTrigger = defaultTrigger;
         return this;
+    }
+
+    /**
+     * Creates a table foreign key for the given columns.
+     *
+     * @param childColumns
+     *            The names of the columns in this table that are used by the foreign key.
+     * @return The foreign key for further modification.
+     */
+    public TableForeignKey<CreateTableStatement> foreignKey(String... childColumns)
+    {
+        var foreignKey = new TableForeignKey<>(this, childColumns);
+        this.foreignKeys.add(foreignKey);
+        return foreignKey;
     }
 
     private void createTriggers(boolean printLogs)
@@ -509,6 +529,14 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                 primary = primary.substring(0,
                                             primary.length() - 2);
                 sql += ", CONSTRAINT " + this.name + "_PK PRIMARY KEY (" + primary + ")";
+            }
+
+            if (this.foreignKeys.size() > 0)
+            {
+                for (ForeignKey fk : this.foreignKeys)
+                {
+                    sql += ", " + fk.toString();
+                }
             }
 
             if (this.identity == null)

@@ -3,6 +3,7 @@ package bt.db.statement.clause;
 import bt.db.constants.Generated;
 import bt.db.constants.SqlType;
 import bt.db.constants.SqlValue;
+import bt.db.statement.clause.foreign.ColumnForeignKey;
 import bt.db.statement.impl.CreateStatement;
 
 /**
@@ -68,6 +69,9 @@ public class TableColumn<T extends CreateStatement>
 
     /** The comment on this column which will be added to the COLLUMN_COMMENTS table. */
     private String comment;
+
+    /** A defined foreign key for this column. */
+    private ColumnForeignKey<TableColumn<T>, T> foreignKey;
 
     /**
      * Creates a new instance and initializes the fields.
@@ -298,6 +302,11 @@ public class TableColumn<T extends CreateStatement>
         return this;
     }
 
+    public T getStatement()
+    {
+        return this.statement;
+    }
+
     /**
      * Indicates whether this column is used as a primary key.
      *
@@ -360,6 +369,21 @@ public class TableColumn<T extends CreateStatement>
     }
 
     /**
+     * Creates a new column foreign key.
+     *
+     * <p>
+     * This will overwrite any previously created column foreign keys for this column.
+     * </p>
+     *
+     * @return The foreign key for further modification.
+     */
+    public ColumnForeignKey<TableColumn<T>, T> foreignKey()
+    {
+        this.foreignKey = new ColumnForeignKey<>(this);
+        return this.foreignKey;
+    }
+
+    /**
      * Returns the String representing this column creation query.
      *
      * @see java.lang.Object#toString()
@@ -401,6 +425,11 @@ public class TableColumn<T extends CreateStatement>
             {
                 sql += " (START WITH 1, INCREMENT BY " + this.autoIncrement + ")";
             }
+        }
+
+        if (this.foreignKey != null)
+        {
+            sql += " " + this.foreignKey.toString();
         }
 
         if (this.unique)
