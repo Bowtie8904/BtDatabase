@@ -903,14 +903,14 @@ public class SelectStatement extends SqlStatement<SelectStatement>
         }
         catch (SQLException e)
         {
+            endExecutionTime();
             if (this.onFail != null)
             {
                 result = this.onFail.apply(this, new SqlExecutionException(e.getMessage(), sql, e));
             }
             else
             {
-                DatabaseAccess.log.print(sql);
-                DatabaseAccess.log.print(e);
+                this.db.dispatchException(new SqlExecutionException(e.getMessage(), sql, e));
             }
         }
         endExecutionTime();

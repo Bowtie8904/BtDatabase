@@ -106,8 +106,11 @@ public abstract class DatabaseAccess implements Killable
     /** The connection to the database. */
     protected Connection connection;
 
-    /** The dispatcher used to distribute insert, update and delete trigger events to the corresponding listeners. */
-    protected Dispatcher triggerDispatcher;
+    /**
+     * The dispatcher used to distribute insert, update and delete trigger events and exceptions to the corresponding
+     * listeners.
+     */
+    protected Dispatcher eventDispatcher;
 
     /** A map containing savepoint-names mapped to their savepoint objects. */
     protected Map<String, Savepoint> savepoints;
@@ -145,7 +148,7 @@ public abstract class DatabaseAccess implements Killable
                            getClass().getName());
         InstanceKiller.killOnShutdown(this,
                                       1);
-        this.triggerDispatcher = new Dispatcher();
+        this.eventDispatcher = new Dispatcher();
     }
 
     /**
@@ -250,8 +253,7 @@ public abstract class DatabaseAccess implements Killable
         }
         catch (SQLException e)
         {
-            log.print(this,
-                      e);
+            dispatchException(e);
         }
     }
 
@@ -262,7 +264,7 @@ public abstract class DatabaseAccess implements Killable
      */
     protected Dispatcher getTriggerDispatcher()
     {
-        return this.triggerDispatcher;
+        return this.eventDispatcher;
     }
 
     /**
@@ -385,7 +387,7 @@ public abstract class DatabaseAccess implements Killable
             }
         };
 
-        this.triggerDispatcher.subscribeTo(listenFor,
+        this.eventDispatcher.subscribeTo(listenFor,
                                            cons);
 
         log.printfSrc(this,
@@ -409,7 +411,7 @@ public abstract class DatabaseAccess implements Killable
      */
     public <T extends DatabaseChangeEvent> void unregisterListener(Class<T> type, Consumer<T> listener)
     {
-        if (this.triggerDispatcher.unsubscribeFrom(type,
+        if (this.eventDispatcher.unsubscribeFrom(type,
                                                    listener))
         {
             log.printfSrc(this,
@@ -418,6 +420,23 @@ public abstract class DatabaseAccess implements Killable
                           type.getName(),
                           this.getInstanceID());
         }
+    }
+
+    /**
+     * Registers a consumer which will receive any uncaught SQLException during database actions such as statement
+     * executions.
+     *
+     * @param handler
+     */
+    public void registerExceptionHandler(Consumer<SQLException> handler)
+    {
+        this.eventDispatcher.subscribeTo(SQLException.class, handler);
+
+        log.printfSrc(this,
+                      "Registered database exception handler of type '%s' for '%s' to instance %s.",
+                      handler.getClass().getName(),
+                      SQLException.class.getName(),
+                      this.getInstanceID());
     }
 
     /**
@@ -440,18 +459,36 @@ public abstract class DatabaseAccess implements Killable
                 }
                 catch (SQLException e)
                 {
-                    log.print(this,
-                              e);
+                    dispatchException(e);
                 }
             }
         }
         catch (SQLException e)
         {
-            log.print(this,
-                      e);
+            dispatchException(e);
         }
 
         return this.connection;
+    }
+
+    public void dispatchException(SQLException e)
+    {
+        int count = this.eventDispatcher.dispatch(e);
+
+        if (count == 0)
+        {
+            handleException(e);
+        }
+    }
+
+    /**
+     * Default handling of exceptions. This will simply log the stacktrace.
+     *
+     * @param e
+     */
+    protected void handleException(SQLException e)
+    {
+        log.print(this, e);
     }
 
     /**
@@ -495,8 +532,7 @@ public abstract class DatabaseAccess implements Killable
         }
         catch (SQLException e)
         {
-            log.print(this,
-                      e);
+            dispatchException(e);
         }
     }
 
@@ -697,7 +733,7 @@ public abstract class DatabaseAccess implements Killable
         }
         catch (SQLException e)
         {
-            log.print(this, e);
+            dispatchException(e);
         }
     }
 
@@ -732,7 +768,7 @@ public abstract class DatabaseAccess implements Killable
         }
         catch (SQLException e)
         {
-            log.print(this, e);
+            dispatchException(e);
         }
     }
 
@@ -755,7 +791,7 @@ public abstract class DatabaseAccess implements Killable
         }
         catch (SQLException e)
         {
-            log.print(this, e);
+            dispatchException(e);
         }
     }
 
@@ -783,7 +819,7 @@ public abstract class DatabaseAccess implements Killable
         }
         catch (SQLException e)
         {
-            log.print(this, e);
+            dispatchException(e);
         }
     }
 
@@ -815,7 +851,7 @@ public abstract class DatabaseAccess implements Killable
             }
             catch (SQLException e)
             {
-                Logger.global().print(e);
+                dispatchException(e);
             }
         }
 
@@ -1203,7 +1239,7 @@ public abstract class DatabaseAccess implements Killable
      */
     protected void onInsert(InsertEvent event)
     {
-        int count = this.triggerDispatcher.dispatch(event);
+        int count = this.eventDispatcher.dispatch(event);
         log.printfSrc(this,
                       "Dispatched insert event to %d listeners.",
                       count);
@@ -1247,7 +1283,7 @@ public abstract class DatabaseAccess implements Killable
      */
     protected void onUpdate(UpdateEvent event)
     {
-        int count = this.triggerDispatcher.dispatch(event);
+        int count = this.eventDispatcher.dispatch(event);
         log.printfSrc(this,
                       "Dispatched update event to %d listeners.",
                       count);
@@ -1291,7 +1327,7 @@ public abstract class DatabaseAccess implements Killable
      */
     protected void onDelete(DeleteEvent event)
     {
-        int count = this.triggerDispatcher.dispatch(event);
+        int count = this.eventDispatcher.dispatch(event);
         log.printfSrc(this,
                       "Dispatched delete event to %d listeners.",
                       count);

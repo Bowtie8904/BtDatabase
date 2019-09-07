@@ -90,7 +90,7 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
     private int defaultFail(T statement, SqlExecutionException e)
     {
         DatabaseAccess.log.print(statement.toString());
-        DatabaseAccess.log.print(e);
+        this.db.dispatchException(e);
         return -1;
     }
 
@@ -442,7 +442,7 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
         }
         else
         {
-            DatabaseAccess.log.print(e);
+            this.db.dispatchException(e);
             result = -1;
         }
 
