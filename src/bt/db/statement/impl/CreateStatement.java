@@ -5,7 +5,6 @@ import java.util.function.BiFunction;
 import bt.db.DatabaseAccess;
 import bt.db.exc.SqlExecutionException;
 import bt.db.statement.SqlModifyStatement;
-import bt.db.statement.clause.TableColumn;
 
 /**
  * Base class for all different CREATE statements.
@@ -32,18 +31,6 @@ public abstract class CreateStatement<T extends CreateStatement, K extends Creat
     {
         super(db);
         this.name = name.toUpperCase();
-    }
-
-    /**
-     * This implementation does nothing and should be overriden by extensions.
-     *
-     * @param column
-     *            The table collumn to add.
-     * @return This instance for chaining.
-     */
-    public CreateStatement<T, K> addColumn(TableColumn column)
-    {
-        return this;
     }
 
     /**
