@@ -385,6 +385,18 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                 createTriggers(printLogs);
             }
 
+            if (this.asCopySelect != null && this.copyData)
+            {
+                this.db.insert().into(this.name).from(this.asCopySelect).execute(printLogs);
+            }
+
+            result = 1;
+
+            if (this.shouldCommit)
+            {
+                this.db.commit();
+            }
+
             if (this.saveObjectData)
             {
                 this.db.insert()
@@ -393,42 +405,15 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                        .set("object_name", this.name.toUpperCase())
                        .set("object_ddl", sql + ";")
                        .execute();
-            }
 
-            if (this.asCopySelect == null)
-            {
-                for (Column col : this.tableColumns)
+                if (this.asCopySelect == null)
                 {
-                    if (col.getComment() != null)
+                    for (Column col : this.tableColumns)
                     {
-                        this.db.insert()
-                               .into(DatabaseAccess.COMMENT_TABLE)
-                               .set("table_name",
-                                    this.name.toUpperCase())
-                               .set("column_name",
-                                    col.getName().toUpperCase())
-                               .set("column_comment",
-                                    col.getComment())
-                               .execute(printLogs);
-                    }
-                    else
-                    {
-                        this.db.insert()
-                               .into(DatabaseAccess.COMMENT_TABLE)
-                               .set("table_name",
-                                    this.name.toUpperCase())
-                               .set("column_name",
-                                    col.getName().toUpperCase())
-                               .execute(printLogs);
+                        col.saveColumnData(this.db);
                     }
                 }
             }
-            else if (this.copyData)
-            {
-                this.db.insert().into(this.name).from(this.asCopySelect).execute(printLogs);
-            }
-
-            result = 1;
 
             if (this.shouldCommit)
             {

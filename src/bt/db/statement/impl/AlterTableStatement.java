@@ -4,7 +4,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import bt.db.DatabaseAccess;
-import bt.db.constants.Generated;
 import bt.db.constants.SqlType;
 import bt.db.constants.SqlValue;
 import bt.db.exc.SqlExecutionException;
@@ -108,81 +107,10 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
                            return set;
                        })
                        .execute();
-            }
 
-            if (this.newColumn != null)
-            {
-                if (this.newColumn.getComment() != null)
+                if (this.newColumn != null)
                 {
-                    this.db.insert()
-                           .into(DatabaseAccess.COMMENT_TABLE)
-                           .set("table_name",
-                                this.name.toUpperCase())
-                           .set("column_name",
-                                this.newColumn.getName().toUpperCase())
-                           .set("column_comment",
-                                this.newColumn.getComment())
-                           .execute(printLogs);
-                }
-                else
-                {
-                    StringBuilder comment = new StringBuilder();
-
-                    if (this.newColumn.isPrimaryKey())
-                    {
-                        comment.append("primary key, ");
-                    }
-
-                    if (this.newColumn.isNotNull())
-                    {
-                        comment.append("not null, ");
-                    }
-
-                    if (this.newColumn.isIdentity())
-                    {
-                        if (this.newColumn.getGenerationType() == Generated.ALWAYS)
-                        {
-                            comment.append("always ");
-                        }
-                        else if (this.newColumn.getGenerationType() == Generated.DEFAULT)
-                        {
-                            comment.append("default ");
-                        }
-                        comment.append("generated, incremented by ")
-                               .append(this.newColumn.getAutoIncrement())
-                               .append(", ");
-                    }
-
-                    if (this.newColumn.getDefaultValue() != null)
-                    {
-                        comment.append("default = ")
-                               .append(this.newColumn.getDefaultValue())
-                               .append(", ");
-                    }
-
-                    if (comment.length() != 0)
-                    {
-                        this.db.insert()
-                               .into(DatabaseAccess.COMMENT_TABLE)
-                               .set("table_name",
-                                    this.name.toUpperCase())
-                               .set("column_name",
-                                    this.newColumn.getName().toUpperCase())
-                               .set("column_comment",
-                                    comment.substring(0,
-                                                      comment.length() - 2))
-                               .execute(printLogs);
-                    }
-                    else
-                    {
-                        this.db.insert()
-                               .into(DatabaseAccess.COMMENT_TABLE)
-                               .set("table_name",
-                                    this.name.toUpperCase())
-                               .set("column_name",
-                                    this.newColumn.getName().toUpperCase())
-                               .execute(printLogs);
-                    }
+                    this.newColumn.saveColumnData(this.db);
                 }
             }
 

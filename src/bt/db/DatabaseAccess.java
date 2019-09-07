@@ -65,12 +65,12 @@ public abstract class DatabaseAccess implements Killable
     public static final String DEFAULT_LOCAL_DB = "jdbc:derby:./db;create=true;useUnicode=true&characterEncoding=utf8&autoReconnect=true";
 
     /**
-     * The name of the comment table used for comments on table columns.
+     * The name of the column data table used for information on table columns.
      * <p>
-     * <b>bt_column_comments</b>
+     * <b>bt_column_data</b>
      * </p>
      */
-    public static final String COMMENT_TABLE = "bt_column_comments";
+    public static final String COLUMN_DATA = "bt_column_data";
 
     /**
      * The name of the properties table used to store database specific key value pairs.
@@ -188,8 +188,8 @@ public abstract class DatabaseAccess implements Killable
     protected void setup()
     {
         createDatabase();
-        createCommentTable();
-        createTableDataTable();
+        createObjectDataTable();
+        createColumnDataTable();
         createPropertiesTable();
         checkID();
         synchronized (DatabaseAccess.class)
@@ -621,38 +621,59 @@ public abstract class DatabaseAccess implements Killable
     }
 
     /**
-     * Creates the {@link #COMMENT_TABLE} if it does not exist yet.
+     * Creates the {@link #COLUMN_DATA} if it does not exist yet.
      */
-    protected void createCommentTable()
+    protected void createColumnDataTable()
     {
-        create().table(COMMENT_TABLE)
-                .column(new Column("table_Name", SqlType.VARCHAR).size(50).primaryKey()
-                                                                 .comment("The name of the table."))
-
-                .column(new Column("column_Name", SqlType.VARCHAR).size(50).primaryKey()
-                                                                  .comment("The name of the column that this comment is for."))
-
-                .column(new Column("column_Comment", SqlType.VARCHAR).size(Column.COMMENT_SIZE)
-                                                                     .comment("The comment for this column."))
-
+        create().table(COLUMN_DATA)
+                .column(new Column("instanceID", SqlType.VARCHAR).size(100)
+                                                                 .comment("The instance ID of the creating database."))
+                .column(new Column("table_name", SqlType.VARCHAR).size(100).primaryKey()
+                                                                 .comment("The name of the table that this column belongs to."))
+                .column(new Column("column_name", SqlType.VARCHAR).size(100).primaryKey()
+                                                                  .comment("The name of this column."))
+                .column(new Column("data_type", SqlType.VARCHAR).size(100)
+                                                                .comment("The data type of this columns values."))
+                .column(new Column("primary_key", SqlType.BOOLEAN).defaultValue(false)
+                                                                  .comment("Indicates whether this column is (part of) the primary key."))
+                .column(new Column("is_identity", SqlType.BOOLEAN).defaultValue(false)
+                                                               .comment("Indicates whether this column is marked as an identity."))
+                .column(new Column("identity_spec", SqlType.VARCHAR).size(200)
+                                                                    .comment("Contains further identity information if this column is marked as identity."))
+                .column(new Column("not_null", SqlType.BOOLEAN).defaultValue(false)
+                                                               .comment("Indicates whether this columns can contain null values."))
+                .column(new Column("is_unique", SqlType.BOOLEAN).defaultValue(false)
+                                                             .comment("Indicates whether this column contains only unique values."))
+                .column(new Column("default_value", SqlType.VARCHAR).size(100)
+                                                                    .comment("Contains the defined default value."))
+                .column(new Column("foreign_keys", SqlType.VARCHAR).size(500)
+                                                                   .comment("Contains the names of the column level foreign keys for this column."))
+                .column(new Column("checks", SqlType.VARCHAR).size(500)
+                                                             .comment("Contains the names of the column level check constraints for this column."))
+                .column(new Column("comment", SqlType.VARCHAR).size(9999)
+                                                              .comment("Contains a descriptive comment for this column."))
+                .column(new Column("created", SqlType.TIMESTAMP).defaultValue(SqlValue.SYSTIMESTAMP)
+                                                                .comment("Indicates when this entry was created."))
+                .column(new Column("updated", SqlType.TIMESTAMP).defaultValue(SqlValue.SYSTIMESTAMP)
+                                                                .comment("Indicates when this entry was last updated."))
                 .createDefaultTriggers(false)
-                .saveObjectData(false)
                 .onAlreadyExists((s, e) ->
                 {
                     return 0;
                 })
                 .onSuccess((s, i) ->
                 {
-                    log.print(this, "Created comment table in " + s.getExecutionTime() + "ms.");
+                    log.print(this, "Created column data table in " + s.getExecutionTime() + "ms.");
                 })
                 .commit()
                 .execute();
     }
 
+
     /**
-     * Creates the {@link #COMMENT_TABLE} if it does not exist yet.
+     * Creates the {@link #OBJECT_DATA_TABLE} if it does not exist yet.
      */
-    protected void createTableDataTable()
+    protected void createObjectDataTable()
     {
         create().table(OBJECT_DATA_TABLE)
                 .column(new Column("instanceID", SqlType.VARCHAR).size(500))
@@ -661,6 +682,7 @@ public abstract class DatabaseAccess implements Killable
                 .column(new Column("created", SqlType.TIMESTAMP).defaultValue(SqlValue.SYSTIMESTAMP))
                 .column(new Column("updated", SqlType.TIMESTAMP).defaultValue(SqlValue.SYSTIMESTAMP))
                 .createDefaultTriggers(false)
+                .saveObjectData(false)
                 .onAlreadyExists((s, e) ->
                 {
                     return 0;
@@ -1179,7 +1201,7 @@ public abstract class DatabaseAccess implements Killable
         List<Tripple<String, String, String>> columnInfo = new ArrayList<>();
 
         SqlResultSet set = select()
-                                   .from(COMMENT_TABLE)
+                                   .from(COLUMN_DATA)
                                    .where("table_name")
                                    .equals(table.toUpperCase())
                                    .onLessThan(1,
@@ -1195,7 +1217,7 @@ public abstract class DatabaseAccess implements Killable
             String type = typeMap.get(col);
             columnInfo.add(new SimpleTripple<>(col,
                                                type,
-                                               result.getString("column_comment")));
+                                               result.getString("comment")));
         }
 
         return columnInfo;

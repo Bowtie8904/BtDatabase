@@ -3,6 +3,7 @@ package bt.db.statement.clause;
 import java.util.ArrayList;
 import java.util.List;
 
+import bt.db.DatabaseAccess;
 import bt.db.constants.Generated;
 import bt.db.constants.SqlType;
 import bt.db.constants.SqlValue;
@@ -212,7 +213,10 @@ public class Column
             }
         }
 
-        defaultComment = defaultComment.substring(0, defaultComment.length() - 2);
+        if (!defaultComment.isBlank())
+        {
+            defaultComment = defaultComment.substring(0, defaultComment.length() - 2);
+        }
 
         return defaultComment;
     }
@@ -467,6 +471,94 @@ public class Column
         this.foreignKeys.add(foreignKey);
 
         return this;
+    }
+
+    public void saveColumnData(DatabaseAccess db)
+    {
+        String dataType = this.type.toString();
+
+        if (this.type == SqlType.VARCHAR)
+        {
+            dataType += " (";
+
+            for (int i : this.size)
+            {
+                dataType += i + ", ";
+            }
+
+            dataType = dataType.substring(0, dataType.length() - 2);
+
+            dataType += ")";
+        }
+
+        String identityInfo = "";
+        if (this.asIdentity)
+        {
+            identityInfo += " GENERATED " + (this.generated == Generated.ALWAYS ? "ALWAYS" : "BY DEFAULT") + " AS IDENTITY";
+
+            if (this.autoIncrement > 0)
+            {
+                identityInfo += " (START WITH 1, INCREMENT BY " + this.autoIncrement + ")";
+            }
+        }
+
+        String foreignKeyStr = "";
+        if (this.foreignKeys != null)
+        {
+            for (ForeignKey fk : this.foreignKeys)
+            {
+                foreignKeyStr += fk.getName() + ", ";
+            }
+
+            if (!foreignKeyStr.isBlank())
+            {
+                foreignKeyStr = foreignKeyStr.substring(0, foreignKeyStr.length() - 2);
+            }
+        }
+
+        String checkStr = "";
+        if (this.checks != null)
+        {
+            for (Check check : this.checks)
+            {
+                checkStr += check.getName() + ", ";
+            }
+
+            if (!checkStr.isBlank())
+            {
+                checkStr = checkStr.substring(0, checkStr.length() - 2);
+            }
+        }
+
+        db.insert()
+          .into(DatabaseAccess.COLUMN_DATA)
+          .set("instanceID", db.getInstanceID())
+          .set("table_name", this.statement.getName().toUpperCase())
+          .set("column_name", this.name.toUpperCase())
+          .set("data_type", dataType)
+          .set("primary_key", this.primaryKey)
+          .set("is_identity", this.asIdentity)
+          .set("identity_spec", identityInfo)
+          .set("not_null", this.notNull)
+          .set("is_unique", this.unique)
+          .set("default_value", this.defaultValue == null ? "" : this.defaultValue)
+          .set("foreign_keys", foreignKeyStr)
+          .set("checks", checkStr)
+          .set("comment", getComment())
+          .onDuplicateKey(db.update(DatabaseAccess.COLUMN_DATA)
+                            .set("instanceID", db.getInstanceID())
+                            .set("data_type", dataType)
+                            .set("primary_key", this.primaryKey)
+                            .set("is_identity", this.asIdentity)
+                            .set("identity_spec", identityInfo)
+                            .set("not_null", this.notNull)
+                            .set("is_unique", this.unique)
+                            .set("default_value", this.defaultValue == null ? "" : this.defaultValue)
+                            .set("foreign_keys", foreignKeyStr)
+                            .set("checks", checkStr)
+                            .set("comment", getComment())
+                            .set("updated", SqlValue.SYSTIMESTAMP, SqlType.TIMESTAMP))
+          .execute();
     }
 
     /**
