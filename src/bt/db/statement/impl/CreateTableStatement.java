@@ -11,6 +11,7 @@ import bt.db.RemoteDatabase;
 import bt.db.constants.Generated;
 import bt.db.constants.SqlType;
 import bt.db.exc.SqlExecutionException;
+import bt.db.statement.clause.Check;
 import bt.db.statement.clause.Column;
 import bt.db.statement.clause.ColumnEntry;
 import bt.db.statement.clause.foreign.ForeignKey;
@@ -49,6 +50,9 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
 
     /** Contains all added table foreign keys. */
     private List<TableForeignKey> foreignKeys;
+
+    /** Contains all added table checks. */
+    private List<Check> checks;
 
 
     /**
@@ -227,6 +231,23 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
     {
         foreignKey.setStatement(this);
         this.foreignKeys.add(foreignKey);
+        return this;
+    }
+
+    /**
+     * Adds a new table check.
+     *
+     * @return This instance for chaining.
+     */
+    public CreateTableStatement check(Check check)
+    {
+        if (this.checks == null)
+        {
+            this.checks = new ArrayList<>();
+        }
+
+        this.checks.add(check);
+
         return this;
     }
 
@@ -514,6 +535,14 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
             {
                 primary = primary.substring(0, primary.length() - 2);
                 sql += ", CONSTRAINT " + this.name + "_PK PRIMARY KEY (" + primary + ")";
+            }
+
+            if (this.checks != null)
+            {
+                for (Check check : this.checks)
+                {
+                    sql += ", " + check.toString();
+                }
             }
 
             if (this.foreignKeys.size() > 0)

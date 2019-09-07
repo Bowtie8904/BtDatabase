@@ -77,6 +77,9 @@ public class Column
     /** Defined foreign keys for this column. */
     private List<ColumnForeignKey> foreignKeys;
 
+    /** Defined checks for this column. */
+    private List<Check> checks;
+
     public static Column column(String name, SqlType type)
     {
         return new Column(name, type);
@@ -404,6 +407,23 @@ public class Column
     }
 
     /**
+     * Adds a new column check.
+     *
+     * @return This instance for chaining.
+     */
+    public Column check(Check check)
+    {
+        if (this.checks == null)
+        {
+            this.checks = new ArrayList<>();
+        }
+
+        this.checks.add(check);
+
+        return this;
+    }
+
+    /**
      * Returns the String representing this column creation query.
      *
      * @see java.lang.Object#toString()
@@ -444,6 +464,14 @@ public class Column
             if (this.autoIncrement > 0)
             {
                 sql += " (START WITH 1, INCREMENT BY " + this.autoIncrement + ")";
+            }
+        }
+
+        if (this.checks != null)
+        {
+            for (Check check : this.checks)
+            {
+                sql += " " + check.toString();
             }
         }
 
