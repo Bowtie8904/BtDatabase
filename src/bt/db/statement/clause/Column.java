@@ -151,7 +151,70 @@ public class Column
      */
     public String getComment()
     {
+        if (this.comment == null)
+        {
+            this.comment = generateDefaultComment();
+        }
+
         return this.comment;
+    }
+
+    private String generateDefaultComment()
+    {
+        String defaultComment = "";
+
+        if (isPrimaryKey())
+        {
+            defaultComment += "primary key, ";
+        }
+
+        if (isNotNull())
+        {
+            defaultComment += "not null, ";
+        }
+
+        if (isUnique())
+        {
+            defaultComment += "unique, ";
+        }
+
+        if (isIdentity())
+        {
+            if (getGenerationType() == Generated.ALWAYS)
+            {
+                defaultComment += "always ";
+            }
+            else if (getGenerationType() == Generated.DEFAULT)
+            {
+                defaultComment += "default ";
+            }
+            defaultComment += "generated, incremented by " + getAutoIncrement() + ", ";
+        }
+
+        if (getDefaultValue() != null)
+        {
+            defaultComment += "default = " + getDefaultValue() + ", ";
+        }
+
+        if (this.foreignKeys != null)
+        {
+            for (ForeignKey fk : this.foreignKeys)
+            {
+                defaultComment += "foreign key " + fk.getName() + ", ";
+            }
+        }
+
+        if (this.checks != null)
+        {
+            for (Check check : this.checks)
+            {
+                defaultComment += "check " + check.getName() + ", ";
+            }
+        }
+
+        defaultComment = defaultComment.substring(0, defaultComment.length() - 2);
+
+        return defaultComment;
     }
 
     /**

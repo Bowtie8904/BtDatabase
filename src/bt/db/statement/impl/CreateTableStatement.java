@@ -54,7 +54,6 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
     /** Contains all added table checks. */
     private List<Check> checks;
 
-
     /**
      * Creates a new instance.
      *
@@ -414,66 +413,13 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                     }
                     else
                     {
-                        String comment = "";
-
-                        if (col.isPrimaryKey())
-                        {
-                            comment += "primary key, ";
-                        }
-
-                        if (col.isNotNull())
-                        {
-                            comment += "not null, ";
-                        }
-
-                        if (col.isUnique())
-                        {
-                            comment += "unique, ";
-                        }
-
-                        if (col.isIdentity())
-                        {
-                            if (col.getGenerationType() == Generated.ALWAYS)
-                            {
-                                comment += "always ";
-                            }
-                            else if (col.getGenerationType() == Generated.DEFAULT)
-                            {
-                                comment += "default ";
-                            }
-                            comment += "generated, incremented by " + col.getAutoIncrement() + ", ";
-                        }
-
-                        if (col.getDefaultValue() != null)
-                        {
-                            comment += "default = " + col.getDefaultValue() + ", ";
-                        }
-
-                        if (!comment.isEmpty())
-                        {
-                            comment = comment.substring(0,
-                                                        comment.length() - 2);
-
-                            this.db.insert()
-                                   .into(DatabaseAccess.COMMENT_TABLE)
-                                   .set("table_name",
-                                        this.name.toUpperCase())
-                                   .set("column_name",
-                                        col.getName().toUpperCase())
-                                   .set("column_comment",
-                                        comment)
-                                   .execute(printLogs);
-                        }
-                        else
-                        {
-                            this.db.insert()
-                                   .into(DatabaseAccess.COMMENT_TABLE)
-                                   .set("table_name",
-                                        this.name.toUpperCase())
-                                   .set("column_name",
-                                        col.getName().toUpperCase())
-                                   .execute(printLogs);
-                        }
+                        this.db.insert()
+                               .into(DatabaseAccess.COMMENT_TABLE)
+                               .set("table_name",
+                                    this.name.toUpperCase())
+                               .set("column_name",
+                                    col.getName().toUpperCase())
+                               .execute(printLogs);
                     }
                 }
             }
@@ -558,8 +504,8 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                 // we always need a unique identity of type long for default triggers and automated persisting
                 Column defaultPrimary = new Column("DEFAULT_ID",
                                                    SqlType.LONG).notNull()
-                                                                 .asIdentity(Generated.ALWAYS)
-                                                                 .autoIncrement(1);
+                                                                .asIdentity(Generated.ALWAYS)
+                                                                .autoIncrement(1);
                 defaultPrimary.setStatement(this);
 
                 this.identity = "DEFAULT_ID";
