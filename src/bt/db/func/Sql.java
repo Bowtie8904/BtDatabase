@@ -202,7 +202,7 @@ public final class Sql
      *            The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public CeilFunction ceil(Object value)
+    public static CeilFunction ceil(Object value)
     {
         return new CeilFunction(value);
     }
@@ -223,7 +223,7 @@ public final class Sql
      *            The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public DateFunction date(Object value)
+    public static DateFunction date(Object value)
     {
         return new DateFunction(value);
     }
@@ -241,7 +241,7 @@ public final class Sql
      *            The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public TimeFunction time(Object value)
+    public static TimeFunction time(Object value)
     {
         return new TimeFunction(value);
     }
@@ -259,7 +259,7 @@ public final class Sql
      *            The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public DayFunction day(Object value)
+    public static DayFunction day(Object value)
     {
         return new DayFunction(value);
     }
@@ -277,7 +277,7 @@ public final class Sql
      *            The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public HourFunction hour(Object value)
+    public static HourFunction hour(Object value)
     {
         return new HourFunction(value);
     }
@@ -295,7 +295,7 @@ public final class Sql
      *            The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public MinuteFunction minute(Object value)
+    public static MinuteFunction minute(Object value)
     {
         return new MinuteFunction(value);
     }
@@ -313,7 +313,7 @@ public final class Sql
      *            The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public SecondFunction second(Object value)
+    public static SecondFunction second(Object value)
     {
         return new SecondFunction(value);
     }
@@ -331,7 +331,7 @@ public final class Sql
      *            The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public YearFunction year(Object value)
+    public static YearFunction year(Object value)
     {
         return new YearFunction(value);
     }
@@ -349,7 +349,7 @@ public final class Sql
      *            The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public MonthFunction month(Object value)
+    public static MonthFunction month(Object value)
     {
         return new MonthFunction(value);
     }
@@ -362,7 +362,7 @@ public final class Sql
      *            The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public FloorFunction floor(Object value)
+    public static FloorFunction floor(Object value)
     {
         return new FloorFunction(value);
     }
@@ -375,7 +375,7 @@ public final class Sql
      *            The column to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public LowerFunction lower(Object value)
+    public static LowerFunction lower(Object value)
     {
         return new LowerFunction(value);
     }
@@ -388,7 +388,7 @@ public final class Sql
      *            The column to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public UpperFunction upper(Object value)
+    public static UpperFunction upper(Object value)
     {
         return new UpperFunction(value);
     }
@@ -401,7 +401,7 @@ public final class Sql
      *            The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public LengthFunction length(Object value)
+    public static LengthFunction length(Object value)
     {
         return new LengthFunction(value);
     }
@@ -413,7 +413,7 @@ public final class Sql
      *            The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public LeftTrimFunction leftTrim(Object value)
+    public static LeftTrimFunction leftTrim(Object value)
     {
         return new LeftTrimFunction(value);
     }
@@ -425,7 +425,7 @@ public final class Sql
      *            The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public RightTrimFunction rightTrim(Object value)
+    public static RightTrimFunction rightTrim(Object value)
     {
         return new RightTrimFunction(value);
     }
@@ -435,7 +435,7 @@ public final class Sql
      *
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public RowNumberFunction rowNumber()
+    public static RowNumberFunction rowNumber()
     {
         return new RowNumberFunction();
     }
@@ -450,7 +450,7 @@ public final class Sql
      *            The second value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public ModFunction mod(Object value1, Object value2)
+    public static ModFunction mod(Object value1, Object value2)
     {
         return new ModFunction(value1, value2);
     }
