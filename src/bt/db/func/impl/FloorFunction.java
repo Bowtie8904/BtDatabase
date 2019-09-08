@@ -5,11 +5,11 @@ import bt.db.func.SqlFunction;
 /**
  * @author &#8904
  */
-public class AbsoluteFunction extends SqlFunction<AbsoluteFunction>
+public class FloorFunction extends SqlFunction<FloorFunction>
 {
-    public AbsoluteFunction(Object value)
+    public FloorFunction(Object value)
     {
-        super("abs");
+        super("floor");
         this.value = value.toString();
     }
 }

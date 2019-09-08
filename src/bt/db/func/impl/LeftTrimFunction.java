@@ -4,12 +4,13 @@ import bt.db.func.SqlFunction;
 
 /**
  * @author &#8904
+ *
  */
-public class AbsoluteFunction extends SqlFunction<AbsoluteFunction>
+public class LeftTrimFunction extends SqlFunction<LeftTrimFunction>
 {
-    public AbsoluteFunction(Object value)
+    public LeftTrimFunction(Object value)
     {
-        super("abs");
+        super("ltrim");
         this.value = value.toString();
     }
 }

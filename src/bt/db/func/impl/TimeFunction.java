@@ -4,12 +4,13 @@ import bt.db.func.SqlFunction;
 
 /**
  * @author &#8904
+ *
  */
-public class AbsoluteFunction extends SqlFunction<AbsoluteFunction>
+public class TimeFunction extends SqlFunction<TimeFunction>
 {
-    public AbsoluteFunction(Object value)
+    public TimeFunction(Object value)
     {
-        super("abs");
+        super("time");
         this.value = value.toString();
     }
 }

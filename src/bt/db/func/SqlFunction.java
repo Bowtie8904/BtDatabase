@@ -9,6 +9,7 @@ import java.util.List;
  */
 public class SqlFunction<T extends SqlFunction>
 {
+    protected String value;
     protected String name;
     protected String asName;
     protected List<Object> elements;
@@ -28,5 +29,18 @@ public class SqlFunction<T extends SqlFunction>
     {
         this.asName = asName;
         return this;
+    }
+
+    @Override
+    public String toString()
+    {
+        String value = this.name + "(" + this.value + ")";
+
+        if (this.asName != null)
+        {
+            value += " AS " + this.asName;
+        }
+
+        return value;
     }
 }

@@ -1,7 +1,6 @@
 package bt.db.func.impl;
 
 import bt.db.func.SqlFunction;
-import bt.db.statement.clause.ColumnEntry;
 
 /**
  * @author &#8904
@@ -9,18 +8,18 @@ import bt.db.statement.clause.ColumnEntry;
  */
 public class SumFunction extends SqlFunction<SumFunction>
 {
-    private ColumnEntry column;
+    private String column;
     private boolean distinct;
 
-    public SumFunction(ColumnEntry column)
+    public SumFunction(Object value)
     {
         super("sum");
-        this.column = column;
+        this.column = value.toString();
     }
 
     /**
      * Marks the function as distinct, meaning that only unique values will be taken into account.
-     * 
+     *
      * @return This function instance.
      */
     public SumFunction distinct()
