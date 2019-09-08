@@ -247,9 +247,7 @@ public abstract class DatabaseAccess implements Killable
     {
         try (Connection connection = DriverManager.getConnection(this.dbConnectionString))
         {
-            log.printfSrc(this,
-                          "Loaded database %s",
-                          this.getInstanceID());
+            log.print(this, "Loaded database.");
         }
         catch (SQLException e)
         {

@@ -62,17 +62,10 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
     {
         boolean created = false;
         int success = create().procedure("onInsert")
-                              .parameter("instanceID",
-                                         SqlType.VARCHAR)
-                              .size(40)
-                              .parameter("tableName",
-                                         SqlType.VARCHAR)
-                              .size(40)
-                              .parameter("rowIdFieldName",
-                                         SqlType.VARCHAR)
-                              .size(40)
-                              .parameter("newRowID",
-                                         SqlType.LONG)
+                              .parameter("instanceID", SqlType.VARCHAR).size(40)
+                              .parameter("tableName", SqlType.VARCHAR).size(40)
+                              .parameter("rowIdFieldName", SqlType.VARCHAR).size(40)
+                              .parameter("newRowID", SqlType.LONG)
                               .call(this.getClass().getName() + ".onInsert")
                               .replace()
                               .onFail((s, e) ->
