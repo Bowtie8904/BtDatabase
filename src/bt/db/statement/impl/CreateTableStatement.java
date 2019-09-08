@@ -563,10 +563,9 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                     primary += col.getName() + ", ";
                 }
 
-                if (col.isIdentity() && col.getGenerationType() == Generated.ALWAYS)
+                if (col.getGenerationCaluse() != null && col.isIdentity() && col.getGenerationCaluse().getGenerationType() == Generated.ALWAYS)
                 {
-                    if (this.identity == null
-                        && (col.getType() == SqlType.LONG))
+                    if (this.identity == null && (col.getType() == SqlType.LONG))
                     {
                         this.identity = col.getName();
                     }
@@ -604,8 +603,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                 // we always need a unique identity of type long for default triggers and automated persisting
                 Column defaultPrimary = new Column("DEFAULT_ID",
                                                    SqlType.LONG).notNull()
-                                                                .asIdentity(Generated.ALWAYS)
-                                                                .autoIncrement(1);
+                                                                .generated(Generated.ALWAYS).asIdentity().autoIncrement(1);
                 defaultPrimary.setStatement(this);
 
                 this.identity = "DEFAULT_ID";

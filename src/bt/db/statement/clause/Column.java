@@ -33,18 +33,8 @@ public class Column
     /** Indicates whether this column contains a primary key. true = primary key, false = not a primary key. */
     private boolean primaryKey;
 
-    /**
-     * Indicates whether this columns value should be generated as identity. true = generate, false = don't generate.
-     *
-     * <p>
-     * The behavior is highly dependent on {@link #generated} as it defines whether the value is always uniquely
-     * generated or only generated if it is not inserted explicitly.
-     * </p>
-     */
-    private boolean asIdentity;
-
-    /** Defines the generate behavior on column marked as {@link #asIdentity}. */
-    private Generated generated;
+    /** Defines the generate behavior. */
+    private GenerationClause generated;
 
     /**
      * Indicates whether a value in this column can ever be NULL. true = value can't be null, false = value can be null.
@@ -179,17 +169,25 @@ public class Column
             defaultComment += "unique, ";
         }
 
-        if (isIdentity())
+        if (this.generated != null)
         {
-            if (getGenerationType() == Generated.ALWAYS)
+            if (this.generated.getGenerationType() == Generated.ALWAYS)
             {
                 defaultComment += "always ";
             }
-            else if (getGenerationType() == Generated.DEFAULT)
+            else if (this.generated.getGenerationType() == Generated.DEFAULT)
             {
                 defaultComment += "default ";
             }
-            defaultComment += "generated, incremented by " + getAutoIncrement() + ", ";
+
+            if (isIdentity())
+            {
+                defaultComment += "generated as identity, incremented by " + getAutoIncrement() + ", ";
+            }
+            else
+            {
+                defaultComment += this.generated.getValueDetail();
+            }
         }
 
         if (getDefaultValue() != null)
@@ -201,7 +199,7 @@ public class Column
         {
             for (ForeignKey fk : this.foreignKeys)
             {
-                defaultComment += "foreign key " + fk.getName() + ", ";
+                defaultComment += "foreign key (" + fk.getName() + "), ";
             }
         }
 
@@ -209,7 +207,7 @@ public class Column
         {
             for (Check check : this.checks)
             {
-                defaultComment += "check " + check.getName() + ", ";
+                defaultComment += "check (" + check.getName() + "), ";
             }
         }
 
@@ -267,32 +265,18 @@ public class Column
         return this;
     }
 
-    /**
-     * Marks this column as an identity which means that it can be generated on insert.
-     *
-     * <p>
-     * Only INTEGER and BIGINT (Long) typed columns can be used as identity.
-     * </p>
-     *
-     * <p>
-     * If nothing else is specified by {@link #autoIncrement(int)} the value will be incremented by 1 each time.
-     * </p>
-     *
-     * @param generated
-     *            Defines the behavior of the identity as either {@link Generated#ALWAYS} or {@link Generated#DEFAULT}.
-     * @return This instance for chaining.
-     */
-    public Column asIdentity(Generated generated)
+    public GenerationClause generated(Generated generated)
     {
-        if (this.type != SqlType.INTEGER && this.type != SqlType.LONG)
+        var clause = new GenerationClause(generated, this);
+
+        if (clause.isIdentity() && this.autoIncrement == -1)
         {
-            throw new IllegalArgumentException("Non Integer or Long columns can't be generated as identity.");
+            this.autoIncrement = 1;
         }
 
-        this.asIdentity = true;
-        this.generated = generated;
-        this.autoIncrement = 1;
-        return this;
+        this.generated = clause;
+
+        return clause;
     }
 
     /**
@@ -307,7 +291,7 @@ public class Column
      */
     public boolean isIdentity()
     {
-        return this.asIdentity;
+        return this.generated != null ? this.generated.isIdentity() : false;
     }
 
     /**
@@ -445,12 +429,7 @@ public class Column
         return this.defaultValue;
     }
 
-    /**
-     * Returnes the used generation type for identity collumns.
-     *
-     * @return The generation type.
-     */
-    public Generated getGenerationType()
+    public GenerationClause getGenerationCaluse()
     {
         return this.generated;
     }
@@ -491,14 +470,30 @@ public class Column
             dataType += ")";
         }
 
-        String identityInfo = "";
-        if (this.asIdentity)
+        String generationInfo = "";
+        if (this.generated != null)
         {
-            identityInfo += " GENERATED " + (this.generated == Generated.ALWAYS ? "ALWAYS" : "BY DEFAULT") + " AS IDENTITY";
-
-            if (this.autoIncrement > 0)
+            if (this.generated.getGenerationType() == Generated.ALWAYS)
             {
-                identityInfo += " (START WITH 1, INCREMENT BY " + this.autoIncrement + ")";
+                generationInfo += "always ";
+            }
+            else if (this.generated.getGenerationType() == Generated.DEFAULT)
+            {
+                generationInfo += "default ";
+            }
+
+            if (isIdentity())
+            {
+                generationInfo += "as identity";
+
+                if (this.autoIncrement > 0)
+                {
+                    generationInfo += " (START WITH 1, INCREMENT BY " + this.autoIncrement + ")";
+                }
+            }
+            else
+            {
+                generationInfo += this.generated.getValueDetail();
             }
         }
 
@@ -537,8 +532,8 @@ public class Column
           .set("column_name", this.name.toUpperCase())
           .set("data_type", dataType)
           .set("primary_key", this.primaryKey)
-          .set("is_identity", this.asIdentity)
-          .set("identity_spec", identityInfo)
+          .set("is_identity", isIdentity())
+          .set("generation", generationInfo)
           .set("not_null", this.notNull)
           .set("is_unique", this.unique)
           .set("default_value", this.defaultValue == null ? "" : this.defaultValue)
@@ -549,8 +544,8 @@ public class Column
                             .set("instanceID", db.getInstanceID())
                             .set("data_type", dataType)
                             .set("primary_key", this.primaryKey)
-                            .set("is_identity", this.asIdentity)
-                            .set("identity_spec", identityInfo)
+                            .set("is_identity", isIdentity())
+                            .set("generation", generationInfo)
                             .set("not_null", this.notNull)
                             .set("is_unique", this.unique)
                             .set("default_value", this.defaultValue == null ? "" : this.defaultValue)
@@ -612,9 +607,9 @@ public class Column
             sql += " NOT NULL";
         }
 
-        if (this.asIdentity)
+        if (this.generated != null)
         {
-            sql += " GENERATED " + (this.generated == Generated.ALWAYS ? "ALWAYS" : "BY DEFAULT") + " AS IDENTITY";
+            sql += " " + this.generated.toString();
 
             if (this.autoIncrement > 0)
             {

@@ -94,7 +94,7 @@ public abstract class RemoteDatabase extends DatabaseAccess
     private void createTriggerTable()
     {
         int success = create().table("recent_triggers")
-                              .column(new Column("ID", SqlType.LONG).asIdentity(Generated.ALWAYS).autoIncrement(1))
+                              .column(new Column("ID", SqlType.LONG).generated(Generated.ALWAYS).asIdentity().autoIncrement(1))
                               .column(new Column("tableName", SqlType.VARCHAR).size(40))
                               .column(new Column("rowIdFieldName", SqlType.VARCHAR).size(40))
                               .column(new Column("triggerType", SqlType.VARCHAR).size(30))
@@ -106,7 +106,7 @@ public abstract class RemoteDatabase extends DatabaseAccess
                               .execute();
 
         int success2 = create().table("handled_triggers")
-                               .column(new Column("ID", SqlType.LONG).asIdentity(Generated.ALWAYS).autoIncrement(1))
+                               .column(new Column("ID", SqlType.LONG).generated(Generated.ALWAYS).asIdentity().autoIncrement(1))
                                .column(new Column("trigger_id", SqlType.LONG))
                                .column(new Column("db_id", SqlType.VARCHAR).size(50))
                                .column(new Column("handleTime", SqlType.TIMESTAMP).defaultValue(SqlValue.CURRENT_TIMESTAMP))
