@@ -62,6 +62,9 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     /** Indicates how many rows from the first should be returned. -1 = all rows. */
     private int first = -1;
 
+    /** Indicates how many rows should be skipped from the top of the result set. */
+    private int offset = -1;
+
     /** Contains all joins used in this statement. */
     private List<JoinClause> joins;
 
@@ -476,6 +479,10 @@ public class SelectStatement extends SqlStatement<SelectStatement>
      * <i> n <= 0 </i> means all rows will be returned.
      * </p>
      *
+     * <p>
+     * If an {@link #offset(int) offset} was defined then the first <i>n</i> rows starting from the offset are returned.
+     * </p>
+     *
      * @param n
      *            The number of rows to return.
      * @return This instance for chaining.
@@ -483,6 +490,23 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     public SelectStatement first(int n)
     {
         this.first = n;
+        return this;
+    }
+
+    /**
+     * Makes this statement return the rows starting from the offset
+     *
+     * <p>
+     * <i> n <= 0 </i> means all rows will be returned.
+     * </p>
+     *
+     * @param n
+     *            The offest, number of rows to skip.
+     * @return This instance for chaining.
+     */
+    public SelectStatement offset(int n)
+    {
+        this.offset = n;
         return this;
     }
 
@@ -1015,6 +1039,18 @@ public class SelectStatement extends SqlStatement<SelectStatement>
         if (this.orderBy != null)
         {
             sql += " " + this.orderBy.toString();
+        }
+
+        if (this.offset > 0)
+        {
+            if (this.offset == 1)
+            {
+                sql += " OFFSET 1 ROW";
+            }
+            else
+            {
+                sql += " OFFSET " + this.offset + " ROWS";
+            }
         }
 
         if (this.first > 0)
