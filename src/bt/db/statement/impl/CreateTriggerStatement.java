@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.sql.SQLSyntaxErrorException;
 
 import bt.db.DatabaseAccess;
+import bt.db.constants.SqlState;
 import bt.db.exc.SqlExecutionException;
 import bt.db.statement.clause.TriggerAction;
 
@@ -20,7 +21,6 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
     private String oldAlias, newAlias;
     private boolean forEachRow = true;
     private TriggerAction triggerAction;
-    private boolean replace;
 
     /**
      * Creates a new instance.
@@ -202,17 +202,6 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
     }
 
     /**
-     * This statement will attempt to replace the trigger if it already exists.
-     *
-     * @return This instance for chaining.
-     */
-    public CreateTriggerStatement replace()
-    {
-        this.replace = true;
-        return this;
-    }
-
-    /**
      * @see bt.db.statement.SqlModifyStatement#execute(boolean)
      */
     @Override
@@ -238,6 +227,19 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
                        .set("instanceID", this.db.getInstanceID())
                        .set("object_name", this.name.toUpperCase())
                        .set("object_ddl", sql + ";")
+                       .onDuplicateKey((s, e) ->
+                       {
+                           return this.db.update(DatabaseAccess.OBJECT_DATA_TABLE)
+                                         .set("instanceID", this.db.getInstanceID())
+                                         .set("object_name", this.name.toUpperCase())
+                                         .set("object_ddl", sql + ";")
+                                         .where("upper(object_name)").equals(this.name.toUpperCase())
+                                         .onFail((st, ex) ->
+                                         {
+                                             return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));
+                                         })
+                                         .execute();
+                       })
                        .execute();
             }
 
@@ -250,14 +252,21 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
         }
         catch (SQLException e)
         {
-            if (e.getSQLState().equals(ALREADY_EXISTS_ERROR) && this.replace)
+            if ((e.getSQLState().equals(SqlState.ALREADY_EXISTS.toString()) || e.getSQLState().equals(SqlState.ALREADY_EXISTS_IN.toString())) && this.replace)
             {
-                if (this.db.drop().trigger(this.name).execute(printLogs) > 0)
+                var drop = this.db.drop()
+                                  .trigger(this.name)
+                                  .onFail((s, ex) ->
+                                  {
+                                      handleFail(new SqlExecutionException(e.getMessage(), sql, e));
+                                      return 0;
+                                  });
+
+                if (drop.execute(printLogs) > 0)
                 {
                     try (PreparedStatement statement = this.db.getConnection().prepareStatement(sql))
                     {
-                        log("Replacing trigger '" + this.name + "'.",
-                            printLogs);
+                        log("Replacing trigger '" + this.name + "'.", printLogs);
                         statement.executeUpdate();
                         endExecutionTime();
 
@@ -270,6 +279,19 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
                                    .set("instanceID", this.db.getInstanceID())
                                    .set("object_name", this.name.toUpperCase())
                                    .set("object_ddl", sql + ";")
+                                   .onDuplicateKey((s, e2) ->
+                                   {
+                                       return this.db.update(DatabaseAccess.OBJECT_DATA_TABLE)
+                                                     .set("instanceID", this.db.getInstanceID())
+                                                     .set("object_name", this.name.toUpperCase())
+                                                     .set("object_ddl", sql + ";")
+                                                     .where("upper(object_name)").equals(this.name.toUpperCase())
+                                                     .onFail((st, ex) ->
+                                                     {
+                                                         return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));
+                                                     })
+                                                     .execute();
+                                   })
                                    .execute();
                         }
 
@@ -285,13 +307,6 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
                     {
                         result = handleFail(new SqlExecutionException(e.getMessage(), sql, ex));
                     }
-                }
-                else
-                {
-                    log("Failed to drop trigger.",
-                        printLogs);
-
-                    result = handleFail(new SqlExecutionException(e.getMessage(), sql, e));
                 }
             }
             else

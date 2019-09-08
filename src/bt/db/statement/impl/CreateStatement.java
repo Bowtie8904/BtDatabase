@@ -17,6 +17,8 @@ public abstract class CreateStatement<T extends CreateStatement, K extends Creat
     /** The name that is used in this create statement. This would be the name of the table, trigger, ... */
     protected String name;
 
+    protected boolean replace;
+
     protected boolean saveObjectData = true;
 
     /**
@@ -73,6 +75,22 @@ public abstract class CreateStatement<T extends CreateStatement, K extends Creat
     public T saveObjectData(boolean saveObjectData)
     {
         this.saveObjectData = saveObjectData;
+        return (T)this;
+    }
+
+    /**
+     * Marks this statement for replacement.
+     *
+     * <p>
+     * If an object with this name already exists, this statement will attempt to drop the old one before creating this
+     * one. Dropping an object such as procedures does not work if it is still being used, for example by a trigger.
+     * </p>
+     *
+     * @return This instance for chaining.
+     */
+    public T replace()
+    {
+        this.replace = true;
         return (T)this;
     }
 

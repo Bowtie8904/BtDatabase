@@ -9,6 +9,7 @@ import bt.db.DatabaseAccess;
 import bt.db.EmbeddedDatabase;
 import bt.db.RemoteDatabase;
 import bt.db.constants.Generated;
+import bt.db.constants.SqlState;
 import bt.db.constants.SqlType;
 import bt.db.exc.SqlExecutionException;
 import bt.db.statement.clause.Check;
@@ -404,6 +405,19 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                        .set("instanceID", this.db.getInstanceID())
                        .set("object_name", this.name.toUpperCase())
                        .set("object_ddl", sql + ";")
+                       .onDuplicateKey((s, e) ->
+                       {
+                           return this.db.update(DatabaseAccess.OBJECT_DATA_TABLE)
+                                  .set("instanceID", this.db.getInstanceID())
+                                  .set("object_name", this.name.toUpperCase())
+                                  .set("object_ddl", sql + ";")
+                                  .where("upper(object_name)").equals(this.name.toUpperCase())
+                                         .onFail((st, ex) ->
+                                         {
+                                             return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));
+                                         })
+                                  .execute();
+                       })
                        .execute();
 
                 if (this.asCopySelect == null)
@@ -424,7 +438,108 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
         }
         catch (SQLException e)
         {
-            result = handleFail(new SqlExecutionException(e.getMessage(), sql, e));
+            if ((e.getSQLState().equals(SqlState.ALREADY_EXISTS.toString()) || e.getSQLState().equals(SqlState.ALREADY_EXISTS_IN.toString())) && this.replace)
+            {
+                var drop = this.db.drop()
+                                  .table(this.name)
+                                  .onFail((s, ex) ->
+                                  {
+                                      return handleFail(new SqlExecutionException(e.getMessage(), sql, e));
+                                  })
+                                  .onSuccess((s, i) ->
+                                  {
+                                      this.db.delete().from(DatabaseAccess.COLUMN_DATA)
+                                             .where("upper(table_name)").equals(this.name)
+                                             .onFail((s2, ex) ->
+                                             {
+                                                 return handleFail(new SqlExecutionException(e.getMessage(), sql, e));
+                                             })
+                                             .execute(printLogs);
+
+                                      this.db.delete().from(DatabaseAccess.OBJECT_DATA_TABLE)
+                                             .where("upper(object_name)").equals(this.name)
+                                             .onFail((s2, ex) ->
+                                             {
+                                                 return handleFail(new SqlExecutionException(e.getMessage(), sql, e));
+                                             })
+                                             .execute(printLogs);
+                                  });
+
+                if (drop.execute(printLogs) > 0)
+                {
+                    try (PreparedStatement statement = this.db.getConnection().prepareStatement(sql))
+                    {
+                        log("Replacing table '" + this.name + "'.", printLogs);
+                        statement.executeUpdate();
+                        endExecutionTime();
+
+                        result = 1;
+
+                        if (this.createDefaultTriggers)
+                        {
+                            createTriggers(printLogs);
+                        }
+
+                        if (this.asCopySelect != null && this.copyData)
+                        {
+                            this.db.insert().into(this.name).from(this.asCopySelect).execute(printLogs);
+                        }
+
+                        result = 1;
+
+                        if (this.shouldCommit)
+                        {
+                            this.db.commit();
+                        }
+
+                        if (this.saveObjectData)
+                        {
+                            this.db.insert()
+                                   .into(DatabaseAccess.OBJECT_DATA_TABLE)
+                                   .set("instanceID", this.db.getInstanceID())
+                                   .set("object_name", this.name.toUpperCase())
+                                   .set("object_ddl", sql + ";")
+                                   .onDuplicateKey((s, e2) ->
+                                   {
+                                       return this.db.update(DatabaseAccess.OBJECT_DATA_TABLE)
+                                                     .set("instanceID", this.db.getInstanceID())
+                                                     .set("object_name", this.name.toUpperCase())
+                                                     .set("object_ddl", sql + ";")
+                                                     .where("upper(object_name)").equals(this.name.toUpperCase())
+                                                     .onFail((st, ex) ->
+                                                     {
+                                                         return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));
+                                                     })
+                                                     .execute();
+                                   })
+                                   .execute();
+
+                            if (this.asCopySelect == null)
+                            {
+                                for (Column col : this.tableColumns)
+                                {
+                                    col.saveColumnData(this.db);
+                                }
+                            }
+                        }
+
+                        if (this.shouldCommit)
+                        {
+                            this.db.commit();
+                        }
+
+                        handleSuccess(result);
+                    }
+                    catch (SQLException ex)
+                    {
+                        result = handleFail(new SqlExecutionException(e.getMessage(), sql, ex));
+                    }
+                }
+            }
+            else
+            {
+                result = handleFail(new SqlExecutionException(e.getMessage(), sql, e));
+            }
         }
 
         return result;

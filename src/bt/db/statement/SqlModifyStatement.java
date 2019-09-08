@@ -2,11 +2,14 @@ package bt.db.statement;
 
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
 import bt.db.DatabaseAccess;
+import bt.db.constants.SqlState;
 import bt.db.exc.SqlExecutionException;
 import bt.db.statement.clause.SetClause;
 
@@ -17,21 +20,6 @@ import bt.db.statement.clause.SetClause;
  */
 public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends SqlStatement> extends SqlStatement<K>
 {
-    /** The errorcode of the exception that occours when a foreign key constraint is violated. */
-    protected static final String FOREIGN_KEY_VIOLATION_ERROR = "23503";
-
-    /** The errorcode of the exception that occours when a duplicate key is inserted into a table. */
-    protected static final String DUPLICATE_KEY_ERROR = "23505";
-
-    /** The errorcode of the exception that occours when a check constraint is violated. */
-    protected static final String CHECK_CONSTRAINT_VIOLATION_ERROR = "23513";
-
-    /**
-     * The errorcode of the exception that occours when the program tries to create a database object (trigger,
-     * procedure, ...) eventhough it already exists.
-     */
-    protected static final String ALREADY_EXISTS_ERROR = "X0Y32";
-
     /** A list containing all used set clauses for statement and update statements. */
     protected List<SetClause<T>> setClauses;
 
@@ -65,6 +53,8 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
      */
     protected BiFunction<T, SqlExecutionException, Integer> onAlreadyExists;
 
+    protected Map<String, BiFunction<T, SqlExecutionException, Integer>> errorHandlers;
+
     /** The threshhold indicating whether {@link #onLessThan} should be executed. */
     protected int lowerThreshhold;
 
@@ -85,6 +75,23 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
         super(db);
         this.setClauses = new ArrayList<>();
         this.onFail = this::defaultFail;
+        this.errorHandlers = new HashMap<>();
+    }
+
+    public T handle(bt.db.constants.SqlState state, BiFunction<T, SqlExecutionException, Integer> handler)
+    {
+        return handle(state.toString(), handler);
+    }
+
+    public T handle(org.apache.derby.shared.common.reference.SQLState state, BiFunction<T, SqlExecutionException, Integer> handler)
+    {
+        return handle(state.toString(), handler);
+    }
+
+    public T handle(String state, BiFunction<T, SqlExecutionException, Integer> handler)
+    {
+        this.errorHandlers.put(state.toUpperCase(), handler);
+        return (T)this;
     }
 
     private int defaultFail(T statement, SqlExecutionException e)
@@ -420,21 +427,26 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
         endExecutionTime();
         int result = 0;
 
-        if (this.onDuplicateKey != null && e.getSQLState().equals(DUPLICATE_KEY_ERROR))
+        if (this.onDuplicateKey != null && e.getSQLState().equals(SqlState.DUPLICATE_KEY.toString()))
         {
             result = this.onDuplicateKey.apply((T)this, e);
         }
-        else if (this.onCheckFail != null && e.getSQLState().equals(CHECK_CONSTRAINT_VIOLATION_ERROR))
+        else if (this.onCheckFail != null && e.getSQLState().equals(SqlState.CHECK_CONSTRAINT_VIOLATION.toString()))
         {
             result = this.onCheckFail.apply((T)this, e);
         }
-        else if (this.onForeignKeyFail != null && e.getSQLState().equals(FOREIGN_KEY_VIOLATION_ERROR))
+        else if (this.onForeignKeyFail != null && e.getSQLState().equals(SqlState.FOREIGN_KEY_VIOLATION.toString()))
         {
             result = this.onForeignKeyFail.apply((T)this, e);
         }
-        else if (this.onAlreadyExists != null && e.getSQLState().equals(ALREADY_EXISTS_ERROR))
+        else if (this.onAlreadyExists != null &&
+                 (e.getSQLState().equals(SqlState.ALREADY_EXISTS.toString()) || e.getSQLState().equals(SqlState.ALREADY_EXISTS_IN.toString())))
         {
             result = this.onAlreadyExists.apply((T)this, e);
+        }
+        else if (this.errorHandlers.get(e.getSQLState()) != null)
+        {
+            result = dispatchError(e);
         }
         else if (this.onFail != null)
         {
@@ -447,6 +459,18 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
         }
 
         return result;
+    }
+
+    private int dispatchError(SqlExecutionException e)
+    {
+        var handler = this.errorHandlers.get(e.getSQLState());
+
+        if (handler != null)
+        {
+            return handler.apply((T)this, e);
+        }
+
+        return -1;
     }
 
     protected void handleSuccess(int result)

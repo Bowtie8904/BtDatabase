@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bt.db.DatabaseAccess;
+import bt.db.constants.SqlState;
 import bt.db.constants.SqlType;
 import bt.db.exc.SqlExecutionException;
 
@@ -22,7 +23,6 @@ import bt.db.exc.SqlExecutionException;
 public class CreateProcedureStatement extends CreateStatement<CreateProcedureStatement, CreateProcedureStatement>
 {
     private List<String[]> parameters;
-    private boolean replace;
     private String method;
 
     /**
@@ -91,22 +91,6 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
     }
 
     /**
-     * Marks this procedure for replacement.
-     *
-     * <p>
-     * If a procedure with this name already exists, this statement will attempt to drop the old one before creating
-     * this one. Dropping a procedure does not work if it is still being used, for example by a trigger.
-     * </p>
-     *
-     * @return This instance for chaining.
-     */
-    public CreateProcedureStatement replace()
-    {
-        this.replace = true;
-        return this;
-    }
-
-    /**
      * Sets the java method that should be called by this procedure.
      *
      * @param javaMethod
@@ -145,6 +129,19 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
                        .set("instanceID", this.db.getInstanceID())
                        .set("object_name", this.name.toUpperCase())
                        .set("object_ddl", sql + ";")
+                       .onDuplicateKey((s, e2) ->
+                       {
+                           return this.db.update(DatabaseAccess.OBJECT_DATA_TABLE)
+                                         .set("instanceID", this.db.getInstanceID())
+                                         .set("object_name", this.name.toUpperCase())
+                                         .set("object_ddl", sql + ";")
+                                         .where("upper(object_name)").equals(this.name.toUpperCase())
+                                         .onFail((st, ex) ->
+                                         {
+                                             return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));
+                                         })
+                                         .execute();
+                       })
                        .execute();
             }
 
@@ -160,17 +157,17 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
         }
         catch (SQLException e)
         {
-            if (e.getSQLState().equals(ALREADY_EXISTS_ERROR) && this.replace)
+            if ((e.getSQLState().equals(SqlState.ALREADY_EXISTS.toString()) || e.getSQLState().equals(SqlState.ALREADY_EXISTS_IN.toString())) && this.replace)
             {
-                log("Replacing procedure '" + this.name + "'.",
-                    printLogs);
+                log("Replacing procedure '" + this.name + "'.", printLogs);
 
-                DropStatement drop = this.db.drop().procedure(this.name).onFail((s, ex) ->
-                {
-                    log(ex.getMessage(),
-                        printLogs);
-                    return 0;
-                });
+                DropStatement drop = this.db.drop()
+                                            .procedure(this.name)
+                                            .onFail((s, ex) ->
+                                            {
+                                                handleFail(new SqlExecutionException(e.getMessage(), sql, e));
+                                                return 0;
+                                            });
 
                 if (drop.execute(printLogs) > 0)
                 {
@@ -187,6 +184,19 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
                                    .set("instanceID", this.db.getInstanceID())
                                    .set("object_name", this.name.toUpperCase())
                                    .set("object_ddl", sql + ";")
+                                   .onDuplicateKey((s, e2) ->
+                                   {
+                                       return this.db.update(DatabaseAccess.OBJECT_DATA_TABLE)
+                                                     .set("instanceID", this.db.getInstanceID())
+                                                     .set("object_name", this.name.toUpperCase())
+                                                     .set("object_ddl", sql + ";")
+                                                     .where("upper(object_name)").equals(this.name.toUpperCase())
+                                                     .onFail((st, ex) ->
+                                                     {
+                                                         return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));
+                                                     })
+                                                     .execute();
+                                   })
                                    .execute();
                         }
 
@@ -203,13 +213,6 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
                     {
                         result = handleFail(new SqlExecutionException(e.getMessage(), sql, ex));
                     }
-                }
-                else
-                {
-                    log("Failed to drop procedure.",
-                        printLogs);
-
-                    result = handleFail(new SqlExecutionException(e.getMessage(), sql, e));
                 }
             }
             else
