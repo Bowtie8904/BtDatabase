@@ -12,6 +12,7 @@ import bt.db.constants.Generated;
 import bt.db.constants.SqlState;
 import bt.db.constants.SqlType;
 import bt.db.exc.SqlExecutionException;
+import bt.db.func.Sql;
 import bt.db.statement.clause.Check;
 import bt.db.statement.clause.Column;
 import bt.db.statement.clause.ColumnEntry;
@@ -411,7 +412,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                                   .set("instanceID", this.db.getInstanceID())
                                   .set("object_name", this.name.toUpperCase())
                                   .set("object_ddl", sql + ";")
-                                  .where("upper(object_name)").equals(this.name.toUpperCase())
+                                         .where(Sql.upper("object_name").toString()).equals(this.name.toUpperCase())
                                          .onFail((st, ex) ->
                                          {
                                              return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));
@@ -449,7 +450,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                                   .onSuccess((s, i) ->
                                   {
                                       this.db.delete().from(DatabaseAccess.COLUMN_DATA)
-                                             .where("upper(table_name)").equals(this.name)
+                                             .where(Sql.upper("table_name").toString()).equals(this.name)
                                              .onFail((s2, ex) ->
                                              {
                                                  return handleFail(new SqlExecutionException(e.getMessage(), sql, e));
@@ -457,7 +458,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                                              .execute(printLogs);
 
                                       this.db.delete().from(DatabaseAccess.OBJECT_DATA_TABLE)
-                                             .where("upper(object_name)").equals(this.name)
+                                             .where(Sql.upper("object_name").toString()).equals(this.name)
                                              .onFail((s2, ex) ->
                                              {
                                                  return handleFail(new SqlExecutionException(e.getMessage(), sql, e));
@@ -505,7 +506,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                                                      .set("instanceID", this.db.getInstanceID())
                                                      .set("object_name", this.name.toUpperCase())
                                                      .set("object_ddl", sql + ";")
-                                                     .where("upper(object_name)").equals(this.name.toUpperCase())
+                                                     .where(Sql.upper("object_name").toString()).equals(this.name.toUpperCase())
                                                      .onFail((st, ex) ->
                                                      {
                                                          return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));

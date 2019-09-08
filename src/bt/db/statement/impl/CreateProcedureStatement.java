@@ -10,6 +10,7 @@ import bt.db.DatabaseAccess;
 import bt.db.constants.SqlState;
 import bt.db.constants.SqlType;
 import bt.db.exc.SqlExecutionException;
+import bt.db.func.Sql;
 
 /**
  * Represents an SQL CREATE PROCEDURE statement which can be extended through method chaining.
@@ -135,7 +136,7 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
                                          .set("instanceID", this.db.getInstanceID())
                                          .set("object_name", this.name.toUpperCase())
                                          .set("object_ddl", sql + ";")
-                                         .where("upper(object_name)").equals(this.name.toUpperCase())
+                                         .where(Sql.upper("object_name").toString()).equals(this.name.toUpperCase())
                                          .onFail((st, ex) ->
                                          {
                                              return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));
@@ -190,7 +191,7 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
                                                      .set("instanceID", this.db.getInstanceID())
                                                      .set("object_name", this.name.toUpperCase())
                                                      .set("object_ddl", sql + ";")
-                                                     .where("upper(object_name)").equals(this.name.toUpperCase())
+                                                     .where(Sql.upper("object_name").toString()).equals(this.name.toUpperCase())
                                                      .onFail((st, ex) ->
                                                      {
                                                          return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));
