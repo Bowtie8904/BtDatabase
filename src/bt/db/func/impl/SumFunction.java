@@ -8,13 +8,12 @@ import bt.db.func.SqlFunction;
  */
 public class SumFunction extends SqlFunction<SumFunction>
 {
-    private String column;
     private boolean distinct;
 
     public SumFunction(Object value)
     {
         super("sum");
-        this.column = value.toString();
+        this.value = value.toString();
     }
 
     /**
@@ -31,7 +30,7 @@ public class SumFunction extends SqlFunction<SumFunction>
     @Override
     public String toString()
     {
-        String value = this.name + "(" + (this.distinct ? "DISTINCT " : "") + this.column + ")";
+        String value = this.name + "(" + (this.distinct ? "DISTINCT " : "") + this.value + ")";
 
         if (this.asName != null)
         {
