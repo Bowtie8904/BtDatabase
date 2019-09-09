@@ -9,6 +9,7 @@ import bt.db.func.impl.DateFunction;
 import bt.db.func.impl.DayFunction;
 import bt.db.func.impl.FloorFunction;
 import bt.db.func.impl.HourFunction;
+import bt.db.func.impl.LeftPadFunction;
 import bt.db.func.impl.LeftTrimFunction;
 import bt.db.func.impl.LengthFunction;
 import bt.db.func.impl.LowerFunction;
@@ -18,6 +19,7 @@ import bt.db.func.impl.MinuteFunction;
 import bt.db.func.impl.ModFunction;
 import bt.db.func.impl.MonthFunction;
 import bt.db.func.impl.RandomFunction;
+import bt.db.func.impl.RightPadFunction;
 import bt.db.func.impl.RightTrimFunction;
 import bt.db.func.impl.RowNumberFunction;
 import bt.db.func.impl.SecondFunction;
@@ -453,5 +455,181 @@ public final class Sql
     public static ModFunction mod(Object value1, Object value2)
     {
         return new ModFunction(value1, value2);
+    }
+
+    /**
+     * Converts the given decimal value to hexadecimal.
+     *
+     * @param value
+     *            The value to use.
+     * @return The function whichs toString will return a valid sql representation of this action.
+     */
+    public static SqlFunction decimalToHex(Object value)
+    {
+        return new SqlFunction("decimalToHex", value);
+    }
+
+    /**
+     * Converts the given decimal value to octal.
+     *
+     * @param value
+     *            The value to use.
+     * @return The function whichs toString will return a valid sql representation of this action.
+     */
+    public static SqlFunction decimalToOctal(Object value)
+    {
+        return new SqlFunction("decimalToOctal", value);
+    }
+
+    /**
+     * Converts the given decimal value to binary.
+     *
+     * @param value
+     *            The value to use.
+     * @return The function whichs toString will return a valid sql representation of this action.
+     */
+    public static SqlFunction decimalToBinary(Object value)
+    {
+        return new SqlFunction("decimalToBinary", value);
+    }
+
+    /**
+     * Converts the given hexadecimal value to decimal.
+     *
+     * @param value
+     *            The value to use.
+     * @return The function whichs toString will return a valid sql representation of this action.
+     */
+    public static SqlFunction hexToDecimal(Object value)
+    {
+        return new SqlFunction("hexToDecimal", value);
+    }
+
+    /**
+     * Converts the given hexadecimal value to octal.
+     *
+     * @param value
+     *            The value to use.
+     * @return The function whichs toString will return a valid sql representation of this action.
+     */
+    public static SqlFunction hexToOctal(Object value)
+    {
+        return new SqlFunction("hexToOctal", value);
+    }
+
+    /**
+     * Converts the given hexadecimal value to binary.
+     *
+     * @param value
+     *            The value to use.
+     * @return The function whichs toString will return a valid sql representation of this action.
+     */
+    public static SqlFunction hexToBinary(Object value)
+    {
+        return new SqlFunction("hexToBinary", value);
+    }
+
+    /**
+     * Converts the given binary value to decimal.
+     *
+     * @param value
+     *            The value to use.
+     * @return The function whichs toString will return a valid sql representation of this action.
+     */
+    public static SqlFunction binaryToDecimal(Object value)
+    {
+        return new SqlFunction("binaryToDecimal", value);
+    }
+
+    /**
+     * Converts the given binary value to octal.
+     *
+     * @param value
+     *            The value to use.
+     * @return The function whichs toString will return a valid sql representation of this action.
+     */
+    public static SqlFunction binaryToOctal(Object value)
+    {
+        return new SqlFunction("binaryToOctal", value);
+    }
+
+    /**
+     * Converts the given binary value to hexadecimal.
+     *
+     * @param value
+     *            The value to use.
+     * @return The function whichs toString will return a valid sql representation of this action.
+     */
+    public static SqlFunction binaryToHex(Object value)
+    {
+        return new SqlFunction("binaryToHex", value);
+    }
+
+    /**
+     * Converts the given octal value to decimal.
+     *
+     * @param value
+     *            The value to use.
+     * @return The function whichs toString will return a valid sql representation of this action.
+     */
+    public static SqlFunction octalToDecimal(Object value)
+    {
+        return new SqlFunction("octalToDecimal", value);
+    }
+
+    /**
+     * Converts the given octal value to binary.
+     *
+     * @param value
+     *            The value to use.
+     * @return The function whichs toString will return a valid sql representation of this action.
+     */
+    public static SqlFunction octalToBinary(Object value)
+    {
+        return new SqlFunction("octalToBinary", value);
+    }
+
+    /**
+     * Converts the given octal value to hexadecimal.
+     *
+     * @param value
+     *            The value to use.
+     * @return The function whichs toString will return a valid sql representation of this action.
+     */
+    public static SqlFunction octalToHex(Object value)
+    {
+        return new SqlFunction("octalToHex", value);
+    }
+
+    /**
+     * Pads the given String value on the left side with the given padding String until the given length is reached.
+     *
+     * @param value
+     *            The value to use.
+     * @param length
+     *            The length of the resulting String.
+     * @param The
+     *            character that is used for padding.
+     * @return The function whichs toString will return a valid sql representation of this action.
+     */
+    public static LeftPadFunction lpad(Object value, int length, String pad)
+    {
+        return new LeftPadFunction(value, length, pad);
+    }
+
+    /**
+     * Pads the given String value on the right side with the given padding String until the given length is reached.
+     *
+     * @param value
+     *            The value to use.
+     * @param length
+     *            The length of the resulting String.
+     * @param The
+     *            character that is used for padding.
+     * @return The function whichs toString will return a valid sql representation of this action.
+     */
+    public static RightPadFunction rpad(Object value, int length, String pad)
+    {
+        return new RightPadFunction(value, length, pad);
     }
 }
