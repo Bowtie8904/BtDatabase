@@ -48,6 +48,8 @@ import bt.utils.console.ConsoleTable;
 import bt.utils.files.FileUtils;
 import bt.utils.id.StringID;
 import bt.utils.log.Logger;
+import bt.utils.num.NumberUtils;
+import bt.utils.string.StringUtils;
 
 /**
  * Base class for databases.
@@ -198,6 +200,7 @@ public abstract class DatabaseAccess implements Killable
                           this);
         }
         createDefaultProcedures();
+        createDefaultFunctions();
         log.printfSrc(this,
                       "Setup database instance %s",
                       this.instanceID);
@@ -1351,6 +1354,205 @@ public abstract class DatabaseAccess implements Killable
         log.printfSrc(this,
                       "Dispatched delete event to %d listeners.",
                       count);
+    }
+
+    protected void createDefaultFunctions()
+    {
+        create().function("decimalToHex")
+                .call(NumberUtils.class, "decimalToHex", long.class)
+                .returnNullOnNull()
+                .onAlreadyExists((s, e) ->
+                {
+                    return 0;
+                })
+                .onSuccess((s, i) ->
+                {
+                    log.print("Created function " + s.getName() + ".");
+                })
+                .commit()
+                .execute();
+
+        create().function("decimalToOctal")
+                .call(NumberUtils.class, "decimalToOctal", long.class)
+                .returnNullOnNull()
+                .onAlreadyExists((s, e) ->
+                {
+                    return 0;
+                })
+                .onSuccess((s, i) ->
+                {
+                    log.print("Created function " + s.getName() + ".");
+                })
+                .commit()
+                .execute();
+
+        create().function("decimalToBinary")
+                .call(NumberUtils.class, "decimalToBinary", long.class)
+                .returnNullOnNull()
+                .onAlreadyExists((s, e) ->
+                {
+                    return 0;
+                })
+                .onSuccess((s, i) ->
+                {
+                    log.print("Created function " + s.getName() + ".");
+                })
+                .commit()
+                .execute();
+
+        create().function("hexToDecimal")
+                .call(NumberUtils.class, "hexToDecimal", String.class)
+                .returnNullOnNull()
+                .onAlreadyExists((s, e) ->
+                {
+                    return 0;
+                })
+                .onSuccess((s, i) ->
+                {
+                    log.print("Created function " + s.getName() + ".");
+                })
+                .commit()
+                .execute();
+
+        create().function("hexToOctal")
+                .call(NumberUtils.class, "hexToOctal", String.class)
+                .returnNullOnNull()
+                .onAlreadyExists((s, e) ->
+                {
+                    return 0;
+                })
+                .onSuccess((s, i) ->
+                {
+                    log.print("Created function " + s.getName() + ".");
+                })
+                .commit()
+                .execute();
+
+        create().function("hexToBinary")
+                .call(NumberUtils.class, "hexToBinary", String.class)
+                .returnNullOnNull()
+                .onAlreadyExists((s, e) ->
+                {
+                    return 0;
+                })
+                .onSuccess((s, i) ->
+                {
+                    log.print("Created function " + s.getName() + ".");
+                })
+                .commit()
+                .execute();
+
+        create().function("binaryToDecimal")
+                .call(NumberUtils.class, "binaryToDecimal", String.class)
+                .returnNullOnNull()
+                .onAlreadyExists((s, e) ->
+                {
+                    return 0;
+                })
+                .onSuccess((s, i) ->
+                {
+                    log.print("Created function " + s.getName() + ".");
+                })
+                .commit()
+                .execute();
+
+        create().function("binaryToOctal")
+                .call(NumberUtils.class, "binaryToOctal", String.class)
+                .returnNullOnNull()
+                .onAlreadyExists((s, e) ->
+                {
+                    return 0;
+                })
+                .onSuccess((s, i) ->
+                {
+                    log.print("Created function " + s.getName() + ".");
+                })
+                .commit()
+                .execute();
+
+        create().function("binaryToHex")
+                .call(NumberUtils.class, "binaryToHex", String.class)
+                .returnNullOnNull()
+                .onAlreadyExists((s, e) ->
+                {
+                    return 0;
+                })
+                .onSuccess((s, i) ->
+                {
+                    log.print("Created function " + s.getName() + ".");
+                })
+                .commit()
+                .execute();
+
+        create().function("octalToDecimal")
+                .call(NumberUtils.class, "octalToDecimal", String.class)
+                .returnNullOnNull()
+                .onAlreadyExists((s, e) ->
+                {
+                    return 0;
+                })
+                .onSuccess((s, i) ->
+                {
+                    log.print("Created function " + s.getName() + ".");
+                })
+                .commit()
+                .execute();
+
+        create().function("octalToBinary")
+                .call(NumberUtils.class, "octalToBinary", String.class)
+                .returnNullOnNull()
+                .onAlreadyExists((s, e) ->
+                {
+                    return 0;
+                })
+                .onSuccess((s, i) ->
+                {
+                    log.print("Created function " + s.getName() + ".");
+                })
+                .commit()
+                .execute();
+
+        create().function("octalToHex")
+                .call(NumberUtils.class, "octalToHex", String.class)
+                .returnNullOnNull()
+                .onAlreadyExists((s, e) ->
+                {
+                    return 0;
+                })
+                .onSuccess((s, i) ->
+                {
+                    log.print("Created function " + s.getName() + ".");
+                })
+                .commit()
+                .execute();
+
+        create().function("lpad")
+                .call(StringUtils.class, "leftPad", String.class, int.class, String.class)
+                .returnNullOnNull()
+                .onAlreadyExists((s, e) ->
+                {
+                    return 0;
+                })
+                .onSuccess((s, i) ->
+                {
+                    log.print("Created function " + s.getName() + ".");
+                })
+                .commit()
+                .execute();
+
+        create().function("rpad")
+                .call(StringUtils.class, "rightPad", String.class, int.class, String.class)
+                .returnNullOnNull()
+                .onAlreadyExists((s, e) ->
+                {
+                    return 0;
+                })
+                .onSuccess((s, i) ->
+                {
+                    log.print("Created function " + s.getName() + ".");
+                })
+                .commit()
+                .execute();
     }
 
     /**
