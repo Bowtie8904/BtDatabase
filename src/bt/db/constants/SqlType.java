@@ -186,6 +186,76 @@ public enum SqlType
     }
 
     /**
+     * Converts the name of the class to a fitting sql datatype.
+     *
+     * @param type
+     * @return
+     */
+    public static SqlType convert(Class<?> type)
+    {
+        SqlType sqlType = null;
+
+        switch (type.getName())
+        {
+            case "java.lang.String":
+                sqlType = VARCHAR;
+                break;
+            case "char":
+                sqlType = VARCHAR;
+                break;
+            case "java.lang.Boolean":
+                sqlType = BOOLEAN;
+                break;
+            case "java.sql.Clob":
+                sqlType = CLOB;
+                break;
+            case "java.sql.Blob":
+                sqlType = BLOB;
+                break;
+            case "java.sql.Date":
+                sqlType = DATE;
+                break;
+            case "java.sql.Time":
+                sqlType = TIME;
+                break;
+            case "java.sql.Timestamp":
+                sqlType = TIMESTAMP;
+                break;
+            case "java.lang.Double":
+                sqlType = DOUBLE;
+                break;
+            case "double":
+                sqlType = DOUBLE;
+                break;
+            case "java.lang.Float":
+                sqlType = DOUBLE;
+                break;
+            case "float":
+                sqlType = DOUBLE;
+                break;
+            case "java.lang.Integer":
+                sqlType = INTEGER;
+                break;
+            case "int":
+                sqlType = INTEGER;
+                break;
+            case "short":
+                sqlType = INTEGER;
+                break;
+            case "java.lang.Long":
+                sqlType = LONG;
+                break;
+            case "long":
+                sqlType = LONG;
+                break;
+            default:
+                sqlType = UNKNOWN;
+        }
+
+        return sqlType;
+    }
+
+    /**
      * Returns a String representation of the given array.
      *
      * <p>
