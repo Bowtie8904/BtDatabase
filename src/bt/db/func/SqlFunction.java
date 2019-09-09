@@ -20,6 +20,13 @@ public class SqlFunction<T extends SqlFunction>
         this.elements = new ArrayList<>();
     }
 
+    public SqlFunction(String name, Object value)
+    {
+        this.name = name.toUpperCase();
+        this.elements = new ArrayList<>();
+        this.value = value.toString();
+    }
+
     protected void add(Object element)
     {
         this.elements.add(element);
