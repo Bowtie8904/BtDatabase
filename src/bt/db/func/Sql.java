@@ -18,6 +18,7 @@ import bt.db.func.impl.MinFunction;
 import bt.db.func.impl.MinuteFunction;
 import bt.db.func.impl.ModFunction;
 import bt.db.func.impl.MonthFunction;
+import bt.db.func.impl.NullValueFunction;
 import bt.db.func.impl.RandomFunction;
 import bt.db.func.impl.RightPadFunction;
 import bt.db.func.impl.RightTrimFunction;
@@ -631,5 +632,26 @@ public final class Sql
     public static RightPadFunction rpad(Object value, int length, String pad)
     {
         return new RightPadFunction(value, length, pad);
+    }
+
+    /**
+     * The NVL (COALESCE) function takes two or more compatible arguments and returns the first argument that is not
+     * null.
+     *
+     * <p>
+     * The result is null only if all the arguments are null.
+     * </p>
+     *
+     * @param value1
+     *            The first value to check.
+     * @param value2
+     *            The second value to check.
+     * @param elements
+     *            Additional values.
+     * @return The function whichs toString method will return a valid sql representation of this action.
+     */
+    public static NullValueFunction nvl(Object value1, Object value2, Object... elements)
+    {
+        return new NullValueFunction(value1, value2, elements);
     }
 }
