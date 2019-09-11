@@ -12,8 +12,8 @@ import bt.db.constants.SqlType;
 import bt.db.exc.SqlExecutionException;
 import bt.db.statement.SqlModifyStatement;
 import bt.db.statement.clause.BetweenConditionalClause;
-import bt.db.statement.clause.ConditionalClause;
 import bt.db.statement.clause.SetClause;
+import bt.db.statement.clause.condition.ConditionalClause;
 
 /**
  * Represents an SQL update statement which can be extended through method chaining.

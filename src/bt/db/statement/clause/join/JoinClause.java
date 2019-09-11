@@ -3,7 +3,7 @@ package bt.db.statement.clause.join;
 import java.util.ArrayList;
 import java.util.List;
 
-import bt.db.statement.clause.ConditionalClause;
+import bt.db.statement.clause.condition.ConditionalClause;
 import bt.db.statement.impl.SelectStatement;
 
 /**

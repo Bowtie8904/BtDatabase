@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bt.db.DatabaseAccess;
-import bt.db.statement.clause.ConditionalClause;
+import bt.db.statement.clause.condition.ConditionalClause;
 
 /**
  * Base class for all SQL statements.

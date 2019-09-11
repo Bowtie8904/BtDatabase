@@ -1,4 +1,4 @@
-package bt.db.statement.clause;
+package bt.db.statement.clause.condition;
 
 import java.sql.Date;
 import java.sql.Time;
@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 
 import bt.db.constants.SqlType;
 import bt.db.func.SqlFunction;
+import bt.db.statement.clause.ColumnEntry;
 import bt.db.statement.impl.SelectStatement;
 
 /**

@@ -3,6 +3,7 @@ package bt.db.statement.clause;
 import java.sql.PreparedStatement;
 
 import bt.db.statement.SqlStatement;
+import bt.db.statement.clause.condition.ConditionalClause;
 
 /**
  * Holds data for conditional clauses used in sql statements for BETWEEN conditions.
@@ -55,7 +56,7 @@ public class BetweenConditionalClause<T extends SqlStatement> extends Conditiona
     }
 
     /**
-     * @see bt.db.statement.clause.ConditionalClause#prepareValue(java.sql.PreparedStatement, int)
+     * @see bt.db.statement.clause.condition.ConditionalClause#prepareValue(java.sql.PreparedStatement, int)
      */
     @Override
     public String prepareValue(PreparedStatement statement, int parameterIndex)
@@ -76,7 +77,7 @@ public class BetweenConditionalClause<T extends SqlStatement> extends Conditiona
     }
 
     /**
-     * @see bt.db.statement.clause.ConditionalClause#toString()
+     * @see bt.db.statement.clause.condition.ConditionalClause#toString()
      */
     @Override
     public String toString()
@@ -85,7 +86,7 @@ public class BetweenConditionalClause<T extends SqlStatement> extends Conditiona
     }
 
     /**
-     * @see bt.db.statement.clause.ConditionalClause#toString(boolean)
+     * @see bt.db.statement.clause.condition.ConditionalClause#toString(boolean)
      */
     @Override
     public String toString(boolean prepared)

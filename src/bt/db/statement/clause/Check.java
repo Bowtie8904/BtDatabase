@@ -3,6 +3,7 @@ package bt.db.statement.clause;
 import java.util.ArrayList;
 import java.util.List;
 
+import bt.db.statement.clause.condition.SimpleConditionalClause;
 import bt.utils.id.StringID;
 
 /**
@@ -91,7 +92,7 @@ public class Check extends SimpleConditionalClause<Check>
     /**
      * Forms the SQL for this constraint.
      *
-     * @see bt.db.statement.clause.SimpleConditionalClause#toString()
+     * @see bt.db.statement.clause.condition.SimpleConditionalClause#toString()
      */
     @Override
     public String toString()

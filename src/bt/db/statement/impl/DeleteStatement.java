@@ -9,7 +9,7 @@ import bt.db.DatabaseAccess;
 import bt.db.exc.SqlExecutionException;
 import bt.db.statement.SqlModifyStatement;
 import bt.db.statement.clause.BetweenConditionalClause;
-import bt.db.statement.clause.ConditionalClause;
+import bt.db.statement.clause.condition.ConditionalClause;
 
 /**
  * Represents an SQL delete statement which can be extended through method chaining.

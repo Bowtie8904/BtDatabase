@@ -1,6 +1,6 @@
 package bt.db.statement.clause.join;
 
-import bt.db.statement.clause.ConditionalClause;
+import bt.db.statement.clause.condition.ConditionalClause;
 import bt.db.statement.impl.SelectStatement;
 
 /**
@@ -38,7 +38,7 @@ public class JoinConditionalClause extends ConditionalClause<SelectStatement>
     }
 
     /**
-     * @see bt.db.statement.clause.ConditionalClause#toString()
+     * @see bt.db.statement.clause.condition.ConditionalClause#toString()
      */
     @Override
     public String toString()
@@ -63,7 +63,7 @@ public class JoinConditionalClause extends ConditionalClause<SelectStatement>
     }
 
     /**
-     * @see bt.db.statement.clause.ConditionalClause#toString(boolean)
+     * @see bt.db.statement.clause.condition.ConditionalClause#toString(boolean)
      */
     @Override
     public String toString(boolean prepared)

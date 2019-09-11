@@ -1,4 +1,4 @@
-package bt.db.statement.clause;
+package bt.db.statement.clause.condition;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -9,11 +9,13 @@ import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
 import bt.db.func.SqlFunction;
 import bt.db.statement.SqlStatement;
+import bt.db.statement.clause.BetweenConditionalClause;
+import bt.db.statement.clause.ColumnEntry;
 import bt.db.statement.impl.SelectStatement;
 
 /**
  * Holds data for conditional clauses used in sql statements.
- * 
+ *
  * @author &#8904
  */
 public class ConditionalClause<T extends SqlStatement>
@@ -141,7 +143,7 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Creates a new instance and initializes fields.
-     * 
+     *
      * @param statement
      *            The statement that created this conditional.
      * @param column
@@ -158,7 +160,7 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Prepares the values for execution.
-     * 
+     *
      * @param statement
      *            The statement which should be prepared with this conditionals value.
      * @param parameterIndex
@@ -229,7 +231,7 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Gets the {@link BetweenConditionalClause} this instance uses if it is a between condition.
-     * 
+     *
      * @return
      */
     public BetweenConditionalClause getBetweenClause()
@@ -239,7 +241,7 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Returns the value that is used to check against (right side).
-     * 
+     *
      * @return The String representation of the value.
      */
     public String getValue()
@@ -249,7 +251,7 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Indicates whether this conditional uses a value (right side) which could be inserted with a prepared statement.
-     * 
+     *
      * @return true = uses a valid prepared statement value, false = does not use a prepared statement value.
      */
     public boolean usesValue()
@@ -259,7 +261,7 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Returns the String representing this conditional clause.
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     @Override
@@ -280,7 +282,7 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Returns the String representing this conditional clause.
-     * 
+     *
      * @param prepared
      *            Indicates whether values should be treated for prepared statements or inserted as plain text. true =
      *            use prepared statement, false = insert plain.
@@ -312,11 +314,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether both sides are EQUAL.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -331,11 +333,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether both sides are EQUAL.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -350,11 +352,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether both sides are EQUAL.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -369,11 +371,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether both sides are EQUAL.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -388,11 +390,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether both sides are EQUAL.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -407,11 +409,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether both sides are EQUAL.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -426,11 +428,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether both sides are EQUAL.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -445,11 +447,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether both sides are EQUAL.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -464,11 +466,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether both sides are EQUAL.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -483,11 +485,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether both sides are EQUAL.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -502,11 +504,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether both sides are EQUAL.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -521,11 +523,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether both sides are LIKE each other.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -540,11 +542,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether both sides are NOT EQUAL.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -559,11 +561,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether both sides are NOT EQUAL.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -578,11 +580,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether both sides are NOT EQUAL.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -597,11 +599,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether both sides are NOT EQUAL.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -616,11 +618,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether both sides are NOT EQUAL.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -635,11 +637,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether both sides are NOT EQUAL.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -654,11 +656,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether both sides are NOT EQUAL.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -673,11 +675,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether both sides are NOT EQUAL.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -692,11 +694,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether both sides are NOT EQUAL.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -711,11 +713,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether both sides are NOT EQUAL.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -730,11 +732,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether both sides are NOT EQUAL.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -749,11 +751,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is GREATER THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -768,11 +770,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is GREATER THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -787,11 +789,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is GREATER THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -806,11 +808,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is GREATER THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -825,11 +827,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is GREATER THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -844,11 +846,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is GREATER THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -863,11 +865,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is GREATER THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -882,11 +884,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is GREATER THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -901,11 +903,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is GREATER THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -920,11 +922,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is LESS THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -939,11 +941,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is LESS THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -958,11 +960,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is LESS THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -977,11 +979,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is LESS THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -996,11 +998,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is LESS THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -1015,11 +1017,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is LESS THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -1034,11 +1036,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is LESS THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -1053,11 +1055,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is LESS THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -1072,11 +1074,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is LESS THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -1091,11 +1093,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is GREATER OR EQUAL THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -1110,11 +1112,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is GREATER OR EQUAL THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -1129,11 +1131,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is GREATER OR EQUAL THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -1148,11 +1150,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is GREATER OR EQUAL THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -1167,11 +1169,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is GREATER OR EQUAL THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -1186,11 +1188,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is GREATER OR EQUAL THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -1205,11 +1207,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is GREATER OR EQUAL THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -1224,11 +1226,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is GREATER OR EQUAL THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -1243,11 +1245,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is GREATER OR EQUAL THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -1262,11 +1264,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is LESS OR EQUAL THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -1281,11 +1283,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is LESS OR EQUAL THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -1300,11 +1302,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is LESS OR EQUAL THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -1319,11 +1321,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is LESS OR EQUAL THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -1338,11 +1340,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is LESS OR EQUAL THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -1357,11 +1359,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is LESS OR EQUAL THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -1376,11 +1378,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is LESS OR EQUAL THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -1395,11 +1397,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is LESS OR EQUAL THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -1414,11 +1416,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given value to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is LESS OR EQUAL THAN the right side.
      * </p>
-     * 
+     *
      * @param value
      *            The value to check against.
      * @return The statement that created this conditional.
@@ -1433,7 +1435,7 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * This conditional will check whether the left side IS NULL.
-     * 
+     *
      * @return The statement that created this conditional.
      */
     public T isNull()
@@ -1446,7 +1448,7 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * This conditional will check whether the left side IS NOT NULL.
-     * 
+     *
      * @return The statement that created this conditional.
      */
     public T notNull()
@@ -1459,15 +1461,15 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given select statement to the right side of this conditional.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is contained in the values returned by the given select.
      * </p>
-     * 
+     *
      * <p>
      * The select must be marked as {@link SelectStatement#unprepared()} and can only select a single column.
      * </p>
-     * 
+     *
      * @param select
      *            The select whichs result should be used.
      * @return The statement that created this conditional.
@@ -1488,16 +1490,16 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given select statement to the right side of this conditional.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is NOT contained in the values returned by the given
      * select.
      * </p>
-     * 
+     *
      * <p>
      * The select must be marked as {@link SelectStatement#unprepared()} and can only select a single column.
      * </p>
-     * 
+     *
      * @param select
      *            The select whichs result should be used.
      * @return The statement that created this conditional.
@@ -1518,11 +1520,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given array to the right side of this conditional.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is contained in the values inside the array.
      * </p>
-     * 
+     *
      * @param array
      *            The array to use.
      * @return The statement that created this conditional.
@@ -1538,11 +1540,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given array to the right side of this conditional.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is NOT contained in the values inside the array.
      * </p>
-     * 
+     *
      * @param array
      *            The array to use.
      * @return The statement that created this conditional.
@@ -1558,11 +1560,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given column to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is EQUAL to the right side column value.
      * </p>
-     * 
+     *
      * @param value
      *            The column whichs value should be used to check against.
      * @return The statement that created this conditional.
@@ -1578,11 +1580,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given column to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is LIKE the right side column value.
      * </p>
-     * 
+     *
      * @param value
      *            The column whichs value should be used to check against.
      * @return The statement that created this conditional.
@@ -1598,11 +1600,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given column to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is NOT EQUAL to the right side column value.
      * </p>
-     * 
+     *
      * @param value
      *            The column whichs value should be used to check against.
      * @return The statement that created this conditional.
@@ -1618,11 +1620,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given column to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is GREATER THAN the right side column value.
      * </p>
-     * 
+     *
      * @param value
      *            The column whichs value should be used to check against.
      * @return The statement that created this conditional.
@@ -1638,11 +1640,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given column to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is LESS THAN the right side column value.
      * </p>
-     * 
+     *
      * @param value
      *            The column whichs value should be used to check against.
      * @return The statement that created this conditional.
@@ -1658,11 +1660,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given column to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is GREATER THAN OR EQUAL TO the right side column value.
      * </p>
-     * 
+     *
      * @param value
      *            The column whichs value should be used to check against.
      * @return The statement that created this conditional.
@@ -1678,11 +1680,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given column to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is LESS THAN OR EQUAL TO the right side column value.
      * </p>
-     * 
+     *
      * @param value
      *            The column whichs value should be used to check against.
      * @return The statement that created this conditional.
@@ -1698,11 +1700,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given function to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is EQUAL to the right side column value.
      * </p>
-     * 
+     *
      * @param value
      *            The function whichs value should be used to check against.
      * @return The statement that created this conditional.
@@ -1718,11 +1720,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given function to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is LIKE the right side column value.
      * </p>
-     * 
+     *
      * @param value
      *            The function whichs value should be used to check against.
      * @return The statement that created this conditional.
@@ -1738,11 +1740,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given function to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is NOT EQUAL to the right side column value.
      * </p>
-     * 
+     *
      * @param value
      *            The function whichs value should be used to check against.
      * @return The statement that created this conditional.
@@ -1758,11 +1760,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given function to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is GREATER THAN the right side column value.
      * </p>
-     * 
+     *
      * @param value
      *            The function whichs value should be used to check against.
      * @return The statement that created this conditional.
@@ -1778,11 +1780,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given function to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is LESS THAN the right side column value.
      * </p>
-     * 
+     *
      * @param value
      *            The function whichs value should be used to check against.
      * @return The statement that created this conditional.
@@ -1798,11 +1800,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given function to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is GREATER THAN OR EQUAL TO the right side column value.
      * </p>
-     * 
+     *
      * @param value
      *            The function whichs value should be used to check against.
      * @return The statement that created this conditional.
@@ -1818,11 +1820,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given function to the right side of this conditional to check against.
-     * 
+     *
      * <p>
      * This conditional will then check whether the left side is LESS THAN OR EQUAL TO the right side column value.
      * </p>
-     * 
+     *
      * @param value
      *            The function whichs value should be used to check against.
      * @return The statement that created this conditional.
@@ -1838,11 +1840,11 @@ public class ConditionalClause<T extends SqlStatement>
 
     /**
      * Adds the given between condition to this conditional statement.
-     * 
+     *
      * <p>
      * This conditional will then check whether the value in the set column is between (inclusive) the given values.
      * </p>
-     * 
+     *
      * <p>
      * Valid value types are:
      * <ul>
@@ -1857,7 +1859,7 @@ public class ConditionalClause<T extends SqlStatement>
      * <li>{@link Timestamp}</li>
      * </ul>
      * </p>
-     * 
+     *
      * @param value1
      *            The lower bounds (inclusive).
      * @param value2
