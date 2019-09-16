@@ -27,31 +27,31 @@ import bt.utils.refl.field.Fields;
 /**
  * Offers an interface and static methods to persist and initialize objects who make use of the {@link Column},
  * {@link Table}, {@link Identity} and {@link NoPersist} annotations.
- * 
+ *
  * @author &#8904
  */
 public interface SqlEntry
 {
     /**
      * Persists all important fields of this instance into the given database.
-     * 
+     *
      * @param db
      */
     public void persist(DatabaseAccess db);
 
     /**
      * Initializes all important fields of this instance.
-     * 
+     *
      * @param db
      */
     public void init(DatabaseAccess db);
 
     /**
      * Initializes an instance of the given class by using values from the given database that match the given identity.
-     * 
+     *
      * <p>
      * To allow the initialization of an instance, the class must meet the following requirements:
-     * 
+     *
      * <ul>
      * <li>the class must implement a constructor without arguments</li>
      * <li>all fields that should be initialized need a {@link Column} annotation</li>
@@ -60,7 +60,7 @@ public interface SqlEntry
      * <li>the identity field must be of type long</li>
      * </ul>
      * </p>
-     * 
+     *
      * @param db
      *            The database to use to retrieve the column values.
      * @param cls
@@ -136,10 +136,10 @@ public interface SqlEntry
     /**
      * Initializes instances of the given class by using rows from the table defined by the classes {@link Table}
      * annotation.
-     * 
+     *
      * <p>
      * To allow the initialization of an instance, the class must meet the following requirements:
-     * 
+     *
      * <ul>
      * <li>the class must implement a constructor without arguments</li>
      * <li>all fields that should be initialized need a {@link Column} annotation</li>
@@ -148,7 +148,7 @@ public interface SqlEntry
      * <li>the identity field must be of type long</li>
      * </ul>
      * </p>
-     * 
+     *
      * @param db
      *            The database to use to retrieve the column values.
      * @param cls
@@ -164,10 +164,10 @@ public interface SqlEntry
 
     /**
      * Initializes instances of the given class by using matching database identities with the given IDs.
-     * 
+     *
      * <p>
      * To allow the initialization of an instance, the class must meet the following requirements:
-     * 
+     *
      * <ul>
      * <li>the class must implement a constructor without arguments</li>
      * <li>all fields that should be initialized need a {@link Column} annotation</li>
@@ -176,7 +176,7 @@ public interface SqlEntry
      * <li>the identity field must be of type long</li>
      * </ul>
      * </p>
-     * 
+     *
      * @param db
      *            The database to use to retrieve the column values.
      * @param cls
@@ -397,10 +397,10 @@ public interface SqlEntry
     /**
      * Initializes the given instance by using values from the given database that match the value of the
      * {@link Identity} field.
-     * 
+     *
      * <p>
      * To allow the initialization of an instance, the class must meet the following requirements:
-     * 
+     *
      * <ul>
      * <li>the class must implement a constructor without arguments</li>
      * <li>all fields that should be initialized need a {@link Column} annotation</li>
@@ -409,7 +409,7 @@ public interface SqlEntry
      * <li>the identity field must be of type long</li>
      * </ul>
      * </p>
-     * 
+     *
      * @param db
      *            The database to use to retrieve the column values.
      * @param entry
@@ -482,7 +482,7 @@ public interface SqlEntry
                         }
                         else
                         {
-                            id = new SimpleTripple<String, SqlType, Long>(name,
+                            id = new SimpleTripple<>(name,
                                                                           type,
                                                                           (long)value);
                         }
@@ -525,7 +525,7 @@ public interface SqlEntry
             SqlResultSet set = db.select()
                                  .from(table)
                                  .where(id.getKey())
-                                 .equals(id.getSecondValue().longValue())
+                                 .equal(id.getSecondValue().longValue())
                                  .onLessThan(1,
                                              (i, sqlSet) ->
                                              {
@@ -606,10 +606,10 @@ public interface SqlEntry
     /**
      * Persists the given instance to the database by using the {@link Table} and {@link Column} annotation of the
      * class.
-     * 
+     *
      * <p>
      * To allow the persistance of an instance, the class must meet the following requirements:
-     * 
+     *
      * <ul>
      * <li>the class must implement a constructor without arguments</li>
      * <li>all fields that should be persisted need a {@link Column} annotation</li>
@@ -618,7 +618,7 @@ public interface SqlEntry
      * <li>the identity field must be of type long</li>
      * </ul>
      * </p>
-     * 
+     *
      * @param db
      *            The database to use for persisting.
      * @param entry
@@ -730,7 +730,7 @@ public interface SqlEntry
                     }
                     else
                     {
-                        id = new SimpleEntry<String, Long>(name,
+                        id = new SimpleEntry<>(name,
                                                            (long)value);
                     }
                 }
@@ -806,7 +806,7 @@ public interface SqlEntry
             db.select(id.getKey())
               .from(tableName)
               .where(id.getKey())
-              .equals(id.getValue().longValue())
+              .equal(id.getValue().longValue())
               .onLessThan(1,
                           insert)
               .onMoreThan(0,
