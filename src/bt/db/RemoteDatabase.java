@@ -174,7 +174,7 @@ public abstract class RemoteDatabase extends DatabaseAccess
                                        .notIn(select("trigger_id")
                                                                   .from("handled_triggers")
                                                                   .where("db_id")
-                                                                  .equals(getInstanceID())
+                                                                  .equal(getInstanceID())
                                                                   .unprepared())
                                        .onLessThan(1,
                                                    (num, res) ->

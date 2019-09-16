@@ -2,21 +2,22 @@ package bt.db.statement.impl;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import bt.db.DatabaseAccess;
 import bt.db.exc.SqlExecutionException;
 import bt.db.statement.SqlModifyStatement;
-import bt.db.statement.clause.BetweenConditionalClause;
 import bt.db.statement.clause.condition.ConditionalClause;
+import bt.db.statement.value.Preparable;
+import bt.db.statement.value.Value;
 
 /**
  * Represents an SQL delete statement which can be extended through method chaining.
  *
  * @author &#8904
  */
-public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteStatement>
+public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteStatement> implements Preparable
 {
     /**
      * Creates a new instance.
@@ -66,8 +67,8 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
     public ConditionalClause<DeleteStatement> where(String column)
     {
         ConditionalClause<DeleteStatement> where = new ConditionalClause<>(this,
-                                                                                          column,
-                                                                                          ConditionalClause.WHERE);
+                                                           column,
+                                                           ConditionalClause.WHERE);
         addWhereClause(where);
         return where;
     }
@@ -83,8 +84,8 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
     public ConditionalClause<DeleteStatement> and(String column)
     {
         ConditionalClause<DeleteStatement> where = new ConditionalClause<>(this,
-                                                                                          column,
-                                                                                          ConditionalClause.AND);
+                                                           column,
+                                                           ConditionalClause.AND);
         addWhereClause(where);
         return where;
     }
@@ -100,8 +101,8 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
     public ConditionalClause<DeleteStatement> or(String column)
     {
         ConditionalClause<DeleteStatement> where = new ConditionalClause<>(this,
-                                                                                          column,
-                                                                                          ConditionalClause.OR);
+                                                           column,
+                                                           ConditionalClause.OR);
         addWhereClause(where);
         return where;
     }
@@ -118,28 +119,27 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
 
         try (PreparedStatement statement = this.db.getConnection().prepareStatement(sql))
         {
-            List<ConditionalClause<DeleteStatement>> valueWhere = this.whereClauses
-                                                                                   .stream()
-                                                                                   .filter(w -> w.usesValue())
-                                                                                   .collect(Collectors.toList());
-
             log("Executing: " + sql,
                 printLogs);
 
+
             if (this.prepared)
             {
-                if (!valueWhere.isEmpty())
+                List<Value> values = getValues();
+                Preparable.prepareStatement(statement, values);
+
+                if (!values.isEmpty())
                 {
                     log("With values:",
                         printLogs);
                 }
 
-                for (int i = 0; i < valueWhere.size(); i ++ )
+                Value val = null;
+
+                for (int i = 0; i < values.size(); i ++ )
                 {
-                    ConditionalClause<DeleteStatement> where = valueWhere.get(i);
-                    log("p" + (i + 1) + " = " + where.prepareValue(statement,
-                                                                   i + 1),
-                        printLogs);
+                    val = values.get(i);
+                    log("p" + (i + 1) + " = " + val.getValue() + " [" + val.getType().toString() + "]", printLogs);
                 }
             }
 
@@ -179,26 +179,27 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
             sql += table;
         }
 
-        // indicates whether the last clause was a between clause, to skip the duplicate
-        boolean lastBetween = false;
-
         for (ConditionalClause<DeleteStatement> where : this.whereClauses)
         {
-            if (!lastBetween)
-            {
-                sql += " " + where.toString(this.prepared);
-
-                if (where instanceof BetweenConditionalClause)
-                {
-                    lastBetween = true;
-                }
-            }
-            else
-            {
-                lastBetween = false;
-            }
+            sql += " " + where.toString(this.prepared);
         }
 
         return sql;
+    }
+
+    /**
+     * @see bt.db.statement.value.Preparable#getValues()
+     */
+    @Override
+    public List<Value> getValues()
+    {
+        List<Value> values = new ArrayList<>();
+
+        for (ConditionalClause c : this.whereClauses)
+        {
+            values.addAll(c.getValues());
+        }
+
+        return values;
     }
 }

@@ -5,7 +5,7 @@ import bt.db.statement.impl.SelectStatement;
 
 /**
  * Holds data for conditional part used in sql join on clauses.
- * 
+ *
  * @author &#8904
  */
 public class JoinConditionalClause extends ConditionalClause<SelectStatement>
@@ -15,7 +15,7 @@ public class JoinConditionalClause extends ConditionalClause<SelectStatement>
 
     /**
      * Creates a new instance and initializes the fields.
-     * 
+     *
      * @param statement
      *            The statement that created this instance.
      * @param column

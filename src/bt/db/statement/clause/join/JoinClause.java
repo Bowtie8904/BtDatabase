@@ -5,13 +5,15 @@ import java.util.List;
 
 import bt.db.statement.clause.condition.ConditionalClause;
 import bt.db.statement.impl.SelectStatement;
+import bt.db.statement.value.Preparable;
+import bt.db.statement.value.Value;
 
 /**
  * Base class for all join clauses.
- * 
+ *
  * @author &#8904
  */
-public class JoinClause
+public class JoinClause implements Preparable
 {
     protected static final String INNER = "INNER";
     protected static final String RIGHT = "RIGHT";
@@ -38,7 +40,7 @@ public class JoinClause
 
     /**
      * Creates a new instance and initializes fields.
-     * 
+     *
      * @param statement
      *            The calling statement.
      * @param table1
@@ -56,7 +58,7 @@ public class JoinClause
 
     /**
      * Returns a list of {@link JoinConditionalClause}s that were used to create this join.
-     * 
+     *
      * @return The list.
      */
     public List<JoinConditionalClause> getConditionalClauses()
@@ -66,12 +68,12 @@ public class JoinClause
 
     /**
      * Adds the given conditional clause to this join.
-     * 
+     *
      * <p>
      * This method should never be used explicitly. Creating a conditional through the {@link #on(String)} method will
      * automatically add the clause to this join.
      * </p>
-     * 
+     *
      * @param condition
      */
     public void addConditionalClause(JoinConditionalClause condition)
@@ -81,7 +83,7 @@ public class JoinClause
 
     /**
      * Returns the name of the first table (left side).
-     * 
+     *
      * @return The name of the table.
      */
     public String getFirstTable()
@@ -91,7 +93,7 @@ public class JoinClause
 
     /**
      * Returns the name of the second table (right side).
-     * 
+     *
      * @return The name of the table.
      */
     public String getSecondTable()
@@ -101,7 +103,7 @@ public class JoinClause
 
     /**
      * Creates a new ON {@link JoinConditionalClause} which will be automatically added to this join.
-     * 
+     *
      * @param column
      *            The name of the column to join with.
      * @return The conditional clause.
@@ -120,11 +122,11 @@ public class JoinClause
 
     /**
      * Defines the columns which should be used to join.
-     * 
+     *
      * <p>
      * Making use of this method means that no complex ON syntax can be used.
      * </p>
-     * 
+     *
      * @param columns
      * @return
      */
@@ -138,7 +140,7 @@ public class JoinClause
     /**
      * Defines that this join should be treated as a natural join clause, meaning no specific columns are set and the
      * tables are joined around columns with the same name instead.
-     * 
+     *
      * @return
      */
     public SelectStatement natural()
@@ -149,7 +151,7 @@ public class JoinClause
 
     /**
      * Defines that this join should be treated as a right join clause.
-     * 
+     *
      * @return
      */
     public JoinClause right()
@@ -160,7 +162,7 @@ public class JoinClause
 
     /**
      * Defines that this join should be treated as a left join clause.
-     * 
+     *
      * @return
      */
     public JoinClause left()
@@ -171,7 +173,7 @@ public class JoinClause
 
     /**
      * Returns the String representing this join clause.
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     @Override
@@ -182,7 +184,7 @@ public class JoinClause
 
     /**
      * Returns the String representing this join clause.
-     * 
+     *
      * @param prepared
      *            Indicates whether underlying conditionals from the ON syntax should be treated as prepared statements
      *            or inserted as plain text. true = use prepared statement, false = insert plain.
@@ -217,5 +219,21 @@ public class JoinClause
         }
 
         return sql;
+    }
+
+    /**
+     * @see bt.db.statement.value.Preparable#getValues()
+     */
+    @Override
+    public List<Value> getValues()
+    {
+        List<Value> values = new ArrayList<>();
+
+        for (JoinConditionalClause clause : this.conditionalClauses)
+        {
+            values.addAll(clause.getValues());
+        }
+
+        return values;
     }
 }

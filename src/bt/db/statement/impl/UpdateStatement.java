@@ -3,24 +3,25 @@ package bt.db.statement.impl;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
 import bt.db.exc.SqlExecutionException;
 import bt.db.statement.SqlModifyStatement;
-import bt.db.statement.clause.BetweenConditionalClause;
 import bt.db.statement.clause.SetClause;
 import bt.db.statement.clause.condition.ConditionalClause;
+import bt.db.statement.value.Preparable;
+import bt.db.statement.value.Value;
 
 /**
  * Represents an SQL update statement which can be extended through method chaining.
  *
  * @author &#8904
  */
-public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateStatement>
+public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateStatement> implements Preparable
 {
     /**
      * Creates a new instance.
@@ -61,8 +62,8 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     public ConditionalClause<UpdateStatement> where(String column)
     {
         ConditionalClause<UpdateStatement> where = new ConditionalClause<>(this,
-                                                                           column,
-                                                                           ConditionalClause.WHERE);
+                                                           column,
+                                                           ConditionalClause.WHERE);
         addWhereClause(where);
         return where;
     }
@@ -78,8 +79,8 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     public ConditionalClause<UpdateStatement> and(String column)
     {
         ConditionalClause<UpdateStatement> where = new ConditionalClause<>(this,
-                                                                           column,
-                                                                           ConditionalClause.AND);
+                                                           column,
+                                                           ConditionalClause.AND);
         addWhereClause(where);
         return where;
     }
@@ -95,8 +96,8 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     public ConditionalClause<UpdateStatement> or(String column)
     {
         ConditionalClause<UpdateStatement> where = new ConditionalClause<>(this,
-                                                                           column,
-                                                                           ConditionalClause.OR);
+                                                           column,
+                                                           ConditionalClause.OR);
         addWhereClause(where);
         return where;
     }
@@ -274,11 +275,6 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
 
         try (PreparedStatement statement = this.db.getConnection().prepareStatement(sql);)
         {
-            List<ConditionalClause<UpdateStatement>> valueWhere = this.whereClauses
-                                                                                   .stream()
-                                                                                   .filter(w -> w.usesValue())
-                                                                                   .collect(Collectors.toList());
-
             log("Executing: " + sql,
                 printLogs);
 
@@ -294,17 +290,15 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
                 for (; i < this.setClauses.size(); i ++ )
                 {
                     SetClause<UpdateStatement> set = this.setClauses.get(i);
-                    log("p" + (i + 1) + " = " + set.prepareValue(statement,
-                                                                 i + 1),
-                        printLogs);
+                    log("p" + (i + 1) + " = " + set.prepareValue(statement, i + 1), printLogs);
                 }
 
-                for (; i < valueWhere.size() + this.setClauses.size(); i ++ )
+                List<Value> values = getValues();
+                Preparable.prepareStatement(statement, values, i);
+
+                for (Value val : values)
                 {
-                    ConditionalClause<UpdateStatement> where = valueWhere.get(i - this.setClauses.size());
-                    log("p" + (i + 1) + " = " + where.prepareValue(statement,
-                                                                   i + 1),
-                        printLogs);
+                    log("p" + (i + 1) + " = " + val.getValue(), printLogs);
                 }
             }
 
@@ -358,26 +352,27 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
                                 sql.length() - 2);
         }
 
-        // indicates whether the klast clause was a between clause, to skip the duplicate
-        boolean lastBetween = false;
-
         for (ConditionalClause<UpdateStatement> where : this.whereClauses)
         {
-            if (!lastBetween)
-            {
-                sql += " " + where.toString(this.prepared);
-
-                if (where instanceof BetweenConditionalClause)
-                {
-                    lastBetween = true;
-                }
-            }
-            else
-            {
-                lastBetween = false;
-            }
+            sql += " " + where.toString(this.prepared);
         }
 
         return sql;
+    }
+
+    /**
+     * @see bt.db.statement.value.Preparable#getValues()
+     */
+    @Override
+    public List<Value> getValues()
+    {
+        List<Value> values = new ArrayList<>();
+
+        for (ConditionalClause c : this.whereClauses)
+        {
+            values.addAll(c.getValues());
+        }
+
+        return values;
     }
 }

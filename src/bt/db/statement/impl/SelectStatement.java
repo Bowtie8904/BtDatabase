@@ -8,26 +8,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
 import bt.db.DatabaseAccess;
 import bt.db.exc.SqlExecutionException;
 import bt.db.statement.SqlModifyStatement;
 import bt.db.statement.SqlStatement;
-import bt.db.statement.clause.BetweenConditionalClause;
+import bt.db.statement.clause.FromClause;
 import bt.db.statement.clause.OrderByClause;
 import bt.db.statement.clause.UnionClause;
 import bt.db.statement.clause.condition.ConditionalClause;
 import bt.db.statement.clause.join.JoinClause;
 import bt.db.statement.clause.join.JoinConditionalClause;
 import bt.db.statement.result.SqlResultSet;
+import bt.db.statement.value.Preparable;
+import bt.db.statement.value.Value;
 
 /**
  * Represents an SQL select statement which can be extended through method chaining.
  *
  * @author &#8904
  */
-public class SelectStatement extends SqlStatement<SelectStatement>
+public class SelectStatement extends SqlStatement<SelectStatement> implements Preparable
 {
     /** Executed if the select returned less rows than specified. */
     private BiFunction<Integer, SqlResultSet, SqlResultSet> onLessThan;
@@ -77,6 +78,10 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     /** An alias used if this select is used as a subselect. */
     private String alias;
 
+    private List<SelectStatement> subSelects;
+
+    private List<FromClause> fromClauses;
+
     /**
      * Creates a new instance which selects all columns (*) and will log an error message if no rows are returned.
      *
@@ -85,34 +90,7 @@ public class SelectStatement extends SqlStatement<SelectStatement>
      */
     public SelectStatement(DatabaseAccess db)
     {
-        super(db);
-        this.joins = new ArrayList<>();
-        this.columns = new String[]
-        {
-          "*"
-        };
-        this.selectAll = true;
-        this.statementKeyword = "SELECT";
-
-        this.lowerThreshhold = 1;
-        this.onLessThan = (i, set) ->
-        {
-            DatabaseAccess.log.print("< " + set.getSql() + " > did not return any data.");
-
-            if (set.getValues().size() > 0)
-            {
-                String values = "Used values:\n";
-
-                for (String value : set.getValues())
-                {
-                    values += value + "\n";
-                }
-
-                DatabaseAccess.log.print(values);
-            }
-
-            return set;
-        };
+        this(db, "*");
     }
 
     /**
@@ -127,11 +105,13 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     {
         super(db);
         this.joins = new ArrayList<>();
+        this.subSelects = new ArrayList<>();
+        this.fromClauses = new ArrayList<>();
         this.columns = columns;
 
-        for (String col : this.columns)
+        for (Object col : this.columns)
         {
-            if (col.trim().equals("*"))
+            if (col.toString().trim().equals("*"))
             {
                 this.selectAll = true;
             }
@@ -184,7 +164,7 @@ public class SelectStatement extends SqlStatement<SelectStatement>
      *
      * @return An array of the table names.
      */
-    public String[] getTables()
+    public Object[] getTables()
     {
         return this.tables;
     }
@@ -220,55 +200,21 @@ public class SelectStatement extends SqlStatement<SelectStatement>
      *            The tables to select from.
      * @return This instance for chaining.
      */
-    public SelectStatement from(String... tables)
-    {
-        this.tables = tables;
-        return this;
-    }
-
-    /**
-     * Defines the tables to select from.
-     *
-     * <p>
-     * This can be either String names of tables or SelectStatements.
-     * </p>
-     *
-     * <p>
-     * Any SelectStatement that is added via this method needs an alias and will be set to unprepared.
-     * </p>
-     *
-     * @param tables
-     *            The tables to select from.
-     * @return This instance for chaining.
-     */
     public SelectStatement from(Object... tables)
     {
-        this.tables = new String[tables.length];
-
-        Object tempObj;
-
-        for (int i = 0; i < tables.length; i ++ )
+        for (Object table : tables)
         {
-            tempObj = tables[i];
-
-            if (tempObj instanceof SelectStatement)
+            if (table instanceof SelectStatement)
             {
-                SelectStatement select = (SelectStatement)tempObj;
+                SelectStatement select = (SelectStatement)table;
 
                 if (select.getAlias() == null)
                 {
                     DatabaseAccess.log.print(new SQLSyntaxErrorException("Subselects must have an alias assigned."));
                 }
-                else
-                {
-                    this.tables[i] = "(" + select.unprepared().toString() + ") "
-                                     + select.getAlias();
-                }
             }
-            else
-            {
-                this.tables[i] = tempObj.toString();
-            }
+
+            this.fromClauses.add(new FromClause(table));
         }
 
         return this;
@@ -283,10 +229,23 @@ public class SelectStatement extends SqlStatement<SelectStatement>
      */
     public JoinClause join(String table)
     {
-        JoinClause join = new JoinClause(this,
-                                         this.tables[this.tables.length - 1],
-                                         table);
-        this.joins.add(join);
+        JoinClause join = null;
+        try
+        {
+            FromClause from = this.fromClauses.get(this.fromClauses.size() - 1);
+            join = new JoinClause(this,
+                                  from.getTableName(),
+                                  table);
+            this.joins.add(join);
+
+            // add join to last from clause
+            from.addJoin(join);
+        }
+        catch (IndexOutOfBoundsException e)
+        {
+            DatabaseAccess.log.print("Must define at least one from clause before a join can be performed.");
+        }
+
         return join;
     }
 
@@ -300,8 +259,8 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     public ConditionalClause<SelectStatement> where(String column)
     {
         ConditionalClause<SelectStatement> where = new ConditionalClause<>(this,
-                                                                           column,
-                                                                           ConditionalClause.WHERE);
+                                                           column,
+                                                           ConditionalClause.WHERE);
         addWhereClause(where);
         this.lastConditionalType = ConditionalClause.WHERE;
         return where;
@@ -318,8 +277,8 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     public ConditionalClause<SelectStatement> and(String column)
     {
         ConditionalClause<SelectStatement> clause = new ConditionalClause<>(this,
-                                                                            column,
-                                                                            ConditionalClause.AND);
+                                                            column,
+                                                            ConditionalClause.AND);
 
         if (this.lastConditionalType.equals(ConditionalClause.WHERE))
         {
@@ -344,8 +303,8 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     public ConditionalClause<SelectStatement> or(String column)
     {
         ConditionalClause<SelectStatement> clause = new ConditionalClause<>(this,
-                                                                            column,
-                                                                            ConditionalClause.OR);
+                                                            column,
+                                                            ConditionalClause.OR);
 
         if (this.lastConditionalType.equals(ConditionalClause.WHERE))
         {
@@ -427,8 +386,8 @@ public class SelectStatement extends SqlStatement<SelectStatement>
         }
 
         ConditionalClause<SelectStatement> having = new ConditionalClause<>(this,
-                                                                            column,
-                                                                            ConditionalClause.HAVING);
+                                                            column,
+                                                            ConditionalClause.HAVING);
         addHavingClause(having);
         this.lastConditionalType = ConditionalClause.HAVING;
         return having;
@@ -735,6 +694,17 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     }
 
     /**
+     * Indicates that this statement should be executed as a prepared statement.
+     *
+     * @return This instance for chaining.
+     */
+    public SelectStatement prepared()
+    {
+        this.prepared = true;
+        return this;
+    }
+
+    /**
      * Combines this select with the given one.
      *
      * <p>
@@ -834,71 +804,23 @@ public class SelectStatement extends SqlStatement<SelectStatement>
 
             if (this.prepared)
             {
-                String values = "";
+                List<Value> values = getValues();
 
-                int i = 0;
-
-                List<JoinConditionalClause> valueJoin = new ArrayList<>();
-
-                for (JoinClause join : this.joins)
-                {
-                    valueJoin.addAll(join.getConditionalClauses());
-                }
-
-                valueJoin = valueJoin
-                                     .stream()
-                                     .filter(j -> j.usesValue())
-                                     .collect(Collectors.toList());
-
-                for (; i < valueJoin.size(); i ++ )
-                {
-                    JoinConditionalClause clause = valueJoin.get(i);
-                    String value = "p" + (i + 1) + " = " + clause.prepareValue(statement,
-                                                                               i + 1);
-                    values += value + "\n";
-                    valueList.add(value);
-                }
-
-                int offset = valueJoin.size();
-
-                List<ConditionalClause<SelectStatement>> valueWhere = this.whereClauses
-                                                                                       .stream()
-                                                                                       .filter(w -> w.usesValue())
-                                                                                       .collect(Collectors.toList());
-
-                for (; i < valueWhere.size() + offset; i ++ )
-                {
-                    ConditionalClause<SelectStatement> where = valueWhere.get(i - offset);
-                    String value = "p" + (i + 1) + " = " + where.prepareValue(statement,
-                                                                              i + 1);
-                    values += value + "\n";
-                    valueList.add(value);
-                }
-
-                offset += valueWhere.size();
-
-                List<ConditionalClause<SelectStatement>> valueHaving = this.havingClauses
-                                                                                         .stream()
-                                                                                         .filter(h -> h.usesValue())
-                                                                                         .collect(Collectors.toList());
-
-                for (; i < valueHaving.size() + offset; i ++ )
-                {
-                    ConditionalClause<SelectStatement> having = valueHaving.get(i - offset);
-                    String value = "p" + (i + 1) + " = " + having.prepareValue(statement,
-                                                                               i + 1);
-                    values += value + "\n";
-                    valueList.add(value);
-                }
+                Preparable.prepareStatement(statement, values);
 
                 if (!values.isEmpty())
                 {
                     log("With values:",
                         printLogs);
-                    log(values,
-                        printLogs);
                 }
 
+                Value val = null;
+
+                for (int j = 0; j < values.size(); j ++ )
+                {
+                    val = values.get(j);
+                    log("p" + (j + 1) + " [" + val.getType().toString() + "] = " + val.getValue(), printLogs);
+                }
             }
 
             result = new SqlResultSet(statement.executeQuery());
@@ -955,47 +877,25 @@ public class SelectStatement extends SqlStatement<SelectStatement>
     {
         String sql = this.statementKeyword + " ";
 
-        for (String column : this.columns)
+        for (Object column : this.columns)
         {
             sql += column + ", ";
         }
 
-        sql = sql.substring(0,
-                            sql.length() - 2);
+        sql = sql.substring(0, sql.length() - 2);
 
         sql += " FROM ";
 
-        for (String table : this.tables)
+        for (FromClause table : this.fromClauses)
         {
-            sql += table + ", ";
+            sql += table.toString(this.prepared) + ", ";
         }
 
-        sql = sql.substring(0,
-                            sql.length() - 2);
-
-        for (JoinClause join : this.joins)
-        {
-            sql += " " + join.toString(this.prepared);
-        }
-
-        // indicates whether the klast clause was a between clause, to skip the duplicate
-        boolean lastBetween = false;
+        sql = sql.substring(0, sql.length() - 2);
 
         for (ConditionalClause<SelectStatement> where : this.whereClauses)
         {
-            if (!lastBetween)
-            {
-                sql += " " + where.toString(this.prepared);
-
-                if (where instanceof BetweenConditionalClause)
-                {
-                    lastBetween = true;
-                }
-            }
-            else
-            {
-                lastBetween = false;
-            }
+            sql += " " + where.toString(this.prepared);
         }
 
         if (this.groupBy != null)
@@ -1007,24 +907,11 @@ public class SelectStatement extends SqlStatement<SelectStatement>
                 sql += column + ", ";
             }
 
-            sql = sql.substring(0,
-                                sql.length() - 2);
+            sql = sql.substring(0, sql.length() - 2);
 
             for (ConditionalClause<SelectStatement> having : this.havingClauses)
             {
-                if (!lastBetween)
-                {
-                    sql += " " + having.toString(this.prepared);
-
-                    if (having instanceof BetweenConditionalClause)
-                    {
-                        lastBetween = true;
-                    }
-                }
-                else
-                {
-                    lastBetween = false;
-                }
+                sql += " " + having.toString(this.prepared);
             }
         }
 
@@ -1032,7 +919,7 @@ public class SelectStatement extends SqlStatement<SelectStatement>
         {
             for (UnionClause union : this.unions)
             {
-                sql += " " + union.toString();
+                sql += " " + union.toString(this.prepared);
             }
         }
 
@@ -1066,5 +953,41 @@ public class SelectStatement extends SqlStatement<SelectStatement>
         }
 
         return sql;
+    }
+
+    /**
+     * @see bt.db.statement.value.Preparable#getValues()
+     */
+    @Override
+    public List<Value> getValues()
+    {
+        // TODO functions
+
+        List<Value> values = new ArrayList<>();
+
+        for (FromClause f : this.fromClauses)
+        {
+            values.addAll(f.getValues());
+        }
+
+        for (ConditionalClause c : this.whereClauses)
+        {
+            values.addAll(c.getValues());
+        }
+
+        for (ConditionalClause h : this.havingClauses)
+        {
+            values.addAll(h.getValues());
+        }
+
+        if (this.unions != null)
+        {
+            for (UnionClause u : this.unions)
+            {
+                values.addAll(u.getValues());
+            }
+        }
+
+        return values;
     }
 }

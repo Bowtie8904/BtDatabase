@@ -552,7 +552,7 @@ public abstract class DatabaseAccess implements Killable
                 .set("property_value", value)
                 .onDuplicateKey(update(PROPERTIES_TABLE).set("property_value", value)
                                                         .where("property_key")
-                                                        .equals(key)
+                                                        .equal(key)
                                                         .commit())
                 .commit()
                 .execute();
@@ -574,7 +574,7 @@ public abstract class DatabaseAccess implements Killable
 
         SqlResultSet result = select(Sql.column("property_value").as("value")).from(PROPERTIES_TABLE)
                                                                               .where("property_key")
-                                                                              .equals(key)
+                                                                              .equal(key)
                                                                               .onLessThan(1,
                                                                                           (i, set) ->
                                                                                           {
@@ -967,7 +967,7 @@ public abstract class DatabaseAccess implements Killable
     {
         SqlResultSet set = select("tablename").from(SqlValue.SYSTABLE)
                                               .where("tabletype")
-                                              .equals("T")
+                                              .equal("T")
                                               .onLessThan(1,
                                                           (num, res) ->
                                                           {
@@ -1204,7 +1204,7 @@ public abstract class DatabaseAccess implements Killable
         SqlResultSet set = select()
                                    .from(COLUMN_DATA)
                                    .where("table_name")
-                                   .equals(table.toUpperCase())
+                                   .equal(table.toUpperCase())
                                    .onLessThan(1,
                                                (num, res) ->
                                                {

@@ -23,7 +23,7 @@ public class SqlStatement<T extends SqlStatement>
     protected String[] tables;
 
     /** Used column names. */
-    protected String[] columns;
+    protected Object[] columns;
 
     /** All used where conditionals for this statement. */
     protected List<ConditionalClause<T>> whereClauses;

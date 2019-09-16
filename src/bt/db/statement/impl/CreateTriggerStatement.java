@@ -234,7 +234,7 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
                                          .set("instanceID", this.db.getInstanceID())
                                          .set("object_name", this.name.toUpperCase())
                                          .set("object_ddl", sql + ";")
-                                         .where(Sql.upper("object_name").toString()).equals(this.name.toUpperCase())
+                                         .where(Sql.upper("object_name").toString()).equal(this.name.toUpperCase())
                                          .onFail((st, ex) ->
                                          {
                                              return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));
@@ -286,7 +286,7 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
                                                      .set("instanceID", this.db.getInstanceID())
                                                      .set("object_name", this.name.toUpperCase())
                                                      .set("object_ddl", sql + ";")
-                                                     .where(Sql.upper("object_name").toString()).equals(this.name.toUpperCase())
+                                                     .where(Sql.upper("object_name").toString()).equal(this.name.toUpperCase())
                                                      .onFail((st, ex) ->
                                                      {
                                                          return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));

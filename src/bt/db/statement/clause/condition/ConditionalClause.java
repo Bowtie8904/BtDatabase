@@ -1,45 +1,43 @@
 package bt.db.statement.clause.condition;
 
 import java.sql.Date;
-import java.sql.PreparedStatement;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
-import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
 import bt.db.func.SqlFunction;
-import bt.db.statement.SqlStatement;
-import bt.db.statement.clause.BetweenConditionalClause;
 import bt.db.statement.clause.ColumnEntry;
 import bt.db.statement.impl.SelectStatement;
+import bt.db.statement.value.Preparable;
+import bt.db.statement.value.Value;
 
 /**
- * Holds data for conditional clauses used in sql statements.
- *
  * @author &#8904
+ *
  */
-public class ConditionalClause<T extends SqlStatement>
+public class ConditionalClause<T> implements Preparable
 {
     public static final String WHERE = "WHERE";
     public static final String OR = "OR";
     public static final String AND = "AND";
     public static final String HAVING = "HAVING";
     public static final String ON = "ON";
-
     protected static final String EQUALS = "=";
     protected static final String GREATER = ">";
     protected static final String LESS = "<";
     protected static final String GREATER_EQUALS = ">=";
     protected static final String LESS_EQUALS = "<=";
-    protected static final String NOT = "!=";
+    protected static final String NOT_EQUAL = "!=";
     protected static final String IS_NOT_NULL = "IS NOT NULL";
     protected static final String IS_NULL = "IS NULL";
     protected static final String LIKE = "LIKE";
     protected static final String BETWEEN = "BETWEEN";
     protected static final String IN = "IN";
     protected static final String NOT_IN = "NOT IN";
+    protected static final String NOT = "NOT";
 
-    /** Not using {@link SqlType} because we need more types which are not valid column sql types. */
     protected enum ValueType
     {
         BYTE,
@@ -58,6 +56,7 @@ public class ConditionalClause<T extends SqlStatement>
         COLUMN,
         FUNCTION,
         ARRAY,
+        BETWEEN,
         SUBSELECT;
 
         public static ValueType getType(Object value)
@@ -106,18 +105,22 @@ public class ConditionalClause<T extends SqlStatement>
             {
                 return TIMESTAMP;
             }
+            else if (value instanceof ColumnEntry)
+            {
+                return COLUMN;
+            }
+            else if (value instanceof SqlFunction)
+            {
+                return FUNCTION;
+            }
 
             return null;
         }
     }
 
-    /** The last parameter index that was passed to the {@link #prepareValue(PreparedStatement, int)} method. */
-    protected int lastParameterIndex;
-
     /** The type of the value that is used. */
     protected ValueType valueType;
 
-    /** The name of the column that is checked (left side) during this conditional evaluation. */
     protected String column;
 
     /** The keyword that is used. I.e. WHERE, AND, HAVING, ... */
@@ -127,136 +130,25 @@ public class ConditionalClause<T extends SqlStatement>
     protected String operator;
 
     /** The value that is checked against (right side). */
-    protected String value;
+    protected Object value;
 
-    /** The statement that created this conditional. */
-    protected T statement;
+    protected Object betweenValue1;
+    protected Object betweenValue2;
 
-    /** The {@link BetweenConditionalClause} if this instance uses the between keyword. */
-    protected BetweenConditionalClause<T> betweenClause;
+    protected boolean negateExpression = false;
 
-    /**
-     * Indicates whether this conditional uses a value (right side) which could be inserted with a prepared statement.
-     * true = uses a valid prepared statement value, false = does not use a prepared statement value.
-     */
-    protected boolean usesValue = true;
+    protected T caller;
 
-    /**
-     * Creates a new instance and initializes fields.
-     *
-     * @param statement
-     *            The statement that created this conditional.
-     * @param column
-     *            The column (left side) that should be checked.
-     * @param keyword
-     *            The keyword for this clause, i.e WHERE, HAVING, AND, ...
-     */
-    public ConditionalClause(T statement, String column, String keyword)
+    protected List<Value> values;
+
+    protected SelectStatement subSelect;
+
+    public ConditionalClause(T caller, String column, String keyword)
     {
-        this.statement = statement;
+        this.caller = caller;
         this.column = column;
         this.keyword = keyword;
-    }
-
-    /**
-     * Prepares the values for execution.
-     *
-     * @param statement
-     *            The statement which should be prepared with this conditionals value.
-     * @param parameterIndex
-     *            The index of the parameter in the given statement that should be prepared.
-     * @return A String representation of the prepared value.
-     */
-    public String prepareValue(PreparedStatement statement, int parameterIndex)
-    {
-        try
-        {
-            switch (this.valueType)
-            {
-                case DATE:
-                    statement.setDate(parameterIndex,
-                                      Date.valueOf(this.value));
-                    break;
-                case TIME:
-                    statement.setTime(parameterIndex,
-                                      Time.valueOf(this.value));
-                    break;
-                case TIMESTAMP:
-                    statement.setTimestamp(parameterIndex,
-                                           Timestamp.valueOf(this.value));
-                    break;
-                case BYTE:
-                    statement.setByte(parameterIndex,
-                                      Byte.parseByte(this.value));
-                    break;
-                case SHORT:
-                    statement.setShort(parameterIndex,
-                                       Short.parseShort(this.value));
-                    break;
-                case INTEGER:
-                    statement.setInt(parameterIndex,
-                                     Integer.parseInt(this.value));
-                    break;
-                case LONG:
-                    statement.setLong(parameterIndex,
-                                      Long.parseLong(this.value));
-                    break;
-                case DOUBLE:
-                    statement.setDouble(parameterIndex,
-                                        Double.parseDouble(this.value));
-                    break;
-                case FLOAT:
-                    statement.setFloat(parameterIndex,
-                                       Float.parseFloat(this.value));
-                    break;
-                case BOOLEAN:
-                    statement.setBoolean(parameterIndex,
-                                         Boolean.parseBoolean(this.value));
-                    break;
-                default:
-                    statement.setString(parameterIndex,
-                                        this.value);
-            }
-        }
-        catch (Exception e)
-        {
-            DatabaseAccess.log.print(this,
-                                     e);
-        }
-
-        this.lastParameterIndex = parameterIndex;
-
-        return this.value;
-    }
-
-    /**
-     * Gets the {@link BetweenConditionalClause} this instance uses if it is a between condition.
-     *
-     * @return
-     */
-    public BetweenConditionalClause getBetweenClause()
-    {
-        return this.betweenClause;
-    }
-
-    /**
-     * Returns the value that is used to check against (right side).
-     *
-     * @return The String representation of the value.
-     */
-    public String getValue()
-    {
-        return this.value;
-    }
-
-    /**
-     * Indicates whether this conditional uses a value (right side) which could be inserted with a prepared statement.
-     *
-     * @return true = uses a valid prepared statement value, false = does not use a prepared statement value.
-     */
-    public boolean usesValue()
-    {
-        return this.usesValue;
+        this.values = new ArrayList<>();
     }
 
     /**
@@ -272,12 +164,49 @@ public class ConditionalClause<T extends SqlStatement>
             return "Operator null";
         }
 
-        if (this.operator.equals(IS_NOT_NULL) || this.operator.equals(IS_NULL))
+        if (this.valueType.equals(ValueType.COLUMN))
         {
-            return this.keyword + " " + this.column + " " + this.operator;
+            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator + " " + this.value.toString();
         }
 
-        return this.keyword + " " + this.column + " " + this.operator + " ?";
+        if (this.operator.equals(BETWEEN))
+        {
+            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator + getBetweenString(true);
+        }
+
+        if (this.valueType.equals(ValueType.SUBSELECT))
+        {
+            this.subSelect.prepared();
+            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator + " (" + this.subSelect.toString() + ")";
+        }
+
+        if (this.valueType.equals(ValueType.FUNCTION))
+        {
+            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator + " " + ((SqlFunction)this.value).toString(true);
+        }
+
+        if (this.valueType.equals(ValueType.ARRAY))
+        {
+            String arrayString = " (";
+            Object[] array = (Object[])this.value;
+
+            for (Object obj : array)
+            {
+                arrayString += "?, ";
+            }
+
+            arrayString = arrayString.substring(0, arrayString.length() - 2);
+            arrayString += ")";
+
+            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator + arrayString;
+        }
+
+        if (this.operator.equals(IS_NOT_NULL) || this.operator.equals(IS_NULL))
+        {
+            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator;
+        }
+
+        return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator + " ?";
     }
 
     /**
@@ -294,1548 +223,85 @@ public class ConditionalClause<T extends SqlStatement>
             return "Operator null";
         }
 
-        if (prepared && this.usesValue)
+        if (this.operator.equals(BETWEEN))
+        {
+            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator + getBetweenString(prepared);
+        }
+
+        if (prepared)
         {
             return toString();
         }
 
+        if (this.valueType.equals(ValueType.SUBSELECT))
+        {
+            this.subSelect.unprepared();
+            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator + " (" + this.subSelect.toString() + ")";
+        }
+
+        if (this.valueType.equals(ValueType.FUNCTION))
+        {
+            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator + " " + ((SqlFunction)this.value).toString(prepared);
+        }
+
+        if (this.valueType.equals(ValueType.ARRAY))
+        {
+            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator + " " + SqlType.arrayToString((Object[])this.value);
+        }
+
         if (this.operator.equals(IS_NOT_NULL) || this.operator.equals(IS_NULL))
         {
-            return this.keyword + " " + this.column + " " + this.operator;
+            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator;
         }
         else if (this.valueType == ValueType.STRING || this.valueType == ValueType.DATE
                  || this.valueType == ValueType.TIME || this.valueType == ValueType.TIMESTAMP)
         {
-            return this.keyword + " " + this.column + " " + this.operator + " '" + this.value + "'";
+            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator + " '" + this.value + "'";
         }
 
-        return this.keyword + " " + this.column + " " + this.operator + " " + this.value;
+        return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator + " " + this.value;
     }
 
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether both sides are EQUAL.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T equals(Date value)
+    protected String getBetweenString(boolean prepared)
     {
-        this.valueType = ValueType.DATE;
-        this.operator = EQUALS;
-        this.value = value.toString();
-        return this.statement;
-    }
+        ValueType valueType1 = ValueType.getType(this.betweenValue1);
+        ValueType valueType2 = ValueType.getType(this.betweenValue2);
 
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether both sides are EQUAL.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T equals(Time value)
-    {
-        this.valueType = ValueType.TIME;
-        this.operator = EQUALS;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether both sides are EQUAL.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T equals(Timestamp value)
-    {
-        this.valueType = ValueType.TIMESTAMP;
-        this.operator = EQUALS;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether both sides are EQUAL.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T equals(byte value)
-    {
-        this.valueType = ValueType.BYTE;
-        this.operator = EQUALS;
-        this.value = Byte.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether both sides are EQUAL.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T equals(short value)
-    {
-        this.valueType = ValueType.SHORT;
-        this.operator = EQUALS;
-        this.value = Short.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether both sides are EQUAL.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T equals(int value)
-    {
-        this.valueType = ValueType.INTEGER;
-        this.operator = EQUALS;
-        this.value = Integer.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether both sides are EQUAL.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T equals(long value)
-    {
-        this.valueType = ValueType.LONG;
-        this.operator = EQUALS;
-        this.value = Long.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether both sides are EQUAL.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T equals(double value)
-    {
-        this.valueType = ValueType.DOUBLE;
-        this.operator = EQUALS;
-        this.value = Double.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether both sides are EQUAL.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T equals(float value)
-    {
-        this.valueType = ValueType.FLOAT;
-        this.operator = EQUALS;
-        this.value = Float.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether both sides are EQUAL.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T equals(boolean value)
-    {
-        this.valueType = ValueType.BOOLEAN;
-        this.operator = EQUALS;
-        this.value = Boolean.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether both sides are EQUAL.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T equals(String value)
-    {
-        this.valueType = ValueType.STRING;
-        this.operator = EQUALS;
-        this.value = value;
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether both sides are LIKE each other.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T like(String value)
-    {
-        this.valueType = ValueType.STRING;
-        this.operator = LIKE;
-        this.value = value;
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether both sides are NOT EQUAL.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T not(Date value)
-    {
-        this.valueType = ValueType.DATE;
-        this.operator = NOT;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether both sides are NOT EQUAL.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T not(Time value)
-    {
-        this.valueType = ValueType.TIME;
-        this.operator = NOT;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether both sides are NOT EQUAL.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T not(Timestamp value)
-    {
-        this.valueType = ValueType.TIMESTAMP;
-        this.operator = NOT;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether both sides are NOT EQUAL.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T not(byte value)
-    {
-        this.valueType = ValueType.BYTE;
-        this.operator = NOT;
-        this.value = Byte.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether both sides are NOT EQUAL.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T not(short value)
-    {
-        this.valueType = ValueType.SHORT;
-        this.operator = NOT;
-        this.value = Short.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether both sides are NOT EQUAL.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T not(int value)
-    {
-        this.valueType = ValueType.INTEGER;
-        this.operator = NOT;
-        this.value = Integer.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether both sides are NOT EQUAL.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T not(long value)
-    {
-        this.valueType = ValueType.LONG;
-        this.operator = NOT;
-        this.value = Long.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether both sides are NOT EQUAL.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T not(double value)
-    {
-        this.valueType = ValueType.DOUBLE;
-        this.operator = NOT;
-        this.value = Double.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether both sides are NOT EQUAL.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T not(float value)
-    {
-        this.valueType = ValueType.FLOAT;
-        this.operator = NOT;
-        this.value = Float.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether both sides are NOT EQUAL.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T not(boolean value)
-    {
-        this.valueType = ValueType.BOOLEAN;
-        this.operator = NOT;
-        this.value = Boolean.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether both sides are NOT EQUAL.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T not(String value)
-    {
-        this.valueType = ValueType.STRING;
-        this.operator = NOT;
-        this.value = value;
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is GREATER THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T greaterThan(Date value)
-    {
-        this.valueType = ValueType.DATE;
-        this.operator = GREATER;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is GREATER THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T greaterThan(Time value)
-    {
-        this.valueType = ValueType.TIME;
-        this.operator = GREATER;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is GREATER THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T greaterThan(Timestamp value)
-    {
-        this.valueType = ValueType.TIMESTAMP;
-        this.operator = GREATER;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is GREATER THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T greaterThan(byte value)
-    {
-        this.valueType = ValueType.BYTE;
-        this.operator = GREATER;
-        this.value = Byte.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is GREATER THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T greaterThan(short value)
-    {
-        this.valueType = ValueType.SHORT;
-        this.operator = GREATER;
-        this.value = Short.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is GREATER THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T greaterThan(int value)
-    {
-        this.valueType = ValueType.INTEGER;
-        this.operator = GREATER;
-        this.value = Integer.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is GREATER THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T greaterThan(long value)
-    {
-        this.valueType = ValueType.LONG;
-        this.operator = GREATER;
-        this.value = Long.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is GREATER THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T greaterThan(double value)
-    {
-        this.valueType = ValueType.DOUBLE;
-        this.operator = GREATER;
-        this.value = Double.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is GREATER THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T greaterThan(float value)
-    {
-        this.valueType = ValueType.FLOAT;
-        this.operator = GREATER;
-        this.value = Float.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is LESS THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T lessThan(Date value)
-    {
-        this.valueType = ValueType.DATE;
-        this.operator = LESS;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is LESS THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T lessThan(Time value)
-    {
-        this.valueType = ValueType.TIME;
-        this.operator = LESS;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is LESS THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T lessThan(Timestamp value)
-    {
-        this.valueType = ValueType.TIMESTAMP;
-        this.operator = LESS;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is LESS THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T lessThan(byte value)
-    {
-        this.valueType = ValueType.BYTE;
-        this.operator = LESS;
-        this.value = Byte.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is LESS THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T lessThan(short value)
-    {
-        this.valueType = ValueType.SHORT;
-        this.operator = LESS;
-        this.value = Short.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is LESS THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T lessThan(int value)
-    {
-        this.valueType = ValueType.INTEGER;
-        this.operator = LESS;
-        this.value = Integer.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is LESS THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T lessThan(long value)
-    {
-        this.valueType = ValueType.LONG;
-        this.operator = LESS;
-        this.value = Long.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is LESS THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T lessThan(double value)
-    {
-        this.valueType = ValueType.DOUBLE;
-        this.operator = LESS;
-        this.value = Double.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is LESS THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T lessThan(float value)
-    {
-        this.valueType = ValueType.FLOAT;
-        this.operator = LESS;
-        this.value = Float.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is GREATER OR EQUAL THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T greaterOrEqual(Date value)
-    {
-        this.valueType = ValueType.DATE;
-        this.operator = GREATER_EQUALS;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is GREATER OR EQUAL THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T greaterOrEqual(Time value)
-    {
-        this.valueType = ValueType.TIME;
-        this.operator = GREATER_EQUALS;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is GREATER OR EQUAL THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T greaterOrEqual(Timestamp value)
-    {
-        this.valueType = ValueType.TIMESTAMP;
-        this.operator = GREATER_EQUALS;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is GREATER OR EQUAL THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T greaterOrEqual(byte value)
-    {
-        this.valueType = ValueType.BYTE;
-        this.operator = GREATER_EQUALS;
-        this.value = Byte.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is GREATER OR EQUAL THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T greaterOrEqual(short value)
-    {
-        this.valueType = ValueType.SHORT;
-        this.operator = GREATER_EQUALS;
-        this.value = Short.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is GREATER OR EQUAL THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T greaterOrEqual(int value)
-    {
-        this.valueType = ValueType.INTEGER;
-        this.operator = GREATER_EQUALS;
-        this.value = Integer.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is GREATER OR EQUAL THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T greaterOrEqual(long value)
-    {
-        this.valueType = ValueType.LONG;
-        this.operator = GREATER_EQUALS;
-        this.value = Long.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is GREATER OR EQUAL THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T greaterOrEqual(double value)
-    {
-        this.valueType = ValueType.DOUBLE;
-        this.operator = GREATER_EQUALS;
-        this.value = Double.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is GREATER OR EQUAL THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T greaterOrEqual(float value)
-    {
-        this.valueType = ValueType.FLOAT;
-        this.operator = GREATER_EQUALS;
-        this.value = Float.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is LESS OR EQUAL THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T lessOrEqual(Date value)
-    {
-        this.valueType = ValueType.DATE;
-        this.operator = LESS_EQUALS;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is LESS OR EQUAL THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T lessOrEqual(Time value)
-    {
-        this.valueType = ValueType.TIME;
-        this.operator = LESS_EQUALS;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is LESS OR EQUAL THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T lessOrEqual(Timestamp value)
-    {
-        this.valueType = ValueType.TIMESTAMP;
-        this.operator = LESS_EQUALS;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is LESS OR EQUAL THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T lessOrEqual(byte value)
-    {
-        this.valueType = ValueType.BYTE;
-        this.operator = LESS_EQUALS;
-        this.value = Byte.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is LESS OR EQUAL THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T lessOrEqual(short value)
-    {
-        this.valueType = ValueType.SHORT;
-        this.operator = LESS_EQUALS;
-        this.value = Short.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is LESS OR EQUAL THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T lessOrEqual(int value)
-    {
-        this.valueType = ValueType.INTEGER;
-        this.operator = LESS_EQUALS;
-        this.value = Integer.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is LESS OR EQUAL THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T lessOrEqual(long value)
-    {
-        this.valueType = ValueType.LONG;
-        this.operator = LESS_EQUALS;
-        this.value = Long.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is LESS OR EQUAL THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T lessOrEqual(double value)
-    {
-        this.valueType = ValueType.DOUBLE;
-        this.operator = LESS_EQUALS;
-        this.value = Double.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * Adds the given value to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is LESS OR EQUAL THAN the right side.
-     * </p>
-     *
-     * @param value
-     *            The value to check against.
-     * @return The statement that created this conditional.
-     */
-    public T lessOrEqual(float value)
-    {
-        this.valueType = ValueType.FLOAT;
-        this.operator = LESS_EQUALS;
-        this.value = Float.toString(value);
-        return this.statement;
-    }
-
-    /**
-     * This conditional will check whether the left side IS NULL.
-     *
-     * @return The statement that created this conditional.
-     */
-    public T isNull()
-    {
-        this.valueType = ValueType.NULL;
-        this.operator = IS_NULL;
-        this.usesValue = false;
-        return this.statement;
-    }
-
-    /**
-     * This conditional will check whether the left side IS NOT NULL.
-     *
-     * @return The statement that created this conditional.
-     */
-    public T notNull()
-    {
-        this.valueType = ValueType.NOT_NULL;
-        this.operator = IS_NOT_NULL;
-        this.usesValue = false;
-        return this.statement;
-    }
-
-    /**
-     * Adds the given select statement to the right side of this conditional.
-     *
-     * <p>
-     * This conditional will then check whether the left side is contained in the values returned by the given select.
-     * </p>
-     *
-     * <p>
-     * The select must be marked as {@link SelectStatement#unprepared()} and can only select a single column.
-     * </p>
-     *
-     * @param select
-     *            The select whichs result should be used.
-     * @return The statement that created this conditional.
-     */
-    public T in(SelectStatement select)
-    {
-        if (select.isPrepared())
+        if (valueType1 == null || valueType2 == null)
         {
-            throw new IllegalArgumentException("Subselects must be marked as 'unprepared'.");
+            throw new IllegalArgumentException("One or more argument types are not suitable for a BETWEEN clause.");
         }
 
-        this.valueType = ValueType.SUBSELECT;
-        this.operator = IN;
-        this.value = "(" + select.toString() + ")";
-        this.usesValue = false;
-        return this.statement;
-    }
+        String str = "";
 
-    /**
-     * Adds the given select statement to the right side of this conditional.
-     *
-     * <p>
-     * This conditional will then check whether the left side is NOT contained in the values returned by the given
-     * select.
-     * </p>
-     *
-     * <p>
-     * The select must be marked as {@link SelectStatement#unprepared()} and can only select a single column.
-     * </p>
-     *
-     * @param select
-     *            The select whichs result should be used.
-     * @return The statement that created this conditional.
-     */
-    public T notIn(SelectStatement select)
-    {
-        if (select.isPrepared())
+        if (prepared)
         {
-            throw new IllegalArgumentException("Subselects must be marked as 'unprepared'.");
+            str = " ? " + AND + " ?";
+        }
+        else
+        {
+            if (valueType1 == ValueType.DATE || valueType1 == ValueType.TIME
+                || valueType1 == ValueType.TIMESTAMP)
+            {
+                str += " '" + this.betweenValue1 + "'";
+            }
+            else
+            {
+                str += " " + this.betweenValue1;
+            }
+
+            if (valueType2 == ValueType.DATE || valueType2 == ValueType.TIME
+                || valueType2 == ValueType.TIMESTAMP)
+            {
+                str += " " + AND + " '" + this.betweenValue2 + "'";
+            }
+            else
+            {
+                str += " " + AND + " " + this.betweenValue2;
+            }
         }
 
-        this.valueType = ValueType.SUBSELECT;
-        this.operator = NOT_IN;
-        this.value = "(" + select.toString() + ")";
-        this.usesValue = false;
-        return this.statement;
-    }
-
-    /**
-     * Adds the given array to the right side of this conditional.
-     *
-     * <p>
-     * This conditional will then check whether the left side is contained in the values inside the array.
-     * </p>
-     *
-     * @param array
-     *            The array to use.
-     * @return The statement that created this conditional.
-     */
-    public T in(Object... array)
-    {
-        this.valueType = ValueType.ARRAY;
-        this.operator = IN;
-        this.value = SqlType.arrayToString(array);
-        this.usesValue = false;
-        return this.statement;
-    }
-
-    /**
-     * Adds the given array to the right side of this conditional.
-     *
-     * <p>
-     * This conditional will then check whether the left side is NOT contained in the values inside the array.
-     * </p>
-     *
-     * @param array
-     *            The array to use.
-     * @return The statement that created this conditional.
-     */
-    public T notIn(Object... array)
-    {
-        this.valueType = ValueType.ARRAY;
-        this.operator = NOT_IN;
-        this.value = SqlType.arrayToString(array);
-        this.usesValue = false;
-        return this.statement;
-    }
-
-    /**
-     * Adds the given column to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is EQUAL to the right side column value.
-     * </p>
-     *
-     * @param value
-     *            The column whichs value should be used to check against.
-     * @return The statement that created this conditional.
-     */
-    public T equals(ColumnEntry value)
-    {
-        this.valueType = ValueType.COLUMN;
-        this.operator = EQUALS;
-        this.usesValue = false;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given column to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is LIKE the right side column value.
-     * </p>
-     *
-     * @param value
-     *            The column whichs value should be used to check against.
-     * @return The statement that created this conditional.
-     */
-    public T like(ColumnEntry value)
-    {
-        this.valueType = ValueType.COLUMN;
-        this.operator = LIKE;
-        this.usesValue = false;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given column to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is NOT EQUAL to the right side column value.
-     * </p>
-     *
-     * @param value
-     *            The column whichs value should be used to check against.
-     * @return The statement that created this conditional.
-     */
-    public T not(ColumnEntry value)
-    {
-        this.valueType = ValueType.COLUMN;
-        this.operator = NOT;
-        this.usesValue = false;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given column to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is GREATER THAN the right side column value.
-     * </p>
-     *
-     * @param value
-     *            The column whichs value should be used to check against.
-     * @return The statement that created this conditional.
-     */
-    public T greaterThan(ColumnEntry value)
-    {
-        this.valueType = ValueType.COLUMN;
-        this.operator = GREATER;
-        this.usesValue = false;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given column to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is LESS THAN the right side column value.
-     * </p>
-     *
-     * @param value
-     *            The column whichs value should be used to check against.
-     * @return The statement that created this conditional.
-     */
-    public T lessThan(ColumnEntry value)
-    {
-        this.valueType = ValueType.COLUMN;
-        this.operator = LESS;
-        this.usesValue = false;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given column to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is GREATER THAN OR EQUAL TO the right side column value.
-     * </p>
-     *
-     * @param value
-     *            The column whichs value should be used to check against.
-     * @return The statement that created this conditional.
-     */
-    public T greaterOrEqual(ColumnEntry value)
-    {
-        this.valueType = ValueType.COLUMN;
-        this.operator = GREATER_EQUALS;
-        this.usesValue = false;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given column to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is LESS THAN OR EQUAL TO the right side column value.
-     * </p>
-     *
-     * @param value
-     *            The column whichs value should be used to check against.
-     * @return The statement that created this conditional.
-     */
-    public T lessOrEqual(ColumnEntry value)
-    {
-        this.valueType = ValueType.COLUMN;
-        this.operator = LESS_EQUALS;
-        this.usesValue = false;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given function to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is EQUAL to the right side column value.
-     * </p>
-     *
-     * @param value
-     *            The function whichs value should be used to check against.
-     * @return The statement that created this conditional.
-     */
-    public T equals(SqlFunction value)
-    {
-        this.valueType = ValueType.FUNCTION;
-        this.operator = EQUALS;
-        this.usesValue = false;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given function to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is LIKE the right side column value.
-     * </p>
-     *
-     * @param value
-     *            The function whichs value should be used to check against.
-     * @return The statement that created this conditional.
-     */
-    public T like(SqlFunction value)
-    {
-        this.valueType = ValueType.FUNCTION;
-        this.operator = LIKE;
-        this.usesValue = false;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given function to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is NOT EQUAL to the right side column value.
-     * </p>
-     *
-     * @param value
-     *            The function whichs value should be used to check against.
-     * @return The statement that created this conditional.
-     */
-    public T not(SqlFunction value)
-    {
-        this.valueType = ValueType.FUNCTION;
-        this.operator = NOT;
-        this.usesValue = false;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given function to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is GREATER THAN the right side column value.
-     * </p>
-     *
-     * @param value
-     *            The function whichs value should be used to check against.
-     * @return The statement that created this conditional.
-     */
-    public T greaterThan(SqlFunction value)
-    {
-        this.valueType = ValueType.FUNCTION;
-        this.operator = GREATER;
-        this.usesValue = false;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given function to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is LESS THAN the right side column value.
-     * </p>
-     *
-     * @param value
-     *            The function whichs value should be used to check against.
-     * @return The statement that created this conditional.
-     */
-    public T lessThan(SqlFunction value)
-    {
-        this.valueType = ValueType.FUNCTION;
-        this.operator = LESS;
-        this.usesValue = false;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given function to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is GREATER THAN OR EQUAL TO the right side column value.
-     * </p>
-     *
-     * @param value
-     *            The function whichs value should be used to check against.
-     * @return The statement that created this conditional.
-     */
-    public T greaterOrEqual(SqlFunction value)
-    {
-        this.valueType = ValueType.FUNCTION;
-        this.operator = GREATER_EQUALS;
-        this.usesValue = false;
-        this.value = value.toString();
-        return this.statement;
-    }
-
-    /**
-     * Adds the given function to the right side of this conditional to check against.
-     *
-     * <p>
-     * This conditional will then check whether the left side is LESS THAN OR EQUAL TO the right side column value.
-     * </p>
-     *
-     * @param value
-     *            The function whichs value should be used to check against.
-     * @return The statement that created this conditional.
-     */
-    public T lessOrEqual(SqlFunction value)
-    {
-        this.valueType = ValueType.FUNCTION;
-        this.operator = LESS_EQUALS;
-        this.usesValue = false;
-        this.value = value.toString();
-        return this.statement;
+        return str;
     }
 
     /**
@@ -1864,12 +330,14 @@ public class ConditionalClause<T extends SqlStatement>
      *            The lower bounds (inclusive).
      * @param value2
      *            The upper bounds (inclusive).
-     * @return The statement that created this conditional.
+     * @return The caller that created this conditional.
      */
     public T between(Object value1, Object value2)
     {
         this.operator = BETWEEN;
-        this.usesValue = true;
+        this.valueType = ValueType.BETWEEN;
+        this.betweenValue1 = value1;
+        this.betweenValue2 = value2;
 
         ValueType valueType1 = ValueType.getType(value1);
         ValueType valueType2 = ValueType.getType(value1);
@@ -1879,28 +347,299 @@ public class ConditionalClause<T extends SqlStatement>
             throw new IllegalArgumentException("One or more argument types are not suitable for a BETWEEN clause.");
         }
 
-        this.betweenClause = new BetweenConditionalClause(this.statement,
-                                                          this.column,
-                                                          this.keyword,
-                                                          value1.toString(),
-                                                          value2.toString(),
-                                                          valueType1,
-                                                          valueType2);
+        this.values.add(new Value(SqlType.convert(value1.getClass()), value1));
+        this.values.add(new Value(SqlType.convert(value2.getClass()), value2));
 
-        if (this.statement.getHavingClauses().remove(this))
+        return this.caller;
+    }
+
+    protected void setValueVariables(Object value)
+    {
+        ValueType type = ValueType.getType(value);
+        if (value instanceof SelectStatement)
         {
-            // adding twice so that both values of the BETWEEN clause will be prepared correctly
-            this.statement.addHavingClause(this.betweenClause);
-            this.statement.addHavingClause(this.betweenClause);
+            this.valueType = ValueType.SUBSELECT;
+            this.subSelect = (SelectStatement)value;
+            this.values.addAll(((SelectStatement)value).getValues());
+        }
+        else if (type.equals(ValueType.COLUMN))
+        {
+            this.valueType = ValueType.COLUMN;
+            this.value = value;
+        }
+        else if (type.equals(ValueType.FUNCTION))
+        {
+            this.valueType = ValueType.FUNCTION;
+            this.value = value;
+            this.values.addAll(((SqlFunction)value).getValues());
+        }
+        else
+        {
+            this.valueType = ValueType.getType(value);
+            this.value = value.toString();
+            this.values.add(new Value(SqlType.convert(value.getClass()), value));
+        }
+    }
+
+    /**
+     * Adds the given value to the right side of this conditional to check against.
+     *
+     * <p>
+     * This conditional will then check whether both sides are EQUAL.
+     * </p>
+     *
+     * @param value
+     *            The value to check against.
+     * @return The caller that created this conditional.
+     */
+    public T equal(Object value)
+    {
+        this.operator = EQUALS;
+        setValueVariables(value);
+        return this.caller;
+    }
+
+    /**
+     * Adds the given value to the right side of this conditional to check against.
+     *
+     * <p>
+     * This conditional will then check whether both sides are NOT EQUAL.
+     * </p>
+     *
+     * @param value
+     *            The value to check against.
+     * @return The caller that created this conditional.
+     */
+    public T notEqual(Object value)
+    {
+        this.operator = NOT_EQUAL;
+        setValueVariables(value);
+        return this.caller;
+    }
+
+    /**
+     * Adds the given value to the right side of this conditional to check against.
+     *
+     * <p>
+     * This conditional will then check whether both sides are LIKE each other.
+     * </p>
+     *
+     * @param value
+     *            The value to check against.
+     * @return The caller that created this conditional.
+     */
+    public T like(String value)
+    {
+        this.valueType = ValueType.STRING;
+        this.operator = LIKE;
+        this.value = value;
+        this.values.add(new Value(SqlType.VARCHAR, value));
+        return this.caller;
+    }
+
+    /**
+     * Adds the given value to the right side of this conditional to check against.
+     *
+     * <p>
+     * This conditional will then check whether the left side is GREATER THAN the right side.
+     * </p>
+     *
+     * @param value
+     *            The value to check against.
+     * @return The caller that created this conditional.
+     */
+    public T greaterThan(Object value)
+    {
+        this.operator = GREATER;
+        setValueVariables(value);
+        return this.caller;
+    }
+
+    /**
+     * Adds the given value to the right side of this conditional to check against.
+     *
+     * <p>
+     * This conditional will then check whether the left side is LESS THAN the right side.
+     * </p>
+     *
+     * @param value
+     *            The value to check against.
+     * @return The caller that created this conditional.
+     */
+    public T lessThan(Object value)
+    {
+        this.operator = LESS;
+        setValueVariables(value);
+        return this.caller;
+    }
+
+    /**
+     * Adds the given value to the right side of this conditional to check against.
+     *
+     * <p>
+     * This conditional will then check whether the left side is GREATER OR EQUAL THAN the right side.
+     * </p>
+     *
+     * @param value
+     *            The value to check against.
+     * @return The caller that created this conditional.
+     */
+    public T greaterOrEqual(Object value)
+    {
+        this.operator = GREATER_EQUALS;
+        setValueVariables(value);
+        return this.caller;
+    }
+
+    /**
+     * Adds the given value to the right side of this conditional to check against.
+     *
+     * <p>
+     * This conditional will then check whether the left side is LESS OR EQUAL THAN the right side.
+     * </p>
+     *
+     * @param value
+     *            The value to check against.
+     * @return The caller that created this conditional.
+     */
+    public T lessOrEqual(Object value)
+    {
+        this.operator = LESS_EQUALS;
+        setValueVariables(value);
+        return this.caller;
+    }
+
+    /**
+     * This conditional will check whether the left side IS NULL.
+     *
+     * @return The caller that created this conditional.
+     */
+    public T isNull()
+    {
+        this.valueType = ValueType.NULL;
+        this.operator = IS_NULL;
+
+        return this.caller;
+    }
+
+    /**
+     * This conditional will check whether the left side IS NOT NULL.
+     *
+     * @return The caller that created this conditional.
+     */
+    public T notNull()
+    {
+        this.valueType = ValueType.NOT_NULL;
+        this.operator = IS_NOT_NULL;
+
+        return this.caller;
+    }
+
+    /**
+     * Adds the given select statement to the right side of this conditional.
+     *
+     * <p>
+     * This conditional will then check whether the left side is contained in the values returned by the given select.
+     * </p>
+     *
+     * @param select
+     *            The select whichs result should be used.
+     * @return The caller that created this conditional.
+     */
+    public T in(SelectStatement select)
+    {
+        this.operator = IN;
+        setValueVariables(select);
+
+        return this.caller;
+    }
+
+    /**
+     * Adds the given select statement to the right side of this conditional.
+     *
+     * <p>
+     * This conditional will then check whether the left side is NOT contained in the values returned by the given
+     * select.
+     * </p>
+     *
+     * <p>
+     * The select must be marked as {@link SelectStatement#unprepared()} and can only select a single column.
+     * </p>
+     *
+     * @param select
+     *            The select whichs result should be used.
+     * @return The caller that created this conditional.
+     */
+    public T notIn(SelectStatement select)
+    {
+        this.operator = NOT_IN;
+        setValueVariables(select);
+
+        return this.caller;
+    }
+
+    /**
+     * Adds the given array to the right side of this conditional.
+     *
+     * <p>
+     * This conditional will then check whether the left side is contained in the values inside the array.
+     * </p>
+     *
+     * @param array
+     *            The array to use.
+     * @return The caller that created this conditional.
+     */
+    public T in(Object... array)
+    {
+        this.valueType = ValueType.ARRAY;
+        this.operator = IN;
+        this.value = array;
+
+        for (Object obj : array)
+        {
+            this.values.add(new Value(SqlType.convert(obj.getClass()), obj));
         }
 
-        if (this.statement.getWhereClauses().remove(this))
+        return this.caller;
+    }
+
+    /**
+     * Adds the given array to the right side of this conditional.
+     *
+     * <p>
+     * This conditional will then check whether the left side is NOT contained in the values inside the array.
+     * </p>
+     *
+     * @param array
+     *            The array to use.
+     * @return The caller that created this conditional.
+     */
+    public T notIn(Object... array)
+    {
+        this.valueType = ValueType.ARRAY;
+        this.operator = NOT_IN;
+        this.value = array;
+
+        for (Object obj : array)
         {
-            // adding twice so that both values of the BETWEEN clause will be prepared correctly
-            this.statement.addWhereClause(this.betweenClause);
-            this.statement.addWhereClause(this.betweenClause);
+            this.values.add(new Value(SqlType.convert(obj.getClass()), obj));
         }
 
-        return this.statement;
+        return this.caller;
+    }
+
+    public ConditionalClause<T> not()
+    {
+        this.negateExpression = true;
+        return this;
+    }
+
+    /**
+     * @see bt.db.statement.value.Preparable#getValues()
+     */
+    @Override
+    public List<Value> getValues()
+    {
+        return this.values;
     }
 }

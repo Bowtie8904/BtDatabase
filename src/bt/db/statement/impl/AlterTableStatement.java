@@ -86,7 +86,7 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
             {
                 this.db.select()
                        .from(DatabaseAccess.OBJECT_DATA_TABLE)
-                       .where("object_name").equals(this.name.toUpperCase())
+                       .where("object_name").equal(this.name.toUpperCase())
                        .first()
                        .onLessThan(1, this.db.insert()
                                              .into(DatabaseAccess.OBJECT_DATA_TABLE)
@@ -101,7 +101,7 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
                            this.db.update(DatabaseAccess.OBJECT_DATA_TABLE)
                                   .set("object_ddl", oldDDL + " " + sql + ";")
                                   .set("updated", SqlValue.SYSTIMESTAMP, SqlType.TIMESTAMP)
-                                  .where("object_name").equals(this.name.toUpperCase())
+                                  .where("object_name").equal(this.name.toUpperCase())
                                   .execute();
 
                            return set;

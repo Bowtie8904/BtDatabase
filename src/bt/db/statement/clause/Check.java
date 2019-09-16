@@ -3,7 +3,7 @@ package bt.db.statement.clause;
 import java.util.ArrayList;
 import java.util.List;
 
-import bt.db.statement.clause.condition.SimpleConditionalClause;
+import bt.db.statement.clause.condition.ConditionalClause;
 import bt.utils.id.StringID;
 
 /**
@@ -11,10 +11,10 @@ import bt.utils.id.StringID;
  *
  * @author &#8904
  */
-public class Check extends SimpleConditionalClause<Check>
+public class Check extends ConditionalClause<Check>
 {
     private String name;
-    private List<SimpleConditionalClause<Check>> conditionals;
+    private List<ConditionalClause<Check>> conditionals;
 
     /**
      * Creates a new instance.
@@ -24,7 +24,7 @@ public class Check extends SimpleConditionalClause<Check>
      */
     public Check(String column)
     {
-        super(column, "");
+        super(null, column, "");
         this.caller = this;
         this.conditionals = new ArrayList<>();
     }
@@ -59,11 +59,11 @@ public class Check extends SimpleConditionalClause<Check>
      *            The column to use in this condition.
      * @return The created SimpleConditionalClause.
      */
-    public SimpleConditionalClause<Check> and(String column)
+    public ConditionalClause<Check> and(String column)
     {
-        SimpleConditionalClause<Check> clause = new SimpleConditionalClause<>(this,
-                                                                              column,
-                                                                              SimpleConditionalClause.AND);
+        ConditionalClause<Check> clause = new ConditionalClause<>(this,
+                                                  column,
+                                                  ConditionalClause.AND);
 
         this.conditionals.add(clause);
 
@@ -78,11 +78,11 @@ public class Check extends SimpleConditionalClause<Check>
      *            The column to use in this condition.
      * @return The created SimpleConditionalClause.
      */
-    public SimpleConditionalClause<Check> or(String column)
+    public ConditionalClause<Check> or(String column)
     {
-        SimpleConditionalClause<Check> clause = new SimpleConditionalClause<>(this,
-                                                                              column,
-                                                                              SimpleConditionalClause.OR);
+        ConditionalClause<Check> clause = new ConditionalClause<>(this,
+                                                  column,
+                                                  ConditionalClause.OR);
 
         this.conditionals.add(clause);
 
@@ -92,7 +92,7 @@ public class Check extends SimpleConditionalClause<Check>
     /**
      * Forms the SQL for this constraint.
      *
-     * @see bt.db.statement.clause.condition.SimpleConditionalClause#toString()
+     * @see bt.db.statement.clause.condition.ConditionalClause#toString()
      */
     @Override
     public String toString()
@@ -102,11 +102,11 @@ public class Check extends SimpleConditionalClause<Check>
             this.name = this.column + "_" + StringID.randomID(5) + "_ck";
         }
 
-        String constraint = "CONSTRAINT " + this.name + " CHECK (" + super.toString().trim();
+        String constraint = "CONSTRAINT " + this.name + " CHECK (" + super.toString(false).trim();
 
         for (var cond : this.conditionals)
         {
-            constraint += " " + cond.toString();
+            constraint += " " + cond.toString(false);
         }
 
         constraint += ")";
