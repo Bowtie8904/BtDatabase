@@ -1,6 +1,10 @@
 package bt.db.func.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import bt.db.func.SqlFunction;
+import bt.db.statement.value.Value;
 
 /**
  * @author &#8904
@@ -26,7 +30,7 @@ public class NullValueFunction extends SqlFunction<NullValueFunction>
     {
         String str = this.name + "(";
 
-        for (Object e : this.elements)
+        for (Object e : this.values)
         {
             str += e == null ? "NULL, " : e.toString() + ", ";
         }
@@ -36,5 +40,17 @@ public class NullValueFunction extends SqlFunction<NullValueFunction>
         str += ")";
 
         return str;
+    }
+
+    @Override
+    public String toString(boolean prepared)
+    {
+        return toString();
+    }
+
+    @Override
+    public List<Value> getValues()
+    {
+        return new ArrayList<>();
     }
 }

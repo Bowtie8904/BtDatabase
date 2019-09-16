@@ -1,6 +1,10 @@
 package bt.db.func.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import bt.db.func.SqlFunction;
+import bt.db.statement.value.Value;
 
 /**
  * @author &#8904
@@ -8,26 +12,39 @@ import bt.db.func.SqlFunction;
  */
 public class ModFunction extends SqlFunction<ModFunction>
 {
-    private String value1;
-    private String value2;
-
     public ModFunction(Object value1, Object value2)
     {
         super("mod");
-        this.value1 = value1.toString();
-        this.value2 = value2.toString();
+        add(value1);
+        add(value2);
     }
 
     @Override
     public String toString()
     {
-        String value = this.name + "(" + this.value1 + ", " + this.value2 + ")";
+        String str = this.name + "(";
 
-        if (this.asName != null)
+        for (Object e : this.values)
         {
-            value += " AS " + this.asName;
+            str += e.toString() + ", ";
         }
 
-        return value;
+        str = str.substring(0, str.length() - 2);
+
+        str += ")";
+
+        return str;
+    }
+
+    @Override
+    public String toString(boolean prepared)
+    {
+        return toString();
+    }
+
+    @Override
+    public List<Value> getValues()
+    {
+        return new ArrayList<>();
     }
 }
