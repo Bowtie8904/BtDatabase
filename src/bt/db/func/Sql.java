@@ -1,33 +1,10 @@
 package bt.db.func;
 
-import bt.db.func.impl.AbsoluteFunction;
-import bt.db.func.impl.AverageFunction;
-import bt.db.func.impl.CeilFunction;
 import bt.db.func.impl.ConcatenateFunction;
-import bt.db.func.impl.CountFunction;
-import bt.db.func.impl.DateFunction;
-import bt.db.func.impl.DayFunction;
-import bt.db.func.impl.FloorFunction;
-import bt.db.func.impl.HourFunction;
 import bt.db.func.impl.LeftPadFunction;
-import bt.db.func.impl.LeftTrimFunction;
-import bt.db.func.impl.LengthFunction;
-import bt.db.func.impl.LowerFunction;
-import bt.db.func.impl.MaxFunction;
-import bt.db.func.impl.MinFunction;
-import bt.db.func.impl.MinuteFunction;
 import bt.db.func.impl.ModFunction;
-import bt.db.func.impl.MonthFunction;
 import bt.db.func.impl.NullValueFunction;
-import bt.db.func.impl.RandomFunction;
 import bt.db.func.impl.RightPadFunction;
-import bt.db.func.impl.RightTrimFunction;
-import bt.db.func.impl.RowNumberFunction;
-import bt.db.func.impl.SecondFunction;
-import bt.db.func.impl.SumFunction;
-import bt.db.func.impl.TimeFunction;
-import bt.db.func.impl.UpperFunction;
-import bt.db.func.impl.YearFunction;
 import bt.db.statement.clause.ColumnEntry;
 
 /**
@@ -84,9 +61,9 @@ public final class Sql
      *            The value to use as parameter for this function.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public static AverageFunction avg(Object value)
+    public static SqlFunction avg(Object value)
     {
-        return new AverageFunction(value);
+        return new SqlFunction("avg", value);
     }
 
     /**
@@ -98,9 +75,9 @@ public final class Sql
      *
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public static CountFunction count()
+    public static SqlFunction count()
     {
-        return new CountFunction(new ColumnEntry("*"));
+        return new SqlFunction("count", "*");
     }
 
     /**
@@ -114,9 +91,9 @@ public final class Sql
      *            The value to use as parameter for this function.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public static CountFunction count(Object value)
+    public static SqlFunction count(Object value)
     {
-        return new CountFunction(value);
+        return new SqlFunction("count", value);
     }
 
     /**
@@ -128,9 +105,9 @@ public final class Sql
      *            The value to use as parameter for this function.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public static MaxFunction max(Object value)
+    public static SqlFunction max(Object value)
     {
-        return new MaxFunction(value);
+        return new SqlFunction("max", value);
     }
 
     /**
@@ -141,9 +118,9 @@ public final class Sql
      *            The value to use as parameter for this function.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public static MinFunction min(Object value)
+    public static SqlFunction min(Object value)
     {
-        return new MinFunction(value);
+        return new SqlFunction("min", value);
     }
 
     /**
@@ -154,9 +131,9 @@ public final class Sql
      *            The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public static SumFunction sum(Object value)
+    public static SqlFunction sum(Object value)
     {
-        return new SumFunction(value);
+        return new SqlFunction("sum", value);
     }
 
     /**
@@ -170,9 +147,9 @@ public final class Sql
      *            The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public static AbsoluteFunction abs(Object value)
+    public static SqlFunction abs(Object value)
     {
-        return new AbsoluteFunction(value);
+        return new SqlFunction("abs", value);
     }
 
     /**
@@ -181,9 +158,9 @@ public final class Sql
      *
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public static RandomFunction random()
+    public static SqlFunction random()
     {
-        return new RandomFunction();
+        return new SqlFunction("random");
     }
 
     /**
@@ -192,9 +169,9 @@ public final class Sql
      *
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public static RandomFunction random(int seed)
+    public static SqlFunction random(int seed)
     {
-        return new RandomFunction(seed);
+        return new SqlFunction("rand", seed);
     }
 
     /**
@@ -205,9 +182,9 @@ public final class Sql
      *            The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public static CeilFunction ceil(Object value)
+    public static SqlFunction ceil(Object value)
     {
-        return new CeilFunction(value);
+        return new SqlFunction("ceil", value);
     }
 
     /**
@@ -226,9 +203,9 @@ public final class Sql
      *            The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public static DateFunction date(Object value)
+    public static SqlFunction date(Object value)
     {
-        return new DateFunction(value);
+        return new SqlFunction("date", value);
     }
 
     /**
@@ -244,9 +221,9 @@ public final class Sql
      *            The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public static TimeFunction time(Object value)
+    public static SqlFunction time(Object value)
     {
-        return new TimeFunction(value);
+        return new SqlFunction("time", value);
     }
 
     /**
@@ -262,9 +239,9 @@ public final class Sql
      *            The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public static DayFunction day(Object value)
+    public static SqlFunction day(Object value)
     {
-        return new DayFunction(value);
+        return new SqlFunction("day", value);
     }
 
     /**
@@ -280,9 +257,9 @@ public final class Sql
      *            The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public static HourFunction hour(Object value)
+    public static SqlFunction hour(Object value)
     {
-        return new HourFunction(value);
+        return new SqlFunction("hour", value);
     }
 
     /**
@@ -298,9 +275,9 @@ public final class Sql
      *            The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public static MinuteFunction minute(Object value)
+    public static SqlFunction minute(Object value)
     {
-        return new MinuteFunction(value);
+        return new SqlFunction("minute", value);
     }
 
     /**
@@ -316,9 +293,9 @@ public final class Sql
      *            The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public static SecondFunction second(Object value)
+    public static SqlFunction second(Object value)
     {
-        return new SecondFunction(value);
+        return new SqlFunction("second", value);
     }
 
     /**
@@ -334,9 +311,9 @@ public final class Sql
      *            The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public static YearFunction year(Object value)
+    public static SqlFunction year(Object value)
     {
-        return new YearFunction(value);
+        return new SqlFunction("year", value);
     }
 
     /**
@@ -352,9 +329,9 @@ public final class Sql
      *            The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public static MonthFunction month(Object value)
+    public static SqlFunction month(Object value)
     {
-        return new MonthFunction(value);
+        return new SqlFunction("month", value);
     }
 
     /**
@@ -365,9 +342,9 @@ public final class Sql
      *            The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public static FloorFunction floor(Object value)
+    public static SqlFunction floor(Object value)
     {
-        return new FloorFunction(value);
+        return new SqlFunction("floor", value);
     }
 
     /**
@@ -378,9 +355,9 @@ public final class Sql
      *            The column to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public static LowerFunction lower(Object value)
+    public static SqlFunction lower(Object value)
     {
-        return new LowerFunction(value);
+        return new SqlFunction("lower", value);
     }
 
     /**
@@ -391,9 +368,9 @@ public final class Sql
      *            The column to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public static UpperFunction upper(Object value)
+    public static SqlFunction upper(Object value)
     {
-        return new UpperFunction(value);
+        return new SqlFunction("upper", value);
     }
 
     /**
@@ -404,9 +381,9 @@ public final class Sql
      *            The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public static LengthFunction length(Object value)
+    public static SqlFunction length(Object value)
     {
-        return new LengthFunction(value);
+        return new SqlFunction("length", value);
     }
 
     /**
@@ -416,9 +393,9 @@ public final class Sql
      *            The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public static LeftTrimFunction leftTrim(Object value)
+    public static SqlFunction leftTrim(Object value)
     {
-        return new LeftTrimFunction(value);
+        return new SqlFunction("ltrim", value);
     }
 
     /**
@@ -428,9 +405,9 @@ public final class Sql
      *            The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public static RightTrimFunction rightTrim(Object value)
+    public static SqlFunction rightTrim(Object value)
     {
-        return new RightTrimFunction(value);
+        return new SqlFunction("rtrim", value);
     }
 
     /**
@@ -438,9 +415,9 @@ public final class Sql
      *
      * @return The function whichs toString will return a valid sql representation of this action.
      */
-    public static RowNumberFunction rowNumber()
+    public static SqlFunction rowNumber()
     {
-        return new RowNumberFunction();
+        return new SqlFunction("row_number() over");
     }
 
     /**
