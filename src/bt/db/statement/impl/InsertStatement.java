@@ -11,6 +11,7 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
@@ -411,21 +412,20 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
 
             if (this.dataSelect == null && this.prepared)
             {
-                if (!this.setClauses.isEmpty())
+                var reducedList = this.setClauses.stream().filter(set -> !(set.getValue() instanceof SqlFunction)).collect(Collectors.toList());
+
+                if (!reducedList.isEmpty())
                 {
                     log("With values:",
                         printLogs);
                 }
 
-                for (int i = 0; i < this.setClauses.size(); i ++ )
+                for (int i = 0; i < reducedList.size(); i ++ )
                 {
-                    SetClause<InsertStatement> set = this.setClauses.get(i);
-                    if (!(set.getValue() instanceof SqlFunction))
-                    {
-                        log("p" + (i + 1) + " = " + set.prepareValue(statement,
-                                                                     i + 1),
-                            printLogs);
-                    }
+                    SetClause<InsertStatement> set = reducedList.get(i);
+                    log("p" + (i + 1) + " = " + set.prepareValue(statement,
+                                                                 i + 1),
+                        printLogs);
                 }
             }
 

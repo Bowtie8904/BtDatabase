@@ -6,6 +6,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
@@ -297,20 +298,19 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
 
             if (this.prepared)
             {
-                if (!this.setClauses.isEmpty())
+                var reducedList = this.setClauses.stream().filter(set -> !(set.getValue() instanceof SqlFunction)).collect(Collectors.toList());
+
+                if (!reducedList.isEmpty())
                 {
                     log("With values:",
                         printLogs);
                 }
                 int i = 0;
 
-                for (; i < this.setClauses.size(); i ++ )
+                for (; i < reducedList.size(); i ++ )
                 {
-                    SetClause<UpdateStatement> set = this.setClauses.get(i);
-                    if (!(set.getValue() instanceof SqlFunction))
-                    {
-                        log("p" + (i + 1) + " = " + set.prepareValue(statement, i + 1), printLogs);
-                    }
+                    SetClause<UpdateStatement> set = reducedList.get(i);
+                    log("p" + (i + 1) + " = " + set.prepareValue(statement, i + 1), printLogs);
                 }
 
                 List<Value> values = getValues();
