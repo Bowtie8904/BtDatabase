@@ -262,6 +262,21 @@ public class ConditionalClause<T> implements Preparable
         return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator + " " + this.value;
     }
 
+    public String getColumn()
+    {
+        return this.column;
+    }
+
+    public String getKeyword()
+    {
+        return this.keyword;
+    }
+
+    public boolean isNegated()
+    {
+        return this.negateExpression;
+    }
+
     protected String getBetweenString(boolean prepared)
     {
         ValueType valueType1 = ValueType.getType(this.betweenValue1);
