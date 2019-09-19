@@ -1,5 +1,6 @@
 package bt.db.statement.impl;
 
+import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.Date;
@@ -8,11 +9,13 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
 import bt.db.exc.SqlExecutionException;
+import bt.db.func.Sql;
 import bt.db.statement.SqlModifyStatement;
 import bt.db.statement.clause.SetClause;
 
@@ -26,6 +29,8 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     private int repeats = 1;
 
     private SelectStatement dataSelect;
+
+    private Consumer<Long> identityReceiver;
 
     /**
      * Creates a new instance. On duplicate key this will log an error message and return -1.
@@ -333,6 +338,18 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     }
 
     /**
+     * Defines a consumer that receives the used identity for this insert statement.
+     *
+     * @param identityConsumer
+     * @return This instance for chaining.
+     */
+    public InsertStatement usedIdentity(Consumer<Long> identityConsumer)
+    {
+        this.identityReceiver = identityConsumer;
+        return this;
+    }
+
+    /**
      * @return The number of affected rows or an error code (usually -1, can be customized for different errors via the
      *         fail methods).
      *
@@ -400,6 +417,19 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
             if (this.shouldCommit)
             {
                 this.db.commit();
+            }
+
+            if (this.identityReceiver != null)
+            {
+                var set = this.db.select(Sql.column(Sql.lastIdentity().toString()).as("id")).from(this.tables[0]).first().execute();
+                long usedIdentity = -1;
+
+                for (var row : set)
+                {
+                    usedIdentity = ((BigDecimal)row.get("id")).longValue();
+                    break;
+                }
+                this.identityReceiver.accept(usedIdentity);
             }
 
             handleSuccess(result);
