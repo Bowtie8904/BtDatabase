@@ -42,6 +42,18 @@ public final class Sql
     }
 
     /**
+     * The IDENTITY_VAL_LOCAL function is a non-deterministic function that returns the most recently assigned value of
+     * an identity column for a connection, where the assignment occurred as a result of a single row INSERT statement
+     * using a VALUES clause or a single row UPDATE statement.
+     *
+     * @return The function whichs toString will return a valid sql representation of this action.
+     */
+    public static SqlFunction lastIdentity()
+    {
+        return new SqlFunction("IDENTITY_VAL_LOCAL");
+    }
+
+    /**
      * Concatenates the toString() representations of the given objects.
      *
      * @param elements
