@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
 import bt.db.exc.SqlExecutionException;
+import bt.db.func.SqlFunction;
 import bt.db.statement.SqlModifyStatement;
 import bt.db.statement.clause.SetClause;
 import bt.db.statement.clause.condition.ConditionalClause;
@@ -62,8 +63,8 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     public ConditionalClause<UpdateStatement> where(String column)
     {
         ConditionalClause<UpdateStatement> where = new ConditionalClause<>(this,
-                                                           column,
-                                                           ConditionalClause.WHERE);
+                                                                           column,
+                                                                           ConditionalClause.WHERE);
         addWhereClause(where);
         return where;
     }
@@ -79,8 +80,8 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     public ConditionalClause<UpdateStatement> and(String column)
     {
         ConditionalClause<UpdateStatement> where = new ConditionalClause<>(this,
-                                                           column,
-                                                           ConditionalClause.AND);
+                                                                           column,
+                                                                           ConditionalClause.AND);
         addWhereClause(where);
         return where;
     }
@@ -96,8 +97,8 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     public ConditionalClause<UpdateStatement> or(String column)
     {
         ConditionalClause<UpdateStatement> where = new ConditionalClause<>(this,
-                                                           column,
-                                                           ConditionalClause.OR);
+                                                                           column,
+                                                                           ConditionalClause.OR);
         addWhereClause(where);
         return where;
     }
@@ -137,6 +138,22 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
                                                          sqlType);
         addSetClause(set);
         return this;
+    }
+
+    /**
+     * Updates the given column with the given value.
+     *
+     * @param column
+     *            The column whichs value should be updated.
+     * @param value
+     *            The value to update with.
+     * @return This instance for chaining.
+     */
+    public UpdateStatement set(String column, SqlFunction value)
+    {
+        return set(column,
+                   value,
+                   SqlType.UNKNOWN);
     }
 
     /**
@@ -290,7 +307,10 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
                 for (; i < this.setClauses.size(); i ++ )
                 {
                     SetClause<UpdateStatement> set = this.setClauses.get(i);
-                    log("p" + (i + 1) + " = " + set.prepareValue(statement, i + 1), printLogs);
+                    if (!(set.getValue() instanceof SqlFunction))
+                    {
+                        log("p" + (i + 1) + " = " + set.prepareValue(statement, i + 1), printLogs);
+                    }
                 }
 
                 List<Value> values = getValues();

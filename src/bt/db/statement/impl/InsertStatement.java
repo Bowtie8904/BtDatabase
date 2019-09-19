@@ -16,6 +16,7 @@ import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
 import bt.db.exc.SqlExecutionException;
 import bt.db.func.Sql;
+import bt.db.func.SqlFunction;
 import bt.db.statement.SqlModifyStatement;
 import bt.db.statement.clause.SetClause;
 
@@ -159,6 +160,22 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
                                                          valueSupplier);
         addSetClause(set);
         return this;
+    }
+
+    /**
+     * Sets the given column to the given value.
+     *
+     * @param column
+     *            The column whichs value should be set.
+     * @param value
+     *            The value to use.
+     * @return This instance for chaining.
+     */
+    public InsertStatement set(String column, SqlFunction value)
+    {
+        return set(column,
+                   value,
+                   SqlType.UNKNOWN);
     }
 
     /**
@@ -403,9 +420,12 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
                 for (int i = 0; i < this.setClauses.size(); i ++ )
                 {
                     SetClause<InsertStatement> set = this.setClauses.get(i);
-                    log("p" + (i + 1) + " = " + set.prepareValue(statement,
-                                                                 i + 1),
-                        printLogs);
+                    if (!(set.getValue() instanceof SqlFunction))
+                    {
+                        log("p" + (i + 1) + " = " + set.prepareValue(statement,
+                                                                     i + 1),
+                            printLogs);
+                    }
                 }
             }
 
@@ -472,7 +492,14 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
                 {
                     for (SetClause<InsertStatement> set : this.setClauses)
                     {
-                        sql += "?, ";
+                        if (set.getValue() instanceof SqlFunction)
+                        {
+                            sql += set.getStringValue() + ", ";
+                        }
+                        else
+                        {
+                            sql += "?, ";
+                        }
                     }
                 }
                 else

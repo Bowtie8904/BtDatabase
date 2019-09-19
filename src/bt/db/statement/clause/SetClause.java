@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
 import bt.db.constants.SqlValue;
+import bt.db.func.SqlFunction;
 import bt.db.statement.SqlModifyStatement;
 import bt.db.statement.impl.InsertStatement;
 import bt.db.statement.impl.UpdateStatement;
@@ -211,6 +212,7 @@ public class SetClause<T extends SqlModifyStatement>
                         strValue = ((Blob)this.value).toString();
                         break;
                     default:
+                        strValue = this.value.toString();
                         break;
                 }
             }
@@ -238,6 +240,10 @@ public class SetClause<T extends SqlModifyStatement>
         }
         else if (this.statement instanceof UpdateStatement)
         {
+            if (this.value instanceof SqlFunction)
+            {
+                return this.column + " = " + this.value.toString();
+            }
             return this.column + " = ?";
         }
 
@@ -361,6 +367,7 @@ public class SetClause<T extends SqlModifyStatement>
                         strValue = ((Blob)this.value).toString();
                         break;
                     default:
+                        strValue = this.value.toString();
                         break;
                 }
             }
@@ -372,5 +379,10 @@ public class SetClause<T extends SqlModifyStatement>
         }
 
         return strValue;
+    }
+
+    public Object getValue()
+    {
+        return this.value;
     }
 }
