@@ -78,7 +78,10 @@ public class SqlFunction<T extends SqlFunction> implements Preparable
             value += prepared ? "?, " : obj.toString() + ", ";
         }
 
-        value = value.substring(0, value.length() - 2);
+        if (this.values.size() > 0)
+        {
+            value = value.substring(0, value.length() - 2);
+        }
 
         value += ")";
 
