@@ -143,12 +143,21 @@ public class ConditionalClause<T> implements Preparable
 
     protected SelectStatement subSelect;
 
+    protected String prefix = "";
+    protected String postfix = "";
+
     public ConditionalClause(T caller, String column, String keyword)
     {
         this.caller = caller;
         this.column = column;
         this.keyword = keyword;
         this.values = new ArrayList<>();
+    }
+
+    public ConditionalClause(T caller, String prefix, String column, String keyword)
+    {
+        this(caller, column, keyword);
+        this.prefix = prefix;
     }
 
     /**
@@ -166,23 +175,23 @@ public class ConditionalClause<T> implements Preparable
 
         if (this.valueType.equals(ValueType.COLUMN))
         {
-            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator + " " + this.value.toString();
+            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.prefix + this.column + " " + this.operator + " " + this.value.toString() + this.postfix;
         }
 
         if (this.operator.equals(BETWEEN))
         {
-            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator + getBetweenString(true);
+            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.prefix + this.column + " " + this.operator + getBetweenString(true) + this.postfix;
         }
 
         if (this.valueType.equals(ValueType.SUBSELECT))
         {
             this.subSelect.prepared();
-            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator + " (" + this.subSelect.toString() + ")";
+            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.prefix + this.column + " " + this.operator + " (" + this.subSelect.toString() + ")" + this.postfix;
         }
 
         if (this.valueType.equals(ValueType.FUNCTION))
         {
-            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator + " " + ((SqlFunction)this.value).toString(true);
+            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.prefix + this.column + " " + this.operator + " " + ((SqlFunction)this.value).toString(true) + this.postfix;
         }
 
         if (this.valueType.equals(ValueType.ARRAY))
@@ -198,15 +207,15 @@ public class ConditionalClause<T> implements Preparable
             arrayString = arrayString.substring(0, arrayString.length() - 2);
             arrayString += ")";
 
-            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator + arrayString;
+            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.prefix + this.column + " " + this.operator + arrayString + this.postfix;
         }
 
         if (this.operator.equals(IS_NOT_NULL) || this.operator.equals(IS_NULL))
         {
-            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator;
+            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.prefix + this.column + " " + this.operator + this.postfix;
         }
 
-        return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator + " ?";
+        return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.prefix + this.column + " " + this.operator + " ?" + this.postfix;
     }
 
     /**
@@ -225,7 +234,7 @@ public class ConditionalClause<T> implements Preparable
 
         if (this.operator.equals(BETWEEN))
         {
-            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator + getBetweenString(prepared);
+            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.prefix + this.column + " " + this.operator + getBetweenString(prepared) + this.postfix;
         }
 
         if (prepared)
@@ -236,30 +245,30 @@ public class ConditionalClause<T> implements Preparable
         if (this.valueType.equals(ValueType.SUBSELECT))
         {
             this.subSelect.unprepared();
-            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator + " (" + this.subSelect.toString() + ")";
+            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.prefix + this.column + " " + this.operator + " (" + this.subSelect.toString() + ")" + this.postfix;
         }
 
         if (this.valueType.equals(ValueType.FUNCTION))
         {
-            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator + " " + ((SqlFunction)this.value).toString(prepared);
+            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.prefix + this.column + " " + this.operator + " " + ((SqlFunction)this.value).toString(prepared) + this.postfix;
         }
 
         if (this.valueType.equals(ValueType.ARRAY))
         {
-            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator + " " + SqlType.arrayToString((Object[])this.value);
+            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.prefix + this.column + " " + this.operator + " " + SqlType.arrayToString((Object[])this.value) + this.postfix;
         }
 
         if (this.operator.equals(IS_NOT_NULL) || this.operator.equals(IS_NULL))
         {
-            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator;
+            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.prefix + this.column + " " + this.operator + this.postfix;
         }
         else if (this.valueType == ValueType.STRING || this.valueType == ValueType.DATE
                  || this.valueType == ValueType.TIME || this.valueType == ValueType.TIMESTAMP)
         {
-            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator + " '" + this.value + "'";
+            return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.prefix + this.column + " " + this.operator + " '" + this.value + "'" + this.postfix;
         }
 
-        return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.column + " " + this.operator + " " + this.value;
+        return this.keyword + (this.negateExpression ? " " + NOT + " " : " ") + this.prefix + this.column + " " + this.operator + " " + this.value + this.postfix;
     }
 
     public String getColumn()
@@ -275,6 +284,34 @@ public class ConditionalClause<T> implements Preparable
     public boolean isNegated()
     {
         return this.negateExpression;
+    }
+
+    protected void setValueVariables(Object value)
+    {
+        ValueType type = ValueType.getType(value);
+        if (value instanceof SelectStatement)
+        {
+            this.valueType = ValueType.SUBSELECT;
+            this.subSelect = (SelectStatement)value;
+            this.values.addAll(((SelectStatement)value).getValues());
+        }
+        else if (type.equals(ValueType.COLUMN))
+        {
+            this.valueType = ValueType.COLUMN;
+            this.value = value;
+        }
+        else if (type.equals(ValueType.FUNCTION))
+        {
+            this.valueType = ValueType.FUNCTION;
+            this.value = value;
+            this.values.addAll(((SqlFunction)value).getValues());
+        }
+        else
+        {
+            this.valueType = ValueType.getType(value);
+            this.value = value.toString();
+            this.values.add(new Value(SqlType.convert(value.getClass()), value));
+        }
     }
 
     protected String getBetweenString(boolean prepared)
@@ -368,32 +405,40 @@ public class ConditionalClause<T> implements Preparable
         return this.caller;
     }
 
-    protected void setValueVariables(Object value)
+    /**
+     * Adds the given between condition to this conditional statement.
+     *
+     * <p>
+     * This conditional will then check whether the value in the set column is between (inclusive) the given values.
+     * </p>
+     *
+     * <p>
+     * Valid value types are:
+     * <ul>
+     * <li>int</li>
+     * <li>long</li>
+     * <li>byte</li>
+     * <li>short</li>
+     * <li>double</li>
+     * <li>float</li>
+     * <li>{@link Date}</li>
+     * <li>{@link Time}</li>
+     * <li>{@link Timestamp}</li>
+     * </ul>
+     * </p>
+     *
+     * @param value1
+     *            The lower bounds (inclusive).
+     * @param value2
+     *            The upper bounds (inclusive).
+     * @param postfix
+     *            A String that will be added after the expression. Can be used for parenthesis.
+     * @return The caller that created this conditional.
+     */
+    public T between(Object value1, Object value2, String postfix)
     {
-        ValueType type = ValueType.getType(value);
-        if (value instanceof SelectStatement)
-        {
-            this.valueType = ValueType.SUBSELECT;
-            this.subSelect = (SelectStatement)value;
-            this.values.addAll(((SelectStatement)value).getValues());
-        }
-        else if (type.equals(ValueType.COLUMN))
-        {
-            this.valueType = ValueType.COLUMN;
-            this.value = value;
-        }
-        else if (type.equals(ValueType.FUNCTION))
-        {
-            this.valueType = ValueType.FUNCTION;
-            this.value = value;
-            this.values.addAll(((SqlFunction)value).getValues());
-        }
-        else
-        {
-            this.valueType = ValueType.getType(value);
-            this.value = value.toString();
-            this.values.add(new Value(SqlType.convert(value.getClass()), value));
-        }
+        this.postfix = postfix;
+        return between(value1, value2);
     }
 
     /**
@@ -418,6 +463,25 @@ public class ConditionalClause<T> implements Preparable
      * Adds the given value to the right side of this conditional to check against.
      *
      * <p>
+     * This conditional will then check whether both sides are EQUAL.
+     * </p>
+     *
+     * @param value
+     *            The value to check against.
+     * @param postfix
+     *            A String that will be added after the expression. Can be used for parenthesis.
+     * @return The caller that created this conditional.
+     */
+    public T equal(Object value, String postfix)
+    {
+        this.postfix = postfix;
+        return equal(value);
+    }
+
+    /**
+     * Adds the given value to the right side of this conditional to check against.
+     *
+     * <p>
      * This conditional will then check whether both sides are NOT EQUAL.
      * </p>
      *
@@ -430,6 +494,25 @@ public class ConditionalClause<T> implements Preparable
         this.operator = NOT_EQUAL;
         setValueVariables(value);
         return this.caller;
+    }
+
+    /**
+     * Adds the given value to the right side of this conditional to check against.
+     *
+     * <p>
+     * This conditional will then check whether both sides are NOT EQUAL.
+     * </p>
+     *
+     * @param value
+     *            The value to check against.
+     * @param postfix
+     *            A String that will be added after the expression. Can be used for parenthesis.
+     * @return The caller that created this conditional.
+     */
+    public T notEqual(Object value, String postfix)
+    {
+        this.postfix = postfix;
+        return notEqual(value);
     }
 
     /**
@@ -456,6 +539,25 @@ public class ConditionalClause<T> implements Preparable
      * Adds the given value to the right side of this conditional to check against.
      *
      * <p>
+     * This conditional will then check whether both sides are LIKE each other.
+     * </p>
+     *
+     * @param value
+     *            The value to check against.
+     * @param postfix
+     *            A String that will be added after the expression. Can be used for parenthesis.
+     * @return The caller that created this conditional.
+     */
+    public T like(String value, String postfix)
+    {
+        this.postfix = postfix;
+        return like(value);
+    }
+
+    /**
+     * Adds the given value to the right side of this conditional to check against.
+     *
+     * <p>
      * This conditional will then check whether the left side is GREATER THAN the right side.
      * </p>
      *
@@ -468,6 +570,25 @@ public class ConditionalClause<T> implements Preparable
         this.operator = GREATER;
         setValueVariables(value);
         return this.caller;
+    }
+
+    /**
+     * Adds the given value to the right side of this conditional to check against.
+     *
+     * <p>
+     * This conditional will then check whether the left side is GREATER THAN the right side.
+     * </p>
+     *
+     * @param value
+     *            The value to check against.
+     * @param postfix
+     *            A String that will be added after the expression. Can be used for parenthesis.
+     * @return The caller that created this conditional.
+     */
+    public T greaterThan(Object value, String postfix)
+    {
+        this.postfix = postfix;
+        return greaterThan(value);
     }
 
     /**
@@ -492,6 +613,25 @@ public class ConditionalClause<T> implements Preparable
      * Adds the given value to the right side of this conditional to check against.
      *
      * <p>
+     * This conditional will then check whether the left side is LESS THAN the right side.
+     * </p>
+     *
+     * @param value
+     *            The value to check against.
+     * @param postfix
+     *            A String that will be added after the expression. Can be used for parenthesis.
+     * @return The caller that created this conditional.
+     */
+    public T lessthan(Object value, String postfix)
+    {
+        this.postfix = postfix;
+        return lessThan(value);
+    }
+
+    /**
+     * Adds the given value to the right side of this conditional to check against.
+     *
+     * <p>
      * This conditional will then check whether the left side is GREATER OR EQUAL THAN the right side.
      * </p>
      *
@@ -504,6 +644,25 @@ public class ConditionalClause<T> implements Preparable
         this.operator = GREATER_EQUALS;
         setValueVariables(value);
         return this.caller;
+    }
+
+    /**
+     * Adds the given value to the right side of this conditional to check against.
+     *
+     * <p>
+     * This conditional will then check whether the left side is GREATER OR EQUAL THAN the right side.
+     * </p>
+     *
+     * @param value
+     *            The value to check against.
+     * @param postfix
+     *            A String that will be added after the expression. Can be used for parenthesis.
+     * @return The caller that created this conditional.
+     */
+    public T greaterOrEqual(Object value, String postfix)
+    {
+        this.postfix = postfix;
+        return greaterOrEqual(value);
     }
 
     /**
@@ -525,6 +684,25 @@ public class ConditionalClause<T> implements Preparable
     }
 
     /**
+     * Adds the given value to the right side of this conditional to check against.
+     *
+     * <p>
+     * This conditional will then check whether the left side is LESS OR EQUAL THAN the right side.
+     * </p>
+     *
+     * @param value
+     *            The value to check against.
+     * @param postfix
+     *            A String that will be added after the expression. Can be used for parenthesis.
+     * @return The caller that created this conditional.
+     */
+    public T lessOrEqual(Object value, String postfix)
+    {
+        this.postfix = postfix;
+        return lessOrEqual(value);
+    }
+
+    /**
      * This conditional will check whether the left side IS NULL.
      *
      * @return The caller that created this conditional.
@@ -538,6 +716,20 @@ public class ConditionalClause<T> implements Preparable
     }
 
     /**
+     * This conditional will check whether the left side IS NULL.
+     *
+     * @param postfix
+     *            A String that will be added after the expression. Can be used for parenthesis.
+     *
+     * @return The caller that created this conditional.
+     */
+    public T isNull(String postfix)
+    {
+        this.postfix = postfix;
+        return isNull();
+    }
+
+    /**
      * This conditional will check whether the left side IS NOT NULL.
      *
      * @return The caller that created this conditional.
@@ -548,6 +740,19 @@ public class ConditionalClause<T> implements Preparable
         this.operator = IS_NOT_NULL;
 
         return this.caller;
+    }
+
+    /**
+     * This conditional will check whether the left side IS NOT NULL.
+     *
+     * @param postfix
+     *            A String that will be added after the expression. Can be used for parenthesis.
+     * @return The caller that created this conditional.
+     */
+    public T notNull(String postfix)
+    {
+        this.postfix = postfix;
+        return notNull();
     }
 
     /**
@@ -573,6 +778,25 @@ public class ConditionalClause<T> implements Preparable
      * Adds the given select statement to the right side of this conditional.
      *
      * <p>
+     * This conditional will then check whether the left side is contained in the values returned by the given select.
+     * </p>
+     *
+     * @param select
+     *            The select whichs result should be used.
+     * @param postfix
+     *            A String that will be added after the expression. Can be used for parenthesis.
+     * @return The caller that created this conditional.
+     */
+    public T in(SelectStatement select, String postfix)
+    {
+        this.postfix = postfix;
+        return in(select);
+    }
+
+    /**
+     * Adds the given select statement to the right side of this conditional.
+     *
+     * <p>
      * This conditional will then check whether the left side is NOT contained in the values returned by the given
      * select.
      * </p>
@@ -591,6 +815,30 @@ public class ConditionalClause<T> implements Preparable
         setValueVariables(select);
 
         return this.caller;
+    }
+
+    /**
+     * Adds the given select statement to the right side of this conditional.
+     *
+     * <p>
+     * This conditional will then check whether the left side is NOT contained in the values returned by the given
+     * select.
+     * </p>
+     *
+     * <p>
+     * The select must be marked as {@link SelectStatement#unprepared()} and can only select a single column.
+     * </p>
+     *
+     * @param select
+     *            The select whichs result should be used.
+     * @param postfix
+     *            A String that will be added after the expression. Can be used for parenthesis.
+     * @return The caller that created this conditional.
+     */
+    public T notIn(SelectStatement select, String postfix)
+    {
+        this.postfix = postfix;
+        return notIn(select);
     }
 
     /**
@@ -622,6 +870,25 @@ public class ConditionalClause<T> implements Preparable
      * Adds the given array to the right side of this conditional.
      *
      * <p>
+     * This conditional will then check whether the left side is contained in the values inside the array.
+     * </p>
+     *
+     * @param array
+     *            The array to use.
+     * @param postfix
+     *            A String that will be added after the expression. Can be used for parenthesis.
+     * @return The caller that created this conditional.
+     */
+    public T in(Object[] array, String postfix)
+    {
+        this.postfix = postfix;
+        return in(array);
+    }
+
+    /**
+     * Adds the given array to the right side of this conditional.
+     *
+     * <p>
      * This conditional will then check whether the left side is NOT contained in the values inside the array.
      * </p>
      *
@@ -641,6 +908,25 @@ public class ConditionalClause<T> implements Preparable
         }
 
         return this.caller;
+    }
+
+    /**
+     * Adds the given array to the right side of this conditional.
+     *
+     * <p>
+     * This conditional will then check whether the left side is NOT contained in the values inside the array.
+     * </p>
+     *
+     * @param array
+     *            The array to use.
+     * @param postfix
+     *            A String that will be added after the expression. Can be used for parenthesis.
+     * @return The caller that created this conditional.
+     */
+    public T notIn(Object[] array, String postfix)
+    {
+        this.postfix = postfix;
+        return notIn(array);
     }
 
     public ConditionalClause<T> not()

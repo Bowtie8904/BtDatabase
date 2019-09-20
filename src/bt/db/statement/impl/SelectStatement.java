@@ -259,8 +259,28 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
     public ConditionalClause<SelectStatement> where(String column)
     {
         ConditionalClause<SelectStatement> where = new ConditionalClause<>(this,
-                                                           column,
-                                                           ConditionalClause.WHERE);
+                                                                           column,
+                                                                           ConditionalClause.WHERE);
+        addWhereClause(where);
+        this.lastConditionalType = ConditionalClause.WHERE;
+        return where;
+    }
+
+    /**
+     * Creates a new where conditional clause using the given column for this statement.
+     *
+     * @param column
+     *            The column to use in this condition.
+     * @param prefix
+     *            A String that will be put in front of the expression. Can be used for parenthesis.
+     * @return The created ConditionalClause.
+     */
+    public ConditionalClause<SelectStatement> where(String prefix, String column)
+    {
+        ConditionalClause<SelectStatement> where = new ConditionalClause<>(this,
+                                                                           prefix,
+                                                                           column,
+                                                                           ConditionalClause.WHERE);
         addWhereClause(where);
         this.lastConditionalType = ConditionalClause.WHERE;
         return where;
@@ -277,8 +297,37 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
     public ConditionalClause<SelectStatement> and(String column)
     {
         ConditionalClause<SelectStatement> clause = new ConditionalClause<>(this,
-                                                            column,
-                                                            ConditionalClause.AND);
+                                                                            column,
+                                                                            ConditionalClause.AND);
+
+        if (this.lastConditionalType.equals(ConditionalClause.WHERE))
+        {
+            addWhereClause(clause);
+        }
+        else if (this.lastConditionalType.equals(ConditionalClause.HAVING))
+        {
+            addHavingClause(clause);
+        }
+
+        return clause;
+    }
+
+    /**
+     * Creates a new conditional clause to chain with an existing where or having clause using the given column for this
+     * statement.
+     *
+     * @param column
+     *            The column to use in this condition.
+     * @param prefix
+     *            A String that will be put in front of the expression. Can be used for parenthesis.
+     * @return The created ConditionalClause.
+     */
+    public ConditionalClause<SelectStatement> and(String prefix, String column)
+    {
+        ConditionalClause<SelectStatement> clause = new ConditionalClause<>(this,
+                                                                            prefix,
+                                                                            column,
+                                                                            ConditionalClause.AND);
 
         if (this.lastConditionalType.equals(ConditionalClause.WHERE))
         {
@@ -303,8 +352,37 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
     public ConditionalClause<SelectStatement> or(String column)
     {
         ConditionalClause<SelectStatement> clause = new ConditionalClause<>(this,
-                                                            column,
-                                                            ConditionalClause.OR);
+                                                                            column,
+                                                                            ConditionalClause.OR);
+
+        if (this.lastConditionalType.equals(ConditionalClause.WHERE))
+        {
+            addWhereClause(clause);
+        }
+        else if (this.lastConditionalType.equals(ConditionalClause.HAVING))
+        {
+            addHavingClause(clause);
+        }
+
+        return clause;
+    }
+
+    /**
+     * Creates a new conditional clause to chain with an existing where or having clause using the given column for this
+     * statement.
+     *
+     * @param column
+     *            The column to use in this condition.
+     * @param prefix
+     *            A String that will be put in front of the expression. Can be used for parenthesis.
+     * @return The created ConditionalClause.
+     */
+    public ConditionalClause<SelectStatement> or(String prefix, String column)
+    {
+        ConditionalClause<SelectStatement> clause = new ConditionalClause<>(this,
+                                                                            prefix,
+                                                                            column,
+                                                                            ConditionalClause.OR);
 
         if (this.lastConditionalType.equals(ConditionalClause.WHERE))
         {
@@ -386,8 +464,8 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
         }
 
         ConditionalClause<SelectStatement> having = new ConditionalClause<>(this,
-                                                            column,
-                                                            ConditionalClause.HAVING);
+                                                                            column,
+                                                                            ConditionalClause.HAVING);
         addHavingClause(having);
         this.lastConditionalType = ConditionalClause.HAVING;
         return having;

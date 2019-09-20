@@ -71,6 +71,25 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
     }
 
     /**
+     * Creates a new where conditional clause using the given column for this statement.
+     *
+     * @param column
+     *            The column to use in this condition.
+     * @param prefix
+     *            A String that will be put in front of the expression. Can be used for parenthesis.
+     * @return The created ConditionalClause.
+     */
+    public ConditionalClause<UpdateStatement> where(String prefix, String column)
+    {
+        ConditionalClause<UpdateStatement> where = new ConditionalClause<>(this,
+                                                                           prefix,
+                                                                           column,
+                                                                           ConditionalClause.WHERE);
+        addWhereClause(where);
+        return where;
+    }
+
+    /**
      * Creates a new conditional clause to chain with an existing where or having clause using the given column for this
      * statement.
      *
@@ -93,6 +112,28 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      *
      * @param column
      *            The column to use in this condition.
+     * @param prefix
+     *            A String that will be put in front of the expression. Can be used for parenthesis.
+     * @return The created ConditionalClause.
+     */
+    public ConditionalClause<UpdateStatement> and(String prefix, String column)
+    {
+        ConditionalClause<UpdateStatement> clause = new ConditionalClause<>(this,
+                                                                            prefix,
+                                                                            column,
+                                                                            ConditionalClause.AND);
+
+        addWhereClause(clause);
+
+        return clause;
+    }
+
+    /**
+     * Creates a new conditional clause to chain with an existing where or having clause using the given column for this
+     * statement.
+     *
+     * @param column
+     *            The column to use in this condition.
      * @return The created ConditionalClause.
      */
     public ConditionalClause<UpdateStatement> or(String column)
@@ -102,6 +143,28 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
                                                                            ConditionalClause.OR);
         addWhereClause(where);
         return where;
+    }
+
+    /**
+     * Creates a new conditional clause to chain with an existing where or having clause using the given column for this
+     * statement.
+     *
+     * @param column
+     *            The column to use in this condition.
+     * @param prefix
+     *            A String that will be put in front of the expression. Can be used for parenthesis.
+     * @return The created ConditionalClause.
+     */
+    public ConditionalClause<UpdateStatement> or(String prefix, String column)
+    {
+        ConditionalClause<UpdateStatement> clause = new ConditionalClause<>(this,
+                                                                            prefix,
+                                                                            column,
+                                                                            ConditionalClause.OR);
+
+        addWhereClause(clause);
+
+        return clause;
     }
 
     /**
