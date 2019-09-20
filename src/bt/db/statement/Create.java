@@ -4,6 +4,7 @@ import bt.db.DatabaseAccess;
 import bt.db.statement.impl.CreateFunctionStatement;
 import bt.db.statement.impl.CreateProcedureStatement;
 import bt.db.statement.impl.CreateTableStatement;
+import bt.db.statement.impl.CreateTemporaryTableStatement;
 import bt.db.statement.impl.CreateTriggerStatement;
 
 /**
@@ -36,6 +37,23 @@ public class Create extends SqlStatement<Create>
     {
         return new CreateTriggerStatement(this.db,
                                           name);
+    }
+
+    /**
+     * Creates a create temporary table statement for the table with the given name.
+     *
+     * <p>
+     * The table will be dropped when the connection to the database is closed.
+     * </p>
+     *
+     * @param name
+     *            The name of the table that should be created.
+     * @return The created {@link CreateTemporaryTableStatement}.
+     */
+    public CreateTemporaryTableStatement temporaryTable(String name)
+    {
+        return new CreateTemporaryTableStatement(this.db,
+                                                 name);
     }
 
     /**

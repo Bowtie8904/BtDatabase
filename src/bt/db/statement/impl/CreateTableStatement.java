@@ -472,7 +472,6 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                     {
                         log("Replacing table '" + this.name + "'.", printLogs);
                         statement.executeUpdate();
-                        endExecutionTime();
 
                         result = 1;
 
@@ -485,6 +484,8 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                         {
                             this.db.insert().into(this.name).from(this.asCopySelect).execute(printLogs);
                         }
+
+                        endExecutionTime();
 
                         result = 1;
 
