@@ -622,7 +622,7 @@ public class ConditionalClause<T> implements Preparable
      *            A String that will be added after the expression. Can be used for parenthesis.
      * @return The caller that created this conditional.
      */
-    public T lessthan(Object value, String postfix)
+    public T lessThan(Object value, String postfix)
     {
         this.postfix = postfix;
         return lessThan(value);
