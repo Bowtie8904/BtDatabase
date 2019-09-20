@@ -25,6 +25,7 @@ import bt.db.listener.evnt.DatabaseChangeEvent;
 import bt.db.listener.evnt.DeleteEvent;
 import bt.db.listener.evnt.InsertEvent;
 import bt.db.listener.evnt.UpdateEvent;
+import bt.db.listener.impl.IdentityListener;
 import bt.db.statement.Alter;
 import bt.db.statement.Create;
 import bt.db.statement.clause.Column;
@@ -151,6 +152,7 @@ public abstract class DatabaseAccess implements Killable
         InstanceKiller.killOnShutdown(this,
                                       1);
         this.eventDispatcher = new Dispatcher();
+        this.registerListener(DatabaseChangeEvent.class, IdentityListener::receive);
     }
 
     /**
