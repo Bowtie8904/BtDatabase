@@ -3,10 +3,8 @@ package bt.db.statement.impl;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
@@ -29,8 +27,6 @@ public class CreateTemporaryTableStatement extends CreateStatement<CreateTempora
     private boolean copyData = true;
 
     private boolean preserve;
-
-    private String[] primaryKeys = new String[] {};
 
     /**
      * Creates a new instance.
@@ -151,12 +147,6 @@ public class CreateTemporaryTableStatement extends CreateStatement<CreateTempora
         return this;
     }
 
-    public CreateTemporaryTableStatement primaryKey(String... columns)
-    {
-        this.primaryKeys = columns;
-        return this;
-    }
-
     /**
      * @see bt.db.statement.SqlModifyStatement#execute(boolean)
      */
@@ -202,14 +192,9 @@ public class CreateTemporaryTableStatement extends CreateStatement<CreateTempora
     public String toString()
     {
         String sql = this.statementKeyword + " " + this.name + " (";
-        String primary = "";
 
         if (this.asCopySelect != null)
         {
-            List<String> primaries = Arrays.asList(this.primaryKeys)
-                                           .stream()
-                                           .map(p -> p.toUpperCase())
-                                           .collect(Collectors.toList());
             var resultSet = this.asCopySelect.execute();
             var cols = resultSet.getColumnTypes();
             String name;
@@ -227,33 +212,16 @@ public class CreateTemporaryTableStatement extends CreateStatement<CreateTempora
                     column.size(9999);
                 }
 
-                if (primaries.contains(name.toUpperCase()))
-                {
-                    column.primaryKey();
-                }
-
                 column(column);
             }
         }
 
         for (Column col : this.tableColumns)
         {
-            if (col.isPrimaryKey())
-            {
-                primary += col.getName() + ", ";
-            }
-
             sql += col.toString() + ", ";
         }
 
         sql = sql.substring(0, sql.length() - 2);
-
-        if (primary.length() != 0)
-        {
-            primary = primary.substring(0, primary.length() - 2);
-            sql += ", CONSTRAINT " + this.name + "_PK PRIMARY KEY (" + primary + ")";
-        }
-
         sql += ")";
 
         if (this.preserve)
