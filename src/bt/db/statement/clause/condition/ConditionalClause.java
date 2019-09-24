@@ -37,6 +37,7 @@ public class ConditionalClause<T> implements Preparable
     protected static final String IN = "IN";
     protected static final String NOT_IN = "NOT IN";
     protected static final String NOT = "NOT";
+    protected static final String EXISTS = "EXISTS";
 
     protected enum ValueType
     {
@@ -933,6 +934,46 @@ public class ConditionalClause<T> implements Preparable
     {
         this.negateExpression = true;
         return this;
+    }
+
+    /**
+     * Adds the given select statement to the right side of this conditional.
+     *
+     * <p>
+     * This conditional will then check whether the right side select returns any data.
+     * </p>
+     *
+     * @param select
+     *            The select whichs result should be used.
+     * @return The caller that created this conditional.
+     */
+    public T exists(SelectStatement select)
+    {
+        this.operator = EXISTS;
+        setValueVariables(select);
+
+        return this.caller;
+    }
+
+    /**
+     * Adds the given select statement to the right side of this conditional.
+     *
+     * <p>
+     * This conditional will then check whether the right side select returns any data.
+     * </p>
+     *
+     * @param select
+     *            The select whichs result should be used.
+     * @param postfix
+     *            A String that will be added after the expression. Can be used for parenthesis.
+     * @return The caller that created this conditional.
+     */
+    public T exists(SelectStatement select, String postfix)
+    {
+        this.operator = EXISTS;
+        setValueVariables(select);
+
+        return this.caller;
     }
 
     /**
