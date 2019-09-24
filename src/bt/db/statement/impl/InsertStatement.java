@@ -90,6 +90,18 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     }
 
     /**
+     * Defines the columns used in a 'select into from' statement.
+     *
+     * @param columns
+     * @return
+     */
+    public InsertStatement columns(Object... columns)
+    {
+        this.columns = columns;
+        return this;
+    }
+
+    /**
      * Defines how often the statement should be executed. (default=1)
      *
      * <p>
@@ -518,6 +530,19 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
         }
         else
         {
+            if (this.columns != null && this.columns.length > 0)
+            {
+                sql += "(";
+
+                for (Object col : this.columns)
+                {
+                    sql += col.toString() + ", ";
+                }
+
+                sql = sql.substring(0, sql.length() - 2);
+
+                sql += ")";
+            }
             sql += " " + this.dataSelect.toString();
         }
 
