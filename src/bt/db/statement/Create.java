@@ -2,6 +2,7 @@ package bt.db.statement;
 
 import bt.db.DatabaseAccess;
 import bt.db.statement.impl.CreateFunctionStatement;
+import bt.db.statement.impl.CreateIndexStatement;
 import bt.db.statement.impl.CreateProcedureStatement;
 import bt.db.statement.impl.CreateTableStatement;
 import bt.db.statement.impl.CreateTemporaryTableStatement;
@@ -93,5 +94,11 @@ public class Create extends SqlStatement<Create>
     {
         return new CreateFunctionStatement(this.db,
                                             name);
+    }
+
+    public CreateIndexStatement index(String name)
+    {
+        return new CreateIndexStatement(this.db,
+                                        name);
     }
 }
