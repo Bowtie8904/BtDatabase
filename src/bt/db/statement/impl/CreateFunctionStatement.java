@@ -113,7 +113,6 @@ public class CreateFunctionStatement extends CreateStatement<CreateFunctionState
         String sql = toString();
 
         int result = Integer.MIN_VALUE;
-        String log = "";
 
         try (Statement statement = this.db.getConnection().createStatement())
         {
@@ -160,7 +159,7 @@ public class CreateFunctionStatement extends CreateStatement<CreateFunctionState
         {
             if ((e.getSQLState().equals(SqlState.ALREADY_EXISTS.toString()) || e.getSQLState().equals(SqlState.ALREADY_EXISTS_IN.toString())) && this.replace)
             {
-                log("Replacing procedure '" + this.name + "'.", printLogs);
+                log("Replacing function '" + this.name + "'.", printLogs);
 
                 DropStatement drop = this.db.drop()
                                             .function(this.name)
