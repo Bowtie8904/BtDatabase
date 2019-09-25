@@ -1264,10 +1264,7 @@ public abstract class DatabaseAccess implements Killable
      */
     protected void onInsert(InsertEvent event)
     {
-        int count = this.eventDispatcher.dispatch(event);
-        log.printfSrc(this,
-                      "Dispatched insert event to %d listeners.",
-                      count);
+        this.eventDispatcher.dispatch(event);
     }
 
     /**
@@ -1308,10 +1305,7 @@ public abstract class DatabaseAccess implements Killable
      */
     protected void onUpdate(UpdateEvent event)
     {
-        int count = this.eventDispatcher.dispatch(event);
-        log.printfSrc(this,
-                      "Dispatched update event to %d listeners.",
-                      count);
+        this.eventDispatcher.dispatch(event);
     }
 
     /**
@@ -1352,10 +1346,7 @@ public abstract class DatabaseAccess implements Killable
      */
     protected void onDelete(DeleteEvent event)
     {
-        int count = this.eventDispatcher.dispatch(event);
-        log.printfSrc(this,
-                      "Dispatched delete event to %d listeners.",
-                      count);
+        this.eventDispatcher.dispatch(event);
     }
 
     protected void createDefaultFunctions()
