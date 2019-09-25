@@ -5,6 +5,7 @@ import java.util.List;
 
 import bt.db.DatabaseAccess;
 import bt.db.constants.Generated;
+import bt.db.constants.Index;
 import bt.db.constants.SqlType;
 import bt.db.constants.SqlValue;
 import bt.db.statement.clause.foreign.ColumnForeignKey;
@@ -35,6 +36,11 @@ public class Column
 
     /** Defines the generate behavior. */
     private GenerationClause generated;
+
+    /** The pameters to create an index for this column. */
+    private Index[] indexParams = new Index[] {};
+
+    private boolean shouldIndex;
 
     /**
      * Indicates whether a value in this column can ever be NULL. true = value can't be null, false = value can be null.
@@ -277,6 +283,23 @@ public class Column
         this.generated = clause;
 
         return clause;
+    }
+
+    public Column index(Index... params)
+    {
+        this.indexParams = params;
+        this.shouldIndex = true;
+        return this;
+    }
+
+    public boolean shouldIndex()
+    {
+        return this.shouldIndex;
+    }
+
+    public Index[] getIndexParams()
+    {
+        return this.indexParams;
     }
 
     /**

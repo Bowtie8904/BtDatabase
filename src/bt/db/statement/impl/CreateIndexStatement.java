@@ -47,6 +47,12 @@ public class CreateIndexStatement extends CreateStatement<CreateIndexStatement, 
         return clause;
     }
 
+    public CreateIndexStatement unique()
+    {
+        this.unique = true;
+        return this;
+    }
+
     /**
      * @see bt.db.statement.SqlModifyStatement#executeStatement(boolean)
      */

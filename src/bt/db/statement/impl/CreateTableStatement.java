@@ -9,6 +9,7 @@ import bt.db.DatabaseAccess;
 import bt.db.EmbeddedDatabase;
 import bt.db.RemoteDatabase;
 import bt.db.constants.Generated;
+import bt.db.constants.Index;
 import bt.db.constants.SqlState;
 import bt.db.constants.SqlType;
 import bt.db.exc.SqlExecutionException;
@@ -18,6 +19,7 @@ import bt.db.statement.clause.Column;
 import bt.db.statement.clause.ColumnEntry;
 import bt.db.statement.clause.foreign.ForeignKey;
 import bt.db.statement.clause.foreign.TableForeignKey;
+import bt.utils.id.StringID;
 
 /**
  * Represents an SQL create table statement which can be extended through method chaining.
@@ -380,11 +382,44 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
             log("Executing: " + sql,
                 printLogs);
             statement.executeUpdate();
-            endExecutionTime();
 
             if (this.createDefaultTriggers)
             {
                 createTriggers(printLogs);
+            }
+
+            for (var col : this.tableColumns)
+            {
+                if (col.shouldIndex())
+                {
+                    boolean addedCol = false;
+                    var index = this.db.create().index(this.name + "_" + col.getName() + "_" + StringID.randomID(5) + "_IDX").on(this.name);
+
+                    for (Index param : col.getIndexParams())
+                    {
+                        if (param == Index.UNIQUE)
+                        {
+                            index.unique();
+                        }
+                        else if (param == Index.ASC)
+                        {
+                            index.column(col.getName()).asc();
+                            addedCol = true;
+                        }
+                        else if (param == Index.DESC)
+                        {
+                            index.column(col.getName()).desc();
+                            addedCol = true;
+                        }
+                    }
+
+                    if (!addedCol)
+                    {
+                        index.column(col.getName()).asc();
+                    }
+
+                    index.execute(printLogs);
+                }
             }
 
             if (this.asCopySelect != null && this.copyData)
@@ -434,6 +469,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
             {
                 this.db.commit();
             }
+            endExecutionTime();
 
             handleSuccess(result);
         }
