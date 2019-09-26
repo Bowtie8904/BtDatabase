@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
 import bt.utils.console.ConsoleTable;
+import bt.utils.log.Logger;
 
 /**
  * Wraps the values from the given ResultSet to make them more accessible and serializable.
@@ -463,6 +464,12 @@ public class SqlResultSet implements Iterable<SqlResult>
     public SqlResultSet print()
     {
         System.out.println(toString(this.defaultFormat));
+        return this;
+    }
+
+    public SqlResultSet print(Logger log)
+    {
+        log.print("\n" + toString(this.defaultFormat));
         return this;
     }
 
