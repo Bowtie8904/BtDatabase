@@ -20,6 +20,7 @@ import bt.db.statement.clause.condition.ConditionalClause;
 import bt.db.statement.clause.join.JoinClause;
 import bt.db.statement.clause.join.JoinConditionalClause;
 import bt.db.statement.result.SqlResultSet;
+import bt.db.statement.result.StreamableResultSet;
 import bt.db.statement.value.Preparable;
 import bt.db.statement.value.Value;
 
@@ -941,6 +942,67 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
         return result;
     }
 
+    public StreamableResultSet executeAsStream(boolean printLogs)
+    {
+        startExecutionTime();
+        String sql = toString();
+        StreamableResultSet result = null;
+
+        try
+        {
+            PreparedStatement statement = this.db.getConnection()
+                                                 .prepareStatement(sql,
+                                                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                                                   ResultSet.CONCUR_READ_ONLY);
+            log("Executing: " + sql, printLogs);
+
+            List<String> valueList = new ArrayList<>();
+
+            if (this.prepared)
+            {
+                List<Value> values = getValues();
+
+                Preparable.prepareStatement(statement, values);
+
+                if (!values.isEmpty())
+                {
+                    log("With values:", printLogs);
+                }
+
+                Value val = null;
+
+                for (int j = 0; j < values.size(); j ++ )
+                {
+                    val = values.get(j);
+                    log("p" + (j + 1) + " [" + val.getType().toString() + "] = " + val.getValue(), printLogs);
+                }
+            }
+
+            result = new StreamableResultSet(statement.executeQuery(), statement);
+            endExecutionTime();
+
+            if (this.onSuccess != null)
+            {
+                this.onSuccess.accept(this, null);
+            }
+        }
+        catch (SQLException e)
+        {
+            endExecutionTime();
+            if (this.onFail != null)
+            {
+                this.onFail.apply(this, new SqlExecutionException(e.getMessage(), sql, e));
+            }
+            else
+            {
+                this.db.dispatchException(new SqlExecutionException(e.getMessage(), sql, e));
+            }
+        }
+
+        endExecutionTime();
+        return result;
+    }
+
     /**
      * Formats the full select statement.
      *
@@ -1039,8 +1101,6 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
     @Override
     public List<Value> getValues()
     {
-        // TODO functions
-
         List<Value> values = new ArrayList<>();
 
         for (FromClause f : this.fromClauses)
