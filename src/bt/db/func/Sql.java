@@ -643,4 +643,68 @@ public final class Sql
     {
         return new NullValueFunction(value1, value2, elements);
     }
+
+    /**
+     * Adds the given number of days to the value.
+     *
+     * @param value
+     *            The value to use.
+     * @param length
+     *            The number of days to add.
+     * @return The function whichs toString will return a valid sql representation of this action.
+     */
+    public static SqlFunction addDays(Object value, int days)
+    {
+        var func = new SqlFunction("addDays", value);
+        func.add(days);
+        return func;
+    }
+
+    /**
+     * Adds the given number of hours to the value.
+     *
+     * @param value
+     *            The value to use.
+     * @param length
+     *            The number of hours to add.
+     * @return The function whichs toString will return a valid sql representation of this action.
+     */
+    public static SqlFunction addHours(Object value, int hours)
+    {
+        var func = new SqlFunction("addHours", value);
+        func.add(hours);
+        return func;
+    }
+
+    /**
+     * Adds the given number of minutes to the value.
+     *
+     * @param value
+     *            The value to use.
+     * @param length
+     *            The number of minutes to add.
+     * @return The function whichs toString will return a valid sql representation of this action.
+     */
+    public static SqlFunction addMinutes(Object value, int mins)
+    {
+        var func = new SqlFunction("addMinutes", value);
+        func.add(mins);
+        return func;
+    }
+
+    /**
+     * Adds the given number of days to the value.
+     *
+     * @param value
+     *            The value to use.
+     * @param length
+     *            The number of days to add.
+     * @return The function whichs toString will return a valid sql representation of this action.
+     */
+    public static SqlFunction addSeconds(Object value, int secs)
+    {
+        var func = new SqlFunction("addSeconds", value);
+        func.add(secs);
+        return func;
+    }
 }
