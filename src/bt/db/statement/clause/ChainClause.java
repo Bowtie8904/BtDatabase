@@ -7,18 +7,26 @@ import bt.db.statement.value.Preparable;
 import bt.db.statement.value.Value;
 
 /**
- * Combines a union keyword and a SelectStatement.
+ * Combines two SelectStatement with a chaining keyword such as UNION, INTERSECT or EXCEPT.
  *
  * @author &#8904
  */
-public class UnionClause implements Preparable
+public class ChainClause implements Preparable
 {
     /** The standard UNION keyword. Causing only unique rows in the resultset. */
     public static final String UNION = "UNION";
     /** The UNION ALL keyword. Causing the resultset to contain all combined rows. */
     public static final String UNION_ALL = "UNION ALL";
+    /** The standard INTERSECT keyword. Causing only unique rows in the resultset. */
+    public static final String INTERSECT = "INTERSECT";
+    /** The INTERSECT ALL keyword. Causing the resultset to contain all combined rows. */
+    public static final String INTERSECT_ALL = "INTERSECT ALL";
+    /** The standard INTERSECT keyword. Causing only unique rows in the resultset. */
+    public static final String EXCEPT = "EXCEPT";
+    /** The INTERSECT ALL keyword. Causing the resultset to contain all combined rows. */
+    public static final String EXCEPT_ALL = "EXCEPT ALL";
 
-    /** The union keyword used. */
+    /** The chain keyword used. */
     private String keyword;
 
     /** The appended statement. */
@@ -32,14 +40,14 @@ public class UnionClause implements Preparable
      * @param statement
      *            The SelectStatement to append.
      */
-    public UnionClause(String keyword, SelectStatement statement)
+    public ChainClause(String keyword, SelectStatement statement)
     {
         this.keyword = keyword;
         this.statement = statement;
     }
 
     /**
-     * Creates a formatted UNION clause String. The statement will be set to unprepared and appended as String.
+     * Creates a formatted chain clause String. The statement will be set to unprepared and appended as String.
      *
      * @see java.lang.Object#toString()
      */
