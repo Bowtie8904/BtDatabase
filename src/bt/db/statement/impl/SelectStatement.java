@@ -13,9 +13,9 @@ import bt.db.DatabaseAccess;
 import bt.db.exc.SqlExecutionException;
 import bt.db.statement.SqlModifyStatement;
 import bt.db.statement.SqlStatement;
+import bt.db.statement.clause.ChainClause;
 import bt.db.statement.clause.FromClause;
 import bt.db.statement.clause.OrderByClause;
-import bt.db.statement.clause.UnionClause;
 import bt.db.statement.clause.condition.ConditionalClause;
 import bt.db.statement.clause.join.JoinClause;
 import bt.db.statement.clause.join.JoinConditionalClause;
@@ -73,8 +73,8 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
     /** Indictaes that * is selected. */
     private boolean selectAll;
 
-    /** Holds all used UNION and UNION ALL clauses. */
-    private List<UnionClause> unions;
+    /** Holds all used chain clauses. */
+    private List<ChainClause> chains;
 
     /** An alias used if this select is used as a subselect. */
     private String alias;
@@ -800,7 +800,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      */
     public SelectStatement unionAll(SelectStatement select)
     {
-        createUnion(UnionClause.UNION_ALL,
+        createChain(ChainClause.UNION_ALL,
                     select);
         return this;
     }
@@ -822,7 +822,96 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      */
     public SelectStatement union(SelectStatement select)
     {
-        createUnion(UnionClause.UNION,
+        createChain(ChainClause.UNION,
+                    select);
+        return this;
+    }
+
+    /**
+     * Combines this select with the given one.
+     *
+     * <p>
+     * The given select will be executed unprepared.
+     * </p>
+     *
+     * <p>
+     * The SqlResultSet of this select will contain all rows that occur in both selects.
+     * </p>
+     *
+     * @param select
+     *            The select to append to this one.
+     * @return This instance for chaining.
+     */
+    public SelectStatement intersectAll(SelectStatement select)
+    {
+        createChain(ChainClause.INTERSECT_ALL,
+                    select);
+        return this;
+    }
+
+    /**
+     * Combines this select with the given one.
+     *
+     * <p>
+     * The given select will be executed unprepared.
+     * </p>
+     *
+     * <p>
+     * The SqlResultSet of this select will only contain unique rows that occur in both selects.
+     * </p>
+     *
+     * @param select
+     *            The select to append to this one.
+     * @return This instance for chaining.
+     */
+    public SelectStatement intersect(SelectStatement select)
+    {
+        createChain(ChainClause.INTERSECT,
+                    select);
+        return this;
+    }
+
+    /**
+     * Combines this select with the given one.
+     *
+     * <p>
+     * The given select will be executed unprepared.
+     * </p>
+     *
+     * <p>
+     * The SqlResultSet of this select will contain all rows that occur only in this select and not in the given one.
+     * </p>
+     *
+     * @param select
+     *            The select to append to this one.
+     * @return This instance for chaining.
+     */
+    public SelectStatement exceptAll(SelectStatement select)
+    {
+        createChain(ChainClause.EXCEPT_ALL,
+                    select);
+        return this;
+    }
+
+    /**
+     * Combines this select with the given one.
+     *
+     * <p>
+     * The given select will be executed unprepared.
+     * </p>
+     *
+     * <p>
+     * The SqlResultSet of this select will only contain unique rows that occur only in this select and not in the given
+     * one.
+     * </p>
+     *
+     * @param select
+     *            The select to append to this one.
+     * @return This instance for chaining.
+     */
+    public SelectStatement except(SelectStatement select)
+    {
+        createChain(ChainClause.EXCEPT,
                     select);
         return this;
     }
@@ -831,18 +920,18 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * Creates a new UnionClause and adds it to the list.
      *
      * @param unionType
-     *            {@link UnionClause#UNION} or {@link UnionClause#UNION_ALL}.
+     *            {@link ChainClause#UNION} or {@link ChainClause#UNION_ALL}.
      * @param select
      *            The select to append.
      */
-    private void createUnion(String unionType, SelectStatement select)
+    private void createChain(String chainType, SelectStatement select)
     {
-        if (this.unions == null)
+        if (this.chains == null)
         {
-            this.unions = new ArrayList<>();
+            this.chains = new ArrayList<>();
         }
 
-        this.unions.add(new UnionClause(unionType,
+        this.chains.add(new ChainClause(chainType,
                                         select));
     }
 
@@ -1055,9 +1144,9 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
             }
         }
 
-        if (this.unions != null)
+        if (this.chains != null)
         {
-            for (UnionClause union : this.unions)
+            for (ChainClause union : this.chains)
             {
                 sql += " " + union.toString(this.prepared);
             }
@@ -1118,9 +1207,9 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
             values.addAll(h.getValues());
         }
 
-        if (this.unions != null)
+        if (this.chains != null)
         {
-            for (UnionClause u : this.unions)
+            for (ChainClause u : this.chains)
             {
                 values.addAll(u.getValues());
             }
