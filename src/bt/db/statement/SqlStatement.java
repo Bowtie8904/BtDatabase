@@ -107,16 +107,16 @@ public class SqlStatement<T extends SqlStatement>
     {
         if (shouldLog)
         {
+            DatabaseAccess.log.setCallerStackIndex(4);
             if (text == null || text.isEmpty())
             {
                 DatabaseAccess.log.printEmpty();
             }
             else
             {
-                DatabaseAccess.log.setCallerStackIndex(3);
                 DatabaseAccess.log.print(text);
-                DatabaseAccess.log.setCallerStackIndex(2);
             }
+            DatabaseAccess.log.setCallerStackIndex(2);
         }
     }
 
