@@ -116,7 +116,7 @@ public class SqlStatement<T extends SqlStatement>
             {
                 DatabaseAccess.log.print(text);
             }
-            DatabaseAccess.log.setCallerStackIndex(2);
+            DatabaseAccess.log.setCallerStackIndex(3);
         }
     }
 

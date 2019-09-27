@@ -755,7 +755,9 @@ public abstract class DatabaseAccess implements Killable
             if (this.connection != null && !this.connection.getAutoCommit())
             {
                 this.connection.rollback();
+                log.setCallerStackIndex(4);
                 log.print(this, "Rolled transaction back.");
+                log.setCallerStackIndex(3);
             }
         }
         catch (SQLException e)
@@ -788,7 +790,9 @@ public abstract class DatabaseAccess implements Killable
                     if (sp != null)
                     {
                         this.connection.rollback(sp);
+                        log.setCallerStackIndex(4);
                         log.print(this, "Rolled transaction back to savepoint " + savepoint.toUpperCase() + ".");
+                        log.setCallerStackIndex(3);
                     }
                 }
             }
@@ -813,7 +817,9 @@ public abstract class DatabaseAccess implements Killable
             if (this.connection != null && !this.connection.getAutoCommit())
             {
                 this.connection.commit();
+                log.setCallerStackIndex(4);
                 log.print(this, "Committed transaction.");
+                log.setCallerStackIndex(3);
             }
         }
         catch (SQLException e)
@@ -842,7 +848,9 @@ public abstract class DatabaseAccess implements Killable
         try
         {
             this.savepoints.put(name.toUpperCase(), this.getConnection().setSavepoint(name.toUpperCase()));
+            log.setCallerStackIndex(4);
             log.print(this, "Created savepoint " + name.toUpperCase() + ".");
+            log.setCallerStackIndex(3);
         }
         catch (SQLException e)
         {
