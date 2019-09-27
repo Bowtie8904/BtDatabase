@@ -801,7 +801,7 @@ public interface SqlEntry
                 return -1;
             });
 
-            update.where(id.getKey()).equals(id.getValue().longValue());
+            update.where(id.getKey()).equal(id.getValue().longValue());
 
             db.select(id.getKey())
               .from(tableName)
