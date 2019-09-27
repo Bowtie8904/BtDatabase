@@ -5,13 +5,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Savepoint;
 import java.sql.Statement;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -1552,63 +1550,7 @@ public abstract class DatabaseAccess implements Killable
                 .execute();
 
         create().function("addDays")
-                .call(DateUtils.class, "addDays", Date.class, int.class)
-                .returnNullOnNull()
-                .onAlreadyExists((s, e) ->
-                {
-                    return 0;
-                })
-                .onSuccess((s, i) ->
-                {
-                    log.print("Created function " + s.getName() + ".");
-                })
-                .commit()
-                .execute();
-
-        create().function("addDays")
-                .call(DateUtils.class, "addDays", Time.class, int.class)
-                .returnNullOnNull()
-                .onAlreadyExists((s, e) ->
-                {
-                    return 0;
-                })
-                .onSuccess((s, i) ->
-                {
-                    log.print("Created function " + s.getName() + ".");
-                })
-                .commit()
-                .execute();
-
-        create().function("addDays")
                 .call(DateUtils.class, "addDays", Timestamp.class, int.class)
-                .returnNullOnNull()
-                .onAlreadyExists((s, e) ->
-                {
-                    return 0;
-                })
-                .onSuccess((s, i) ->
-                {
-                    log.print("Created function " + s.getName() + ".");
-                })
-                .commit()
-                .execute();
-
-        create().function("addHours")
-                .call(DateUtils.class, "addHours", Date.class, int.class)
-                .returnNullOnNull()
-                .onAlreadyExists((s, e) ->
-                {
-                    return 0;
-                })
-                .onSuccess((s, i) ->
-                {
-                    log.print("Created function " + s.getName() + ".");
-                })
-                .commit()
-                .execute();
-
-        create().function("addHours")
-                .call(DateUtils.class, "addHours", Time.class, int.class)
                 .returnNullOnNull()
                 .onAlreadyExists((s, e) ->
                 {
@@ -1636,63 +1578,7 @@ public abstract class DatabaseAccess implements Killable
                 .execute();
 
         create().function("addMinutes")
-                .call(DateUtils.class, "addMinutes", Date.class, int.class)
-                .returnNullOnNull()
-                .onAlreadyExists((s, e) ->
-                {
-                    return 0;
-                })
-                .onSuccess((s, i) ->
-                {
-                    log.print("Created function " + s.getName() + ".");
-                })
-                .commit()
-                .execute();
-
-        create().function("addMinutes")
-                .call(DateUtils.class, "addMinutes", Time.class, int.class)
-                .returnNullOnNull()
-                .onAlreadyExists((s, e) ->
-                {
-                    return 0;
-                })
-                .onSuccess((s, i) ->
-                {
-                    log.print("Created function " + s.getName() + ".");
-                })
-                .commit()
-                .execute();
-
-        create().function("addMinutes")
                 .call(DateUtils.class, "addMinutes", Timestamp.class, int.class)
-                .returnNullOnNull()
-                .onAlreadyExists((s, e) ->
-                {
-                    return 0;
-                })
-                .onSuccess((s, i) ->
-                {
-                    log.print("Created function " + s.getName() + ".");
-                })
-                .commit()
-                .execute();
-
-        create().function("addSeconds")
-                .call(DateUtils.class, "addSeconds", Date.class, int.class)
-                .returnNullOnNull()
-                .onAlreadyExists((s, e) ->
-                {
-                    return 0;
-                })
-                .onSuccess((s, i) ->
-                {
-                    log.print("Created function " + s.getName() + ".");
-                })
-                .commit()
-                .execute();
-
-        create().function("addSeconds")
-                .call(DateUtils.class, "addSeconds", Time.class, int.class)
                 .returnNullOnNull()
                 .onAlreadyExists((s, e) ->
                 {
