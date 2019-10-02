@@ -121,6 +121,9 @@ public abstract class DatabaseAccess implements Killable
     /** A map containing savepoint-names mapped to their savepoint objects. */
     protected Map<String, Savepoint> savepoints;
 
+    /** Indicates whether a message should be logged upon commit. */
+    protected boolean logCommit = true;
+
     /**
      * Gets the instance with the given ID.
      *
@@ -833,15 +836,29 @@ public abstract class DatabaseAccess implements Killable
             if (this.connection != null && !this.connection.getAutoCommit())
             {
                 this.connection.commit();
-                log.setCallerStackIndex(4);
-                log.print(this, "Committed transaction.");
-                log.setCallerStackIndex(3);
+
+                if (this.logCommit)
+                {
+                    log.setCallerStackIndex(4);
+                    log.print(this, "Committed transaction.");
+                    log.setCallerStackIndex(3);
+                }
             }
         }
         catch (SQLException e)
         {
             dispatchException(e);
         }
+    }
+
+    /**
+     * Sets whether a message should be logged upon commit.
+     *
+     * @param logCommit
+     */
+    public void setLogCommit(boolean logCommit)
+    {
+        this.logCommit = logCommit;
     }
 
     /**
