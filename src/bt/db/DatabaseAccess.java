@@ -39,6 +39,7 @@ import bt.db.statement.impl.TruncateTableStatement;
 import bt.db.statement.impl.UpdateStatement;
 import bt.db.statement.result.SqlResult;
 import bt.db.statement.result.SqlResultSet;
+import bt.db.statement.result.StreamableResultSet;
 import bt.db.store.SqlEntry;
 import bt.runtime.InstanceKiller;
 import bt.runtime.Killable;
@@ -393,7 +394,7 @@ public abstract class DatabaseAccess implements Killable
         };
 
         this.eventDispatcher.subscribeTo(listenFor,
-                                           cons);
+                                         cons);
 
         log.printfSrc(this,
                       "Registered database listener of type '%s' for '%s' to instance %s.",
@@ -417,7 +418,7 @@ public abstract class DatabaseAccess implements Killable
     public <T extends DatabaseChangeEvent> void unregisterListener(Class<T> type, Consumer<T> listener)
     {
         if (this.eventDispatcher.unsubscribeFrom(type,
-                                                   listener))
+                                                 listener))
         {
             log.printfSrc(this,
                           "Unregistered database listener of type '%s' for '%s' to instance %s.",
@@ -642,13 +643,13 @@ public abstract class DatabaseAccess implements Killable
                 .column(new Column("primary_key", SqlType.BOOLEAN).defaultValue(false)
                                                                   .comment("Indicates whether this column is (part of) the primary key."))
                 .column(new Column("is_identity", SqlType.BOOLEAN).defaultValue(false)
-                                                               .comment("Indicates whether this column is marked as an identity."))
+                                                                  .comment("Indicates whether this column is marked as an identity."))
                 .column(new Column("generation", SqlType.VARCHAR).size(200)
-                                                                    .comment("Contains further generation information of this column."))
+                                                                 .comment("Contains further generation information of this column."))
                 .column(new Column("not_null", SqlType.BOOLEAN).defaultValue(false)
                                                                .comment("Indicates whether this columns can contain null values."))
                 .column(new Column("is_unique", SqlType.BOOLEAN).defaultValue(false)
-                                                             .comment("Indicates whether this column contains only unique values."))
+                                                                .comment("Indicates whether this column contains only unique values."))
                 .column(new Column("default_value", SqlType.VARCHAR).size(100)
                                                                     .comment("Contains the defined default value."))
                 .column(new Column("foreign_keys", SqlType.VARCHAR).size(500)
@@ -673,7 +674,6 @@ public abstract class DatabaseAccess implements Killable
                 .commit()
                 .execute();
     }
-
 
     /**
      * Creates the {@link #OBJECT_DATA_TABLE} if it does not exist yet.
@@ -739,6 +739,22 @@ public abstract class DatabaseAccess implements Killable
         {
             throw e;
         }
+    }
+
+    /**
+     * Executes the given raw SQL String of a select statement and returns a streamable result set.
+     *
+     * @param sql
+     *            The raw SQL String to execute.
+     * @return The {@link StreamableResultSet} resulting from the query.
+     * @throws SQLException
+     */
+    public StreamableResultSet executeQueryAsStream(String sql) throws SQLException
+    {
+        Statement statement = getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                                              ResultSet.CONCUR_READ_ONLY);
+        return new StreamableResultSet(statement.executeQuery(sql), statement);
+
     }
 
     /**
