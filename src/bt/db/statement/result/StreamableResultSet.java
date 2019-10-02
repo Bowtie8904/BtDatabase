@@ -1,8 +1,8 @@
 package bt.db.statement.result;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Spliterator;
 import java.util.Spliterators.AbstractSpliterator;
 import java.util.function.Consumer;
@@ -19,10 +19,10 @@ import bt.utils.log.Logger;
 public class StreamableResultSet extends AbstractSpliterator<ResultSet> implements UncheckedCloseable
 {
     private ResultSet results;
-    private PreparedStatement statement;
+    private Statement statement;
     private SqlResultSet printableResultSet;
 
-    public StreamableResultSet(ResultSet results, PreparedStatement statement)
+    public StreamableResultSet(ResultSet results, Statement statement)
     {
         super(Long.MAX_VALUE, Spliterator.ORDERED);
         this.results = results;
