@@ -1031,6 +1031,11 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
         return result;
     }
 
+    public StreamableResultSet executeAsStream()
+    {
+        return executeAsStream(false);
+    }
+
     public StreamableResultSet executeAsStream(boolean printLogs)
     {
         startExecutionTime();
