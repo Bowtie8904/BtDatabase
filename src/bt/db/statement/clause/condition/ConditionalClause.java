@@ -930,6 +930,74 @@ public class ConditionalClause<T> implements Preparable
         return notIn(array);
     }
 
+    /**
+     * Adds the given list to the right side of this conditional.
+     *
+     * <p>
+     * This conditional will then check whether the left side is contained in the values inside the list.
+     * </p>
+     *
+     * @param list
+     *            The list to use.
+     * @return The caller that created this conditional.
+     */
+    public T in(List list)
+    {
+        return in(list.toArray(), "");
+    }
+
+    /**
+     * Adds the given list to the right side of this conditional.
+     *
+     * <p>
+     * This conditional will then check whether the left side is contained in the values inside the list.
+     * </p>
+     *
+     * @param list
+     *            The list to use.
+     * @param postfix
+     *            A String that will be added after the expression. Can be used for parenthesis.
+     * @return The caller that created this conditional.
+     */
+    public T in(List list, String postfix)
+    {
+        return in(list.toArray(), postfix);
+    }
+
+    /**
+     * Adds the given list to the right side of this conditional.
+     *
+     * <p>
+     * This conditional will then check whether the left side is NOT contained in the values inside the list.
+     * </p>
+     *
+     * @param list
+     *            The list to use.
+     * @return The caller that created this conditional.
+     */
+    public T notIn(List list)
+    {
+        return notIn(list.toArray(), "");
+    }
+
+    /**
+     * Adds the given list to the right side of this conditional.
+     *
+     * <p>
+     * This conditional will then check whether the left side is NOT contained in the values inside the list.
+     * </p>
+     *
+     * @param list
+     *            The list to use.
+     * @param postfix
+     *            A String that will be added after the expression. Can be used for parenthesis.
+     * @return The caller that created this conditional.
+     */
+    public T notIn(List list, String postfix)
+    {
+        return notIn(list.toArray(), postfix);
+    }
+
     public ConditionalClause<T> not()
     {
         this.negateExpression = true;
