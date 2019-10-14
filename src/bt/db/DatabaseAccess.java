@@ -98,7 +98,13 @@ public abstract class DatabaseAccess implements Killable
     protected static Map<String, DatabaseAccess> instances = new HashMap<>();
 
     /** The Logger for all database related logging. Writing to 'logs/database_log.log'. */
-    public static Logger log = new Logger("logs/database_log.log");
+    public static Logger log;
+
+    static
+    {
+        log = new Logger("logs/database_log.log");
+        log.registerSource(log, "DATABASE_LOGGER");
+    }
 
     /** The URL of the database. */
     protected final String dbConnectionString;
@@ -757,7 +763,6 @@ public abstract class DatabaseAccess implements Killable
         Statement statement = getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
                                                               ResultSet.CONCUR_READ_ONLY);
         return new StreamableResultSet(statement.executeQuery(sql), statement);
-
     }
 
     /**
