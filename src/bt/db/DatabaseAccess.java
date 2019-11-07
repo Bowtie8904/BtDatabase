@@ -100,12 +100,6 @@ public abstract class DatabaseAccess implements Killable
     /** The Logger for all database related logging. Writing to 'logs/database_log.log'. */
     public static Logger log;
 
-    static
-    {
-        log = new Logger("logs/database_log.log");
-        log.registerSource(log, "DATABASE_LOGGER");
-    }
-
     /** The URL of the database. */
     protected final String dbConnectionString;
 
@@ -159,6 +153,13 @@ public abstract class DatabaseAccess implements Killable
     protected DatabaseAccess(String dbURL)
     {
         this.dbConnectionString = dbURL;
+
+        if (log == null)
+        {
+            log = new Logger("database_log.log");
+            log.registerSource(log, "DATABASE_LOGGER");
+        }
+
         log.registerSource(this,
                            getClass().getName());
         InstanceKiller.killOnShutdown(this,
