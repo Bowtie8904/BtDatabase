@@ -109,7 +109,7 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
                        })
                        .execute();
 
-                Null.checkConsume(this.newColumn, this.db, this.newColumn::saveColumnData);
+                Null.checkRun(this.newColumn, () -> this.newColumn.saveColumnData(this.db));
             }
 
             if (this.shouldCommit)

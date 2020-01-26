@@ -138,13 +138,13 @@ public abstract class RemoteDatabase extends DatabaseAccess
     @Override
     public void kill()
     {
-        Null.checkConsume(this.triggerCheck, true, this.triggerCheck::cancel);
+        Null.checkRun(this.triggerCheck, () -> this.triggerCheck.cancel(true));
         super.kill();
     }
 
     private void startTriggerCheck()
     {
-        Null.checkConsume(this.triggerCheck, false, this.triggerCheck::cancel);
+        Null.checkRun(this.triggerCheck, () -> this.triggerCheck.cancel(false));
 
         this.triggerCheck = Threads.get()
                                    .scheduleAtFixedRateDaemon(
