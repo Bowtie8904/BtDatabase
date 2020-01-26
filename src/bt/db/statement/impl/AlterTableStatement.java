@@ -9,6 +9,7 @@ import bt.db.constants.SqlValue;
 import bt.db.exc.SqlExecutionException;
 import bt.db.statement.clause.Column;
 import bt.db.statement.result.SqlResult;
+import bt.utils.nulls.Null;
 
 /**
  * Represents an SQL alter statement which can be extended through method chaining.
@@ -108,10 +109,7 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
                        })
                        .execute();
 
-                if (this.newColumn != null)
-                {
-                    this.newColumn.saveColumnData(this.db);
-                }
+                Null.checkConsume(this.newColumn, this.db, this.newColumn::saveColumnData);
             }
 
             if (this.shouldCommit)

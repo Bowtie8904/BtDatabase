@@ -10,6 +10,7 @@ import bt.db.constants.SqlValue;
 import bt.db.statement.clause.Column;
 import bt.db.statement.result.SqlResult;
 import bt.db.statement.result.SqlResultSet;
+import bt.utils.nulls.Null;
 import bt.utils.thread.Threads;
 
 /**
@@ -137,20 +138,13 @@ public abstract class RemoteDatabase extends DatabaseAccess
     @Override
     public void kill()
     {
-        if (this.triggerCheck != null)
-        {
-            this.triggerCheck.cancel(true);
-        }
-
+        Null.checkConsume(this.triggerCheck, true, this.triggerCheck::cancel);
         super.kill();
     }
 
     private void startTriggerCheck()
     {
-        if (this.triggerCheck != null)
-        {
-            this.triggerCheck.cancel(false);
-        }
+        Null.checkConsume(this.triggerCheck, false, this.triggerCheck::cancel);
 
         this.triggerCheck = Threads.get()
                                    .scheduleAtFixedRateDaemon(
