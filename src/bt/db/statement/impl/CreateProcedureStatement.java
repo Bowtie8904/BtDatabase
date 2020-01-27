@@ -11,6 +11,7 @@ import bt.db.constants.SqlState;
 import bt.db.constants.SqlType;
 import bt.db.exc.SqlExecutionException;
 import bt.db.func.Sql;
+import bt.utils.nulls.Null;
 
 /**
  * Represents an SQL CREATE PROCEDURE statement which can be extended through method chaining.
@@ -151,10 +152,7 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
                 this.db.commit();
             }
 
-            if (this.onSuccess != null)
-            {
-                this.onSuccess.accept(this, result);
-            }
+            Null.checkConsume(this.onSuccess, result, (r) -> this.onSuccess.accept(this, r));
         }
         catch (SQLException e)
         {

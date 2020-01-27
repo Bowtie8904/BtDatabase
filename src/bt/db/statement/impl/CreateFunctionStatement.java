@@ -13,6 +13,7 @@ import bt.db.constants.SqlState;
 import bt.db.constants.SqlType;
 import bt.db.exc.SqlExecutionException;
 import bt.db.func.Sql;
+import bt.utils.nulls.Null;
 
 /**
  * A statement to define an SQL function which calls a java method.
@@ -150,10 +151,7 @@ public class CreateFunctionStatement extends CreateStatement<CreateFunctionState
                 this.db.commit();
             }
 
-            if (this.onSuccess != null)
-            {
-                this.onSuccess.accept(this, result);
-            }
+            Null.checkConsume(this.onSuccess, result, (r) -> this.onSuccess.accept(this, r));
         }
         catch (SQLException e)
         {

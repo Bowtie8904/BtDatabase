@@ -23,6 +23,7 @@ import bt.db.statement.result.SqlResultSet;
 import bt.db.statement.result.StreamableResultSet;
 import bt.db.statement.value.Preparable;
 import bt.db.statement.value.Value;
+import bt.utils.nulls.Null;
 
 /**
  * Represents an SQL select statement which can be extended through method chaining.
@@ -999,10 +1000,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
             log("Returned rows: " + result.size(),
                 printLogs);
 
-            if (this.onSuccess != null)
-            {
-                this.onSuccess.accept(this, result);
-            }
+            Null.checkConsume(this.onSuccess, result, (r) -> this.onSuccess.accept(this, r));
 
             if (result.size() < this.lowerThreshhold && this.onLessThan != null)
             {
@@ -1075,10 +1073,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
             result = new StreamableResultSet(statement.executeQuery(), statement);
             endExecutionTime();
 
-            if (this.onSuccess != null)
-            {
-                this.onSuccess.accept(this, null);
-            }
+            Null.checkRun(this.onSuccess, () -> this.onSuccess.accept(this, null));
         }
         catch (SQLException e)
         {

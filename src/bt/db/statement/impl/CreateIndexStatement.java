@@ -9,6 +9,7 @@ import bt.db.DatabaseAccess;
 import bt.db.exc.SqlExecutionException;
 import bt.db.func.Sql;
 import bt.db.statement.clause.IndexColumnClause;
+import bt.utils.nulls.Null;
 
 /**
  * A statement to define an SQL index.
@@ -99,10 +100,7 @@ public class CreateIndexStatement extends CreateStatement<CreateIndexStatement, 
                 this.db.commit();
             }
 
-            if (this.onSuccess != null)
-            {
-                this.onSuccess.accept(this, result);
-            }
+            Null.checkConsume(this.onSuccess, result, (r) -> this.onSuccess.accept(this, r));
         }
         catch (SQLException e)
         {

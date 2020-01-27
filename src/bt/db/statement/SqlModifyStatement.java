@@ -12,6 +12,7 @@ import bt.db.DatabaseAccess;
 import bt.db.constants.SqlState;
 import bt.db.exc.SqlExecutionException;
 import bt.db.statement.clause.SetClause;
+import bt.utils.nulls.Null;
 
 /**
  * Base class for data modifying statements (statement, update, delete, ...).
@@ -476,10 +477,7 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
     protected void handleSuccess(int result)
     {
         endExecutionTime();
-        if (this.onSuccess != null)
-        {
-            this.onSuccess.accept((T)this, result);
-        }
+        Null.checkConsume(this.onSuccess, result, (r) -> this.onSuccess.accept((T)this, r));
     }
 
     protected int handleThreshholds(int reached)
