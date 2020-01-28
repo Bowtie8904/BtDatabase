@@ -241,15 +241,16 @@ public class SqlResultSet implements Iterable<SqlResult>
 
         for (int i = 1; i <= count; i ++ )
         {
+            String columnName = meta.getColumnName(i).toUpperCase();
             int valueType = meta.getColumnType(i);
-            this.colOrder.add(meta.getColumnName(i));
-            this.valueTypes.put(meta.getColumnName(i),
+            this.colOrder.add(columnName);
+            this.valueTypes.put(columnName,
                                 SqlType.convert(valueType).toString());
             int width = meta.getColumnDisplaySize(i) + 4 > 50 ? 50 : meta.getColumnDisplaySize(i) + 4;
 
-            if (width < meta.getColumnName(i).length() + 2)
+            if (width < columnName.length() + 2)
             {
-                width = meta.getColumnName(i).length() + 2;
+                width = columnName.length() + 2;
             }
 
             if (width < 10)
@@ -262,58 +263,58 @@ public class SqlResultSet implements Iterable<SqlResult>
             switch (valueType)
             {
                 case Types.BOOLEAN:
-                    booleanResults.add(meta.getColumnName(i));
+                    booleanResults.add(columnName);
                     break;
                 case Types.CHAR:
-                    stringResults.add(meta.getColumnName(i));
+                    stringResults.add(columnName);
                     break;
                 case Types.VARCHAR:
-                    stringResults.add(meta.getColumnName(i));
+                    stringResults.add(columnName);
                     break;
                 case Types.BIT:
-                    booleanResults.add(meta.getColumnName(i));
+                    booleanResults.add(columnName);
                     break;
                 case Types.TINYINT:
-                    byteResults.add(meta.getColumnName(i));
+                    byteResults.add(columnName);
                     break;
                 case Types.SMALLINT:
-                    shortResults.add(meta.getColumnName(i));
+                    shortResults.add(columnName);
                     break;
                 case Types.INTEGER:
-                    intResults.add(meta.getColumnName(i));
+                    intResults.add(columnName);
                     break;
                 case Types.BIGINT:
-                    longResults.add(meta.getColumnName(i));
+                    longResults.add(columnName);
                     break;
                 case Types.REAL:
-                    floatResults.add(meta.getColumnName(i));
+                    floatResults.add(columnName);
                     break;
                 case Types.FLOAT:
-                    doubleResults.add(meta.getColumnName(i));
+                    doubleResults.add(columnName);
                     break;
                 case Types.DOUBLE:
-                    doubleResults.add(meta.getColumnName(i));
+                    doubleResults.add(columnName);
                     break;
                 case Types.DATE:
-                    dateResults.add(meta.getColumnName(i));
+                    dateResults.add(columnName);
                     break;
                 case Types.TIME:
-                    timeResults.add(meta.getColumnName(i));
+                    timeResults.add(columnName);
                     break;
                 case Types.TIMESTAMP:
-                    timestampResults.add(meta.getColumnName(i));
+                    timestampResults.add(columnName);
                     break;
                 case Types.CLOB:
-                    clobResults.add(meta.getColumnName(i));
+                    clobResults.add(columnName);
                     break;
                 case Types.BLOB:
-                    blobResults.add(meta.getColumnName(i));
+                    blobResults.add(columnName);
                     break;
                 case Types.JAVA_OBJECT:
-                    objectResults.add(meta.getColumnName(i));
+                    objectResults.add(columnName);
                     break;
                 default:
-                    objectResults.add(meta.getColumnName(i));
+                    objectResults.add(columnName);
             }
         }
 
