@@ -84,6 +84,9 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
 
     private List<FromClause> fromClauses;
 
+    /** The object that is used for SELECT INTO clauses. */
+    private Object intoObject;
+
     /**
      * Creates a new instance which selects all columns (*) and will log an error message if no rows are returned.
      *
@@ -140,6 +143,31 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
 
             return set;
         };
+    }
+
+    /**
+     * Sets the object that values will be selected into.
+     *
+     * <p>
+     * The fields of the object that have the same (case-insensitive) names as the selected columns will receive the
+     * selected values.
+     * </p>
+     *
+     * <p>
+     * An exception will be thrown during execution if more than one row is selected.
+     * </p>
+     *
+     * <p>
+     * This can't be used with {@link #executeAsStream(boolean) executeAsStream}, the fields will not be filled.
+     * </p>
+     *
+     * @param intoObject
+     * @return This instance for chaining.
+     */
+    public SelectStatement into(Object intoObject)
+    {
+        this.intoObject = intoObject;
+        return this;
     }
 
     /**
@@ -996,6 +1024,42 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
             endExecutionTime();
             result.setSql(sql);
             result.setValues(valueList);
+
+            if (this.intoObject != null && result.size() > 1)
+            {
+                if (this.onFail != null)
+                {
+                    result = this.onFail.apply(this, new SqlExecutionException("More than one row returned.", sql));
+                }
+                else
+                {
+                    this.db.dispatchException(new SqlExecutionException("More than one row returned.", sql));
+                }
+
+                endExecutionTime();
+                return result;
+            }
+            else if (this.intoObject != null && result.size() == 1)
+            {
+                try
+                {
+                    result.get(0).applyValues(this.intoObject);
+                }
+                catch (IllegalArgumentException | IllegalAccessException e)
+                {
+                    if (this.onFail != null)
+                    {
+                        result = this.onFail.apply(this, new SqlExecutionException(e.getMessage(), sql));
+                    }
+                    else
+                    {
+                        this.db.dispatchException(new SqlExecutionException(e.getMessage(), sql));
+                    }
+
+                    endExecutionTime();
+                    return result;
+                }
+            }
 
             log("Returned rows: " + result.size(),
                 printLogs);

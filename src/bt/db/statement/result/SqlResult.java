@@ -1,5 +1,6 @@
 package bt.db.statement.result;
 
+import java.lang.reflect.Field;
 import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.Date;
@@ -12,10 +13,11 @@ import java.util.Map;
 
 import bt.db.constants.SqlType;
 import bt.db.statement.impl.InsertStatement;
+import bt.utils.refl.field.Fields;
 
 /**
  * Represents a single result (row) of data.
- * 
+ *
  * @author &#8904
  */
 public class SqlResult implements Iterable<Object>
@@ -40,7 +42,7 @@ public class SqlResult implements Iterable<Object>
 
     /**
      * Creates a new instance.
-     * 
+     *
      * @param columnOrder
      *            A list containing the names of the columns in correct order.
      */
@@ -51,7 +53,7 @@ public class SqlResult implements Iterable<Object>
 
     /**
      * Creates a new instance.
-     * 
+     *
      * @param columnOrder
      *            An array containing the names of the columns in correct order.
      */
@@ -61,13 +63,36 @@ public class SqlResult implements Iterable<Object>
     }
 
     /**
+     * Applies the values of this row to the fields of the given object. The fields need to have the same
+     * (case-insensitive) names as the selected columns.
+     *
+     * @param obj
+     *            The object to apply the values to.
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     */
+    public void applyValues(Object obj) throws IllegalArgumentException, IllegalAccessException
+    {
+        for (Field field : Fields.getAllFields(obj.getClass()))
+        {
+            Object value = this.objectResults.get(field.getName().toUpperCase());
+
+            if (value != null || this.objectResults.containsKey(field.getName().toUpperCase()))
+            {
+                field.setAccessible(true);
+                field.set(obj, value);
+            }
+        }
+    }
+
+    /**
      * Sets the values and links them to the columns.
-     * 
+     *
      * <p>
      * Values are added to maps based on their type. Every value will also be added to the {@link Object} map,
      * regardless of type. This makes every value accessible via {@link #get(String)}.
      * </p>
-     * 
+     *
      * @param values
      *            An Object array containing the values in the correct order according to the column order.
      */
@@ -154,7 +179,7 @@ public class SqlResult implements Iterable<Object>
 
     /**
      * Maps the given value to the given name.
-     * 
+     *
      * @param name
      *            The mapped name of the value.
      * @param value
@@ -163,17 +188,17 @@ public class SqlResult implements Iterable<Object>
     public void putObject(String name, Object value)
     {
         name = name.toUpperCase();
-        objectResults.put(name,
+        this.objectResults.put(name,
                           value);
     }
 
     /**
      * Maps the given value to the given name.
-     * 
+     *
      * <p>
      * The value will also be added implicitely via {@link #putObject(String, Object)}.
      * </p>
-     * 
+     *
      * @param name
      *            The mapped name of the value.
      * @param value
@@ -182,7 +207,7 @@ public class SqlResult implements Iterable<Object>
     public void put(String name, String value)
     {
         name = name.toUpperCase();
-        stringResults.put(name,
+        this.stringResults.put(name,
                           value);
         putObject(name,
                   value);
@@ -190,11 +215,11 @@ public class SqlResult implements Iterable<Object>
 
     /**
      * Maps the given value to the given name.
-     * 
+     *
      * <p>
      * The value will also be added implicitely via {@link #putObject(String, Object)}.
      * </p>
-     * 
+     *
      * @param name
      *            The mapped name of the value.
      * @param value
@@ -203,7 +228,7 @@ public class SqlResult implements Iterable<Object>
     public void put(String name, Time value)
     {
         name = name.toUpperCase();
-        timeResults.put(name,
+        this.timeResults.put(name,
                         value);
         putObject(name,
                   value);
@@ -211,11 +236,11 @@ public class SqlResult implements Iterable<Object>
 
     /**
      * Maps the given value to the given name.
-     * 
+     *
      * <p>
      * The value will also be added implicitely via {@link #putObject(String, Object)}.
      * </p>
-     * 
+     *
      * @param name
      *            The mapped name of the value.
      * @param value
@@ -224,7 +249,7 @@ public class SqlResult implements Iterable<Object>
     public void put(String name, Timestamp value)
     {
         name = name.toUpperCase();
-        timestampResults.put(name,
+        this.timestampResults.put(name,
                              value);
         putObject(name,
                   value);
@@ -232,11 +257,11 @@ public class SqlResult implements Iterable<Object>
 
     /**
      * Maps the given value to the given name.
-     * 
+     *
      * <p>
      * The value will also be added implicitely via {@link #putObject(String, Object)}.
      * </p>
-     * 
+     *
      * @param name
      *            The mapped name of the value.
      * @param value
@@ -245,7 +270,7 @@ public class SqlResult implements Iterable<Object>
     public void put(String name, Clob value)
     {
         name = name.toUpperCase();
-        clobResults.put(name,
+        this.clobResults.put(name,
                         value);
         putObject(name,
                   value);
@@ -253,11 +278,11 @@ public class SqlResult implements Iterable<Object>
 
     /**
      * Maps the given value to the given name.
-     * 
+     *
      * <p>
      * The value will also be added implicitely via {@link #putObject(String, Object)}.
      * </p>
-     * 
+     *
      * @param name
      *            The mapped name of the value.
      * @param value
@@ -266,7 +291,7 @@ public class SqlResult implements Iterable<Object>
     public void put(String name, Blob value)
     {
         name = name.toUpperCase();
-        blobResults.put(name,
+        this.blobResults.put(name,
                         value);
         putObject(name,
                   value);
@@ -274,11 +299,11 @@ public class SqlResult implements Iterable<Object>
 
     /**
      * Maps the given value to the given name.
-     * 
+     *
      * <p>
      * The value will also be added implicitely via {@link #putObject(String, Object)}.
      * </p>
-     * 
+     *
      * @param name
      *            The mapped name of the value.
      * @param value
@@ -287,7 +312,7 @@ public class SqlResult implements Iterable<Object>
     public void put(String name, byte value)
     {
         name = name.toUpperCase();
-        byteResults.put(name,
+        this.byteResults.put(name,
                         value);
         putObject(name,
                   value);
@@ -295,11 +320,11 @@ public class SqlResult implements Iterable<Object>
 
     /**
      * Maps the given value to the given name.
-     * 
+     *
      * <p>
      * The value will also be added implicitely via {@link #putObject(String, Object)}.
      * </p>
-     * 
+     *
      * @param name
      *            The mapped name of the value.
      * @param value
@@ -308,7 +333,7 @@ public class SqlResult implements Iterable<Object>
     public void put(String name, short value)
     {
         name = name.toUpperCase();
-        shortResults.put(name,
+        this.shortResults.put(name,
                          value);
         putObject(name,
                   value);
@@ -316,11 +341,11 @@ public class SqlResult implements Iterable<Object>
 
     /**
      * Maps the given value to the given name.
-     * 
+     *
      * <p>
      * The value will also be added implicitely via {@link #putObject(String, Object)}.
      * </p>
-     * 
+     *
      * @param name
      *            The mapped name of the value.
      * @param value
@@ -329,7 +354,7 @@ public class SqlResult implements Iterable<Object>
     public void put(String name, int value)
     {
         name = name.toUpperCase();
-        intResults.put(name,
+        this.intResults.put(name,
                        value);
         putObject(name,
                   value);
@@ -337,11 +362,11 @@ public class SqlResult implements Iterable<Object>
 
     /**
      * Maps the given value to the given name.
-     * 
+     *
      * <p>
      * The value will also be added implicitely via {@link #putObject(String, Object)}.
      * </p>
-     * 
+     *
      * @param name
      *            The mapped name of the value.
      * @param value
@@ -350,7 +375,7 @@ public class SqlResult implements Iterable<Object>
     public void put(String name, long value)
     {
         name = name.toUpperCase();
-        longResults.put(name,
+        this.longResults.put(name,
                         value);
         putObject(name,
                   value);
@@ -358,11 +383,11 @@ public class SqlResult implements Iterable<Object>
 
     /**
      * Maps the given value to the given name.
-     * 
+     *
      * <p>
      * The value will also be added implicitely via {@link #putObject(String, Object)}.
      * </p>
-     * 
+     *
      * @param name
      *            The mapped name of the value.
      * @param value
@@ -371,7 +396,7 @@ public class SqlResult implements Iterable<Object>
     public void put(String name, double value)
     {
         name = name.toUpperCase();
-        doubleResults.put(name,
+        this.doubleResults.put(name,
                           value);
         putObject(name,
                   value);
@@ -379,11 +404,11 @@ public class SqlResult implements Iterable<Object>
 
     /**
      * Maps the given value to the given name.
-     * 
+     *
      * <p>
      * The value will also be added implicitely via {@link #putObject(String, Object)}.
      * </p>
-     * 
+     *
      * @param name
      *            The mapped name of the value.
      * @param value
@@ -392,7 +417,7 @@ public class SqlResult implements Iterable<Object>
     public void put(String name, float value)
     {
         name = name.toUpperCase();
-        floatResults.put(name,
+        this.floatResults.put(name,
                          value);
         putObject(name,
                   value);
@@ -400,11 +425,11 @@ public class SqlResult implements Iterable<Object>
 
     /**
      * Maps the given value to the given name.
-     * 
+     *
      * <p>
      * The value will also be added implicitely via {@link #putObject(String, Object)}.
      * </p>
-     * 
+     *
      * @param name
      *            The mapped name of the value.
      * @param value
@@ -413,7 +438,7 @@ public class SqlResult implements Iterable<Object>
     public void put(String name, Date value)
     {
         name = name.toUpperCase();
-        dateResults.put(name,
+        this.dateResults.put(name,
                         value);
         putObject(name,
                   value);
@@ -421,11 +446,11 @@ public class SqlResult implements Iterable<Object>
 
     /**
      * Maps the given value to the given name.
-     * 
+     *
      * <p>
      * The value will also be added implicitely via {@link #putObject(String, Object)}.
      * </p>
-     * 
+     *
      * @param name
      *            The mapped name of the value.
      * @param value
@@ -434,7 +459,7 @@ public class SqlResult implements Iterable<Object>
     public void put(String name, boolean value)
     {
         name = name.toUpperCase();
-        booleanResults.put(name,
+        this.booleanResults.put(name,
                            value);
         putObject(name,
                   value);
@@ -442,7 +467,7 @@ public class SqlResult implements Iterable<Object>
 
     /**
      * Gets the value mapped to the given name.
-     * 
+     *
      * @param name
      *            The name of the value to get.
      * @return The value or null if no value of this type was mapped to the given name.
@@ -450,12 +475,12 @@ public class SqlResult implements Iterable<Object>
     public String getString(String name)
     {
         name = name.toUpperCase();
-        return stringResults.get(name);
+        return this.stringResults.get(name);
     }
 
     /**
      * Gets the value mapped to the given name.
-     * 
+     *
      * @param name
      *            The name of the value to get.
      * @return The value or 0 if no value of this type was mapped to the given name.
@@ -463,12 +488,12 @@ public class SqlResult implements Iterable<Object>
     public byte getByte(String name)
     {
         name = name.toUpperCase();
-        return byteResults.get(name);
+        return this.byteResults.get(name);
     }
 
     /**
      * Gets the value mapped to the given name.
-     * 
+     *
      * @param name
      *            The name of the value to get.
      * @return The value or 0 if no value of this type was mapped to the given name.
@@ -476,12 +501,12 @@ public class SqlResult implements Iterable<Object>
     public short getShort(String name)
     {
         name = name.toUpperCase();
-        return shortResults.get(name);
+        return this.shortResults.get(name);
     }
 
     /**
      * Gets the value mapped to the given name.
-     * 
+     *
      * @param name
      *            The name of the value to get.
      * @return The value or 0 if no value of this type was mapped to the given name.
@@ -489,12 +514,12 @@ public class SqlResult implements Iterable<Object>
     public int getInt(String name)
     {
         name = name.toUpperCase();
-        return intResults.get(name);
+        return this.intResults.get(name);
     }
 
     /**
      * Gets the value mapped to the given name.
-     * 
+     *
      * @param name
      *            The name of the value to get.
      * @return The value or 0 if no value of this type was mapped to the given name.
@@ -502,12 +527,12 @@ public class SqlResult implements Iterable<Object>
     public long getLong(String name)
     {
         name = name.toUpperCase();
-        return longResults.get(name);
+        return this.longResults.get(name);
     }
 
     /**
      * Gets the value mapped to the given name.
-     * 
+     *
      * @param name
      *            The name of the value to get.
      * @return The value or 0 if no value of this type was mapped to the given name.
@@ -515,12 +540,12 @@ public class SqlResult implements Iterable<Object>
     public double getDouble(String name)
     {
         name = name.toUpperCase();
-        return doubleResults.get(name);
+        return this.doubleResults.get(name);
     }
 
     /**
      * Gets the value mapped to the given name.
-     * 
+     *
      * @param name
      *            The name of the value to get.
      * @return The value or 0 if no value of this type was mapped to the given name.
@@ -528,12 +553,12 @@ public class SqlResult implements Iterable<Object>
     public float getFloat(String name)
     {
         name = name.toUpperCase();
-        return floatResults.get(name);
+        return this.floatResults.get(name);
     }
 
     /**
      * Gets the value mapped to the given name.
-     * 
+     *
      * @param name
      *            The name of the value to get.
      * @return The value or null if no value of this type was mapped to the given name.
@@ -541,12 +566,12 @@ public class SqlResult implements Iterable<Object>
     public Date getDate(String name)
     {
         name = name.toUpperCase();
-        return dateResults.get(name);
+        return this.dateResults.get(name);
     }
 
     /**
      * Gets the value mapped to the given name.
-     * 
+     *
      * @param name
      *            The name of the value to get.
      * @return The value or null if no value of this type was mapped to the given name.
@@ -554,12 +579,12 @@ public class SqlResult implements Iterable<Object>
     public Time getTime(String name)
     {
         name = name.toUpperCase();
-        return timeResults.get(name);
+        return this.timeResults.get(name);
     }
 
     /**
      * Gets the value mapped to the given name.
-     * 
+     *
      * @param name
      *            The name of the value to get.
      * @return The value or null if no value of this type was mapped to the given name.
@@ -567,12 +592,12 @@ public class SqlResult implements Iterable<Object>
     public Timestamp getTimestamp(String name)
     {
         name = name.toUpperCase();
-        return timestampResults.get(name);
+        return this.timestampResults.get(name);
     }
 
     /**
      * Gets the value mapped to the given name.
-     * 
+     *
      * @param name
      *            The name of the value to get.
      * @return The value or null if no value of this type was mapped to the given name.
@@ -580,12 +605,12 @@ public class SqlResult implements Iterable<Object>
     public Clob getClob(String name)
     {
         name = name.toUpperCase();
-        return clobResults.get(name);
+        return this.clobResults.get(name);
     }
 
     /**
      * Gets the value mapped to the given name.
-     * 
+     *
      * @param name
      *            The name of the value to get.
      * @return The value or null if no value of this type was mapped to the given name.
@@ -593,12 +618,12 @@ public class SqlResult implements Iterable<Object>
     public Blob getBlob(String name)
     {
         name = name.toUpperCase();
-        return blobResults.get(name);
+        return this.blobResults.get(name);
     }
 
     /**
      * Gets the value mapped to the given name.
-     * 
+     *
      * @param name
      *            The name of the value to get.
      * @return The value or false if no value of this type was mapped to the given name.
@@ -606,12 +631,12 @@ public class SqlResult implements Iterable<Object>
     public boolean getBoolean(String name)
     {
         name = name.toUpperCase();
-        return booleanResults.get(name);
+        return this.booleanResults.get(name);
     }
 
     /**
      * Gets the value mapped to the given name.
-     * 
+     *
      * @param name
      *            The name of the value to get.
      * @return The value or null if no value was mapped to the given name.
@@ -619,20 +644,20 @@ public class SqlResult implements Iterable<Object>
     public Object get(String name)
     {
         name = name.toUpperCase();
-        return objectResults.get(name);
+        return this.objectResults.get(name);
     }
 
     /**
      * Returns an array of String representations for each value of this result.
-     * 
+     *
      * <p>
      * The order is the same as the one in {@link #getColumnNames()}.
      * </p>
-     * 
+     *
      * <p>
      * null values will be formatted as <i>"< null >"</i>
      * </p>
-     * 
+     *
      * @return A String array containing the values of this result.
      */
     public String[] getValueArray()
@@ -651,7 +676,7 @@ public class SqlResult implements Iterable<Object>
 
     /**
      * Sets the column types of the contained column order.
-     * 
+     *
      * @param types
      *            A map containing the column names as a key and the string representation of {@link SqlType}s as
      *            values.
@@ -663,7 +688,7 @@ public class SqlResult implements Iterable<Object>
 
     /**
      * Gets a list containing the column names in the correct order.
-     * 
+     *
      * @return The list of names.
      */
     public List<String> getColumnNames()
@@ -673,7 +698,7 @@ public class SqlResult implements Iterable<Object>
 
     /**
      * Creates an insert statement string that can be used to reproduce this rows values.
-     * 
+     *
      * @param table
      *            The table to insert into.
      * @param excludeColumns
