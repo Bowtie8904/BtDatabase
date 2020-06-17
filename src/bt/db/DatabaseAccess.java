@@ -1,6 +1,7 @@
 package bt.db;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -911,8 +912,10 @@ public abstract class DatabaseAccess implements Killable
      *
      * @param importFile
      *            The file from where to import.
+     * @throws IOException
+     * @throws FileNotFoundException
      */
-    public void importData(File importFile)
+    public void importData(File importFile) throws FileNotFoundException, IOException
     {
         String[] lines = FileUtils.readLines(importFile);
         int count = 0;
