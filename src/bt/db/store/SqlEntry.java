@@ -21,8 +21,8 @@ import bt.db.store.anot.Identity;
 import bt.db.store.anot.NoPersist;
 import bt.db.store.anot.SqlEntryField;
 import bt.db.store.anot.Table;
+import bt.reflect.field.Fields;
 import bt.types.SimpleTripple;
-import bt.utils.refl.field.Fields;
 
 /**
  * Offers an interface and static methods to persist and initialize objects who make use of the {@link Column},

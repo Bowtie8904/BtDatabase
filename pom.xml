@@ -45,6 +45,16 @@
 			<version>master-SNAPSHOT</version>
 		</dependency>
 		<dependency>
+            <groupId>com.github.Bowtie8904</groupId>
+            <artifactId>BtConsole</artifactId>
+            <version>master-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.Bowtie8904</groupId>
+            <artifactId>BtReflection</artifactId>
+            <version>master-SNAPSHOT</version>
+        </dependency>
+		<dependency>
 			<groupId>org.apache.derby</groupId>
 			<artifactId>derby</artifactId>
 			<version>10.14.2.0</version>

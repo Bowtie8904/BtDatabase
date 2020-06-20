@@ -9,8 +9,8 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import bt.types.close.UncheckedCloseable;
-import bt.utils.log.Logger;
+import bt.log.Logger;
+import bt.types.UncheckedCloseable;
 
 /**
  * @author &#8904

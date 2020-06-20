@@ -271,6 +271,12 @@ public class Column
         return this;
     }
 
+    /**
+     * Sets the generation type for columns whichs value does not have to be explicitely inserted.
+     *
+     * @param generated
+     * @return
+     */
     public GenerationClause generated(Generated generated)
     {
         var clause = new GenerationClause(generated, this);
@@ -285,6 +291,12 @@ public class Column
         return clause;
     }
 
+    /**
+     * Creates an index for this column upon creation by using the given index parameters.
+     *
+     * @param params
+     * @return
+     */
     public Column index(Index... params)
     {
         this.indexParams = params;
@@ -292,11 +304,21 @@ public class Column
         return this;
     }
 
+    /**
+     * Indicates whether this column has been marked to receive an index.
+     *
+     * @return
+     */
     public boolean shouldIndex()
     {
         return this.shouldIndex;
     }
 
+    /**
+     * Gets the specified parameters for the index that should be created.
+     *
+     * @return
+     */
     public Index[] getIndexParams()
     {
         return this.indexParams;
@@ -407,6 +429,11 @@ public class Column
         return this;
     }
 
+    /**
+     * Gets the create statement that this column is a part of.
+     *
+     * @return
+     */
     public CreateStatement getStatement()
     {
         return this.statement;

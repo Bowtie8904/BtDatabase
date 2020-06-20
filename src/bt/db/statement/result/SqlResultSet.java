@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import bt.console.ConsoleTable;
 import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
-import bt.utils.console.ConsoleTable;
-import bt.utils.log.Logger;
+import bt.log.Logger;
 
 /**
  * Wraps the values from the given ResultSet to make them more accessible and serializable.
@@ -506,13 +506,11 @@ public class SqlResultSet implements Iterable<SqlResult>
             consoleRows = new ConsoleTable(columnFormat);
         }
 
-        consoleRows.setTitle(true,
-                             this.colOrder.toArray(new Object[] {}));
+        consoleRows.setCenteredTitle(this.colOrder.toArray(new Object[] {}));
 
         for (SqlResult result : this.results)
         {
-            consoleRows.addRow(true,
-                               result.getValueArray());
+            consoleRows.addCenteredRow(result.getValueArray());
         }
 
         return consoleRows.toString();

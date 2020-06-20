@@ -13,7 +13,7 @@ import java.util.Map;
 
 import bt.db.constants.SqlType;
 import bt.db.statement.impl.InsertStatement;
-import bt.utils.refl.field.Fields;
+import bt.reflect.field.Fields;
 
 /**
  * Represents a single result (row) of data.
