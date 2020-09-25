@@ -1,7 +1,7 @@
 package bt.db.statement.clause.foreign;
 
 import bt.db.statement.impl.CreateStatement;
-import bt.utils.id.StringID;
+import bt.utils.StringID;
 
 /**
  * Defines a table level foreign key.

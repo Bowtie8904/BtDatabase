@@ -13,7 +13,7 @@ import bt.db.constants.SqlState;
 import bt.db.constants.SqlType;
 import bt.db.exc.SqlExecutionException;
 import bt.db.func.Sql;
-import bt.utils.nulls.Null;
+import bt.utils.Null;
 
 /**
  * A statement to define an SQL function which calls a java method.

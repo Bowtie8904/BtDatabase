@@ -9,7 +9,7 @@ import bt.db.DatabaseAccess;
 import bt.db.exc.SqlExecutionException;
 import bt.db.func.Sql;
 import bt.db.statement.clause.IndexColumnClause;
-import bt.utils.nulls.Null;
+import bt.utils.Null;
 
 /**
  * A statement to define an SQL index.

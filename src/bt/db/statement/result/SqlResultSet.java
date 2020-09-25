@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import bt.console.ConsoleTable;
+import bt.console.output.ConsoleTable;
 import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
 import bt.log.Logger;

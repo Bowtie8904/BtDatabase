@@ -19,7 +19,7 @@ import bt.db.statement.clause.Column;
 import bt.db.statement.clause.ColumnEntry;
 import bt.db.statement.clause.foreign.ForeignKey;
 import bt.db.statement.clause.foreign.TableForeignKey;
-import bt.utils.id.StringID;
+import bt.utils.StringID;
 
 /**
  * Represents an SQL create table statement which can be extended through method chaining.

@@ -23,7 +23,7 @@ import bt.db.statement.result.SqlResultSet;
 import bt.db.statement.result.StreamableResultSet;
 import bt.db.statement.value.Preparable;
 import bt.db.statement.value.Value;
-import bt.utils.nulls.Null;
+import bt.utils.Null;
 
 /**
  * Represents an SQL select statement which can be extended through method chaining.

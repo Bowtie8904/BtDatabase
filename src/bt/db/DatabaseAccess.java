@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 
-import bt.console.ConsoleTable;
+import bt.console.output.ConsoleTable;
 import bt.db.config.DatabaseConfiguration;
 import bt.db.constants.SqlType;
 import bt.db.constants.SqlValue;
@@ -29,6 +29,7 @@ import bt.db.listener.evnt.DeleteEvent;
 import bt.db.listener.evnt.InsertEvent;
 import bt.db.listener.evnt.UpdateEvent;
 import bt.db.listener.impl.IdentityListener;
+import bt.db.server.QueryServer;
 import bt.db.statement.Alter;
 import bt.db.statement.Create;
 import bt.db.statement.clause.Column;
@@ -49,12 +50,13 @@ import bt.runtime.evnt.Dispatcher;
 import bt.types.Killable;
 import bt.types.SimpleTripple;
 import bt.types.Tripple;
-import bt.utils.collections.array.Array;
-import bt.utils.date.DateUtils;
-import bt.utils.file.FileUtils;
-import bt.utils.id.StringID;
-import bt.utils.num.NumberUtils;
-import bt.utils.string.StringUtils;
+import bt.utils.Array;
+import bt.utils.DateUtils;
+import bt.utils.FileUtils;
+import bt.utils.Null;
+import bt.utils.NumberUtils;
+import bt.utils.StringID;
+import bt.utils.StringUtils;
 
 /**
  * Base class for databases.
@@ -124,6 +126,9 @@ public abstract class DatabaseAccess implements Killable
 
     /** Indicates whether a message should be logged upon commit. */
     protected boolean logCommit = true;
+
+    /** An optional server to allow querying from outside the application. */
+    protected QueryServer server;
 
     /**
      * Gets the instance with the given ID.
@@ -272,6 +277,12 @@ public abstract class DatabaseAccess implements Killable
         {
             dispatchException(e);
         }
+    }
+
+    public void setupQueryServer(int port) throws IOException
+    {
+        this.server = new QueryServer(this, port);
+        this.server.start();
     }
 
     /**
@@ -551,6 +562,8 @@ public abstract class DatabaseAccess implements Killable
         {
             dispatchException(e);
         }
+
+        Null.checkKill(this.server);
     }
 
     /**

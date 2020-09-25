@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bt.db.statement.clause.condition.ConditionalClause;
-import bt.utils.id.StringID;
+import bt.utils.StringID;
 
 /**
  * A check constraint class that can be used on column and table level.

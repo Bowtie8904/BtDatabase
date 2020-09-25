@@ -12,7 +12,7 @@ import bt.db.DatabaseAccess;
 import bt.db.constants.SqlState;
 import bt.db.exc.SqlExecutionException;
 import bt.db.statement.clause.SetClause;
-import bt.utils.nulls.Null;
+import bt.utils.Null;
 
 /**
  * Base class for data modifying statements (statement, update, delete, ...).

@@ -9,7 +9,7 @@ import bt.db.constants.SqlValue;
 import bt.db.exc.SqlExecutionException;
 import bt.db.statement.clause.Column;
 import bt.db.statement.result.SqlResult;
-import bt.utils.nulls.Null;
+import bt.utils.Null;
 
 /**
  * Represents an SQL alter statement which can be extended through method chaining.

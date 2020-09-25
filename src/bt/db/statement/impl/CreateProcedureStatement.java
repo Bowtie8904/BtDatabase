@@ -11,7 +11,7 @@ import bt.db.constants.SqlState;
 import bt.db.constants.SqlType;
 import bt.db.exc.SqlExecutionException;
 import bt.db.func.Sql;
-import bt.utils.nulls.Null;
+import bt.utils.Null;
 
 /**
  * Represents an SQL CREATE PROCEDURE statement which can be extended through method chaining.

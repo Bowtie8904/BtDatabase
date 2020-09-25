@@ -11,7 +11,7 @@ import bt.db.statement.clause.Column;
 import bt.db.statement.result.SqlResult;
 import bt.db.statement.result.SqlResultSet;
 import bt.scheduler.Threads;
-import bt.utils.nulls.Null;
+import bt.utils.Null;
 
 /**
  * A class which creates and keeps a connection to a remote database.
