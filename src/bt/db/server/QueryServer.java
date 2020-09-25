@@ -36,6 +36,9 @@ public class QueryServer extends Server implements DataProcessor
     {
         Client client = super.createClient(socket);
         client.setRequestProcessor(this);
+
+        DatabaseAccess.log.print("New QueryServer connection established to " + client.getHost() + ":" + client.getPort());
+
         return client;
     }
 
@@ -46,6 +49,8 @@ public class QueryServer extends Server implements DataProcessor
     public Object process(Data incoming)
     {
         Object ret = null;
+
+        DatabaseAccess.log.print("Received '" + incoming.get() + "'.");
 
         if (incoming.get() instanceof String)
         {
@@ -92,6 +97,7 @@ public class QueryServer extends Server implements DataProcessor
         }
         catch (SQLException e)
         {
+            DatabaseAccess.log.print(e);
             ret = e;
         }
 

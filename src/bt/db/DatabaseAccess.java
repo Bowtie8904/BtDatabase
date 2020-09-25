@@ -53,7 +53,6 @@ import bt.types.Tripple;
 import bt.utils.Array;
 import bt.utils.DateUtils;
 import bt.utils.FileUtils;
-import bt.utils.Null;
 import bt.utils.NumberUtils;
 import bt.utils.StringID;
 import bt.utils.StringUtils;
@@ -562,8 +561,6 @@ public abstract class DatabaseAccess implements Killable
         {
             dispatchException(e);
         }
-
-        Null.checkKill(this.server);
     }
 
     /**
