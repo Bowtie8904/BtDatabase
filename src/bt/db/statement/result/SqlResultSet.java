@@ -1,5 +1,6 @@
 package bt.db.statement.result;
 
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -22,7 +23,7 @@ import bt.log.Logger;
  *
  * @author &#8904
  */
-public class SqlResultSet implements Iterable<SqlResult>
+public class SqlResultSet implements Iterable<SqlResult>, Serializable
 {
     private List<SqlResult> results;
     private List<String> colOrder;

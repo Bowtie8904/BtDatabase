@@ -1,5 +1,6 @@
 package bt.db.statement.result;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.sql.Blob;
 import java.sql.Clob;
@@ -20,7 +21,7 @@ import bt.reflect.field.Fields;
  *
  * @author &#8904
  */
-public class SqlResult implements Iterable<Object>
+public class SqlResult implements Iterable<Object>, Serializable
 {
     private Map<String, String> stringResults = new HashMap<>();
     private Map<String, Integer> intResults = new HashMap<>();
