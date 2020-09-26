@@ -84,7 +84,7 @@ public class QueryServer extends Server implements DataProcessor
 
             if (hasResultSet)
             {
-                ret = new SqlResultSet(st.getResultSet());
+                ret = new SqlResultSet(st.getResultSet()).toString();
             }
             else if (updateCount >= 0)
             {
