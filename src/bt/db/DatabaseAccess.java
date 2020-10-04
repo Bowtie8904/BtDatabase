@@ -278,9 +278,11 @@ public abstract class DatabaseAccess implements Killable
         }
     }
 
-    public void setupQueryServer(int port) throws IOException
+    public void setupQueryServer(String discoverName, int port) throws IOException
     {
         this.server = new QueryServer(this, port);
+        this.server.setName(discoverName);
+        this.server.setupMultiCastDiscovering();
         this.server.start();
     }
 
