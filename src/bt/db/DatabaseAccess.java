@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -1049,6 +1050,19 @@ public abstract class DatabaseAccess implements Killable
             exportData(tableName,
                        new File("./DATA_EXPORT/" + tableName + ".sql"),
                        excludeColumns);
+        }
+    }
+
+    public void backup(File backUpDirectory)
+    {
+        try (CallableStatement call = getConnection().prepareCall("CALL SYSCS_UTIL.SYSCS_BACKUP_DATABASE(?)"))
+        {
+            call.setString(1, backUpDirectory.getAbsolutePath());
+            call.execute();
+        }
+        catch (SQLException e)
+        {
+            dispatchException(e);
         }
     }
 
