@@ -1,5 +1,6 @@
 package bt.db.server;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.sql.ResultSet;
@@ -63,6 +64,12 @@ public class QueryServer extends Server implements DataProcessor
             {
                 this.db.rollback();
                 ret = "Rolled transaction back.";
+            }
+            else if (incoming.get().toString().trim().equalsIgnoreCase("backup"))
+            {
+                File backup = new File("./backup/" + System.currentTimeMillis());
+                this.db.backup(backup);
+                ret = "Created backup under " + backup.getAbsolutePath();
             }
             else
             {
