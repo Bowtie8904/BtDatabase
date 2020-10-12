@@ -87,7 +87,7 @@ public class CreateFunctionStatement extends CreateStatement<CreateFunctionState
         }
         catch (Exception e)
         {
-            DatabaseAccess.log.print(e);
+            e.printStackTrace();
             return this;
         }
 

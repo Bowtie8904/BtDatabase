@@ -9,8 +9,8 @@ import java.sql.Statement;
 import bt.async.Data;
 import bt.db.DatabaseAccess;
 import bt.db.statement.result.SqlResultSet;
-import bt.remote.socket.Client;
 import bt.remote.socket.Server;
+import bt.remote.socket.ServerClient;
 import bt.remote.socket.data.DataProcessor;
 
 /**
@@ -32,12 +32,12 @@ public class QueryServer extends Server implements DataProcessor
     }
 
     @Override
-    protected Client createClient(Socket socket) throws IOException
+    protected ServerClient createClient(Socket socket) throws IOException
     {
-        Client client = super.createClient(socket);
+        ServerClient client = super.createClient(socket);
         client.setRequestProcessor(this);
 
-        DatabaseAccess.log.print("New QueryServer connection established to " + client.getHost() + ":" + client.getPort());
+        System.out.println("New QueryServer connection established to " + client.getHost() + ":" + client.getPort());
 
         return client;
     }
@@ -50,7 +50,7 @@ public class QueryServer extends Server implements DataProcessor
     {
         Object ret = null;
 
-        DatabaseAccess.log.print("Received '" + incoming.get() + "'.");
+        System.out.println("Received '" + incoming.get() + "'.");
 
         if (incoming.get() instanceof String)
         {
@@ -97,7 +97,7 @@ public class QueryServer extends Server implements DataProcessor
         }
         catch (SQLException e)
         {
-            DatabaseAccess.log.print(e);
+            e.printStackTrace();
             ret = e;
         }
 

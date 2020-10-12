@@ -8,7 +8,6 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.function.Supplier;
 
-import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
 import bt.db.constants.SqlValue;
 import bt.db.func.SqlFunction;
@@ -219,8 +218,7 @@ public class SetClause<T extends SqlModifyStatement>
         }
         catch (Exception e)
         {
-            DatabaseAccess.log.print(this,
-                                     e);
+            e.printStackTrace();
         }
 
         return strValue;
@@ -374,8 +372,7 @@ public class SetClause<T extends SqlModifyStatement>
         }
         catch (Exception e)
         {
-            DatabaseAccess.log.print(this,
-                                     e);
+            e.printStackTrace();
         }
 
         return strValue;

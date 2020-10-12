@@ -82,7 +82,7 @@ public interface SqlEntry
         catch (InstantiationException | IllegalAccessException
                | InvocationTargetException | SecurityException e1)
         {
-            DatabaseAccess.log.print(e1);
+            e1.printStackTrace();
         }
         catch (NoSuchMethodException noEx)
         {
@@ -119,7 +119,7 @@ public interface SqlEntry
                             }
                             catch (IllegalArgumentException | IllegalAccessException e)
                             {
-                                DatabaseAccess.log.print(e);
+                                e.printStackTrace();
                             }
                         }
                     }
@@ -283,7 +283,7 @@ public interface SqlEntry
             catch (InstantiationException | IllegalAccessException
                    | InvocationTargetException | SecurityException e1)
             {
-                DatabaseAccess.log.print(e1);
+                e1.printStackTrace();
             }
             catch (NoSuchMethodException noEx)
             {
@@ -343,7 +343,7 @@ public interface SqlEntry
                             }
                             catch (IllegalAccessException e)
                             {
-                                DatabaseAccess.log.print(e);
+                                e.printStackTrace();
                             }
                             continue;
                         }
@@ -381,7 +381,7 @@ public interface SqlEntry
                             }
                             catch (IllegalAccessException e)
                             {
-                                DatabaseAccess.log.print(e);
+                                e.printStackTrace();
                             }
                         }
                     }
@@ -465,7 +465,7 @@ public interface SqlEntry
                     }
                     catch (IllegalAccessException e)
                     {
-                        DatabaseAccess.log.print(e);
+                        e.printStackTrace();
                     }
 
                     if (id == null)
@@ -516,7 +516,7 @@ public interface SqlEntry
             }
             catch (IllegalAccessException e)
             {
-                DatabaseAccess.log.print(e);
+                e.printStackTrace();
             }
         }
 
@@ -589,7 +589,7 @@ public interface SqlEntry
                         }
                         catch (IllegalAccessException e)
                         {
-                            DatabaseAccess.log.print(e);
+                            e.printStackTrace();
                         }
                     }
                 }
@@ -659,7 +659,7 @@ public interface SqlEntry
             }
             catch (IllegalAccessException e)
             {
-                DatabaseAccess.log.print(e);
+                e.printStackTrace();
             }
 
             if (pers == null && sqlEntryField != null && value != null)
@@ -789,7 +789,7 @@ public interface SqlEntry
             insert.commit();
             insert.onFail((select, e) ->
             {
-                DatabaseAccess.log.print(e);
+                e.printStackTrace();
                 db.rollback();
                 return -1;
             });

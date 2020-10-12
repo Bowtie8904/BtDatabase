@@ -117,8 +117,7 @@ public abstract class RemoteDatabase extends DatabaseAccess
 
         if (success * success2 == 1)
         {
-            log.print(this,
-                      "Created trigger tables.");
+            System.out.println("Created trigger tables.");
         }
     }
 
@@ -223,7 +222,7 @@ public abstract class RemoteDatabase extends DatabaseAccess
         }
         catch (Exception e)
         {
-            log.print(e);
+            e.printStackTrace();
         }
     }
 }

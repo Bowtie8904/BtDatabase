@@ -127,7 +127,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
         this.lowerThreshhold = 1;
         this.onLessThan = (i, set) ->
         {
-            DatabaseAccess.log.print("< " + set.getSql() + " > did not return any data.");
+            System.out.println("< " + set.getSql() + " > did not return any data.");
 
             if (set.getValues().size() > 0)
             {
@@ -138,7 +138,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
                     values += value + "\n";
                 }
 
-                DatabaseAccess.log.print(values);
+                System.out.println(values);
             }
 
             return set;
@@ -214,7 +214,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
             }
             catch (SQLSyntaxErrorException e)
             {
-                DatabaseAccess.log.print(e);
+                e.printStackTrace();
                 return this;
             }
         }
@@ -240,7 +240,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
 
                 if (select.getAlias() == null)
                 {
-                    DatabaseAccess.log.print(new SQLSyntaxErrorException("Subselects must have an alias assigned."));
+                    new SQLSyntaxErrorException("Subselects must have an alias assigned.").printStackTrace();
                 }
             }
 
@@ -273,7 +273,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
         }
         catch (IndexOutOfBoundsException e)
         {
-            DatabaseAccess.log.print("Must define at least one from clause before a join can be performed.");
+            System.out.println("Must define at least one from clause before a join can be performed.");
         }
 
         return join;
@@ -488,7 +488,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
             }
             catch (SQLSyntaxErrorException e)
             {
-                DatabaseAccess.log.print(e);
+                e.printStackTrace();
                 return null;
             }
         }

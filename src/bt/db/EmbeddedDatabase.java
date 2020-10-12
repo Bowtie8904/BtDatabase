@@ -76,8 +76,7 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
 
         if (success == 1)
         {
-            log.print(this,
-                      "Created onInsert procedure.");
+            System.out.println("Created onInsert procedure.");
             created = true;
         }
 
@@ -103,8 +102,7 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
 
         if (success == 1)
         {
-            log.print(this,
-                      "Created onDelete procedure.");
+            System.out.println("Created onDelete procedure.");
             created = true;
         }
 
@@ -130,8 +128,7 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
 
         if (success == 1)
         {
-            log.print(this,
-                      "Created onUpdate procedure.");
+            System.out.println("Created onUpdate procedure.");
             created = true;
         }
 
@@ -167,14 +164,12 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
             derbyHome = jarFile.getParentFile().getAbsolutePath();
             System.setProperty("derby.system.home",
                                derbyHome);
-            log.printfSrc(this,
-                          "Set derby home to %s",
-                          derbyHome);
+            System.out.printf("Set derby home to %s",
+                              derbyHome);
         }
         catch (Exception e)
         {
-            log.print(this,
-                      e);
+            e.printStackTrace();
         }
     }
 
@@ -203,8 +198,7 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
         }
         catch (Exception e)
         {
-            log.print(this,
-                      e);
+            e.printStackTrace();
         }
         return null;
     }
@@ -219,9 +213,8 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
             try (CallableStatement statement = getConnection().prepareCall(sql))
             {
                 statement.executeUpdate();
-                log.printfSrc(this,
-                              "Added %s to the database.",
-                              path);
+                System.out.printf("Added %s to the database.",
+                                  path);
             }
             catch (SQLException e)
             {
@@ -230,9 +223,8 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
                 try (CallableStatement statement = getConnection().prepareCall(sql))
                 {
                     statement.executeUpdate();
-                    log.printfSrc(this,
-                                  "Replaced %s in the database.",
-                                  path);
+                    System.out.printf("Replaced %s in the database.",
+                                      path);
                 }
                 catch (SQLException e1)
                 {}
@@ -243,8 +235,7 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
             try (CallableStatement statement = getConnection().prepareCall(sql))
             {
                 statement.executeUpdate();
-                log.print(this,
-                          "Added classpath to the database.");
+                System.out.println("Added classpath to the database.");
             }
             catch (SQLException e1)
             {}

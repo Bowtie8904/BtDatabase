@@ -5,6 +5,7 @@ import java.util.List;
 
 import bt.db.DatabaseAccess;
 import bt.db.statement.clause.condition.ConditionalClause;
+import bt.log.Logger;
 
 /**
  * Base class for all SQL statements.
@@ -107,16 +108,18 @@ public class SqlStatement<T extends SqlStatement>
     {
         if (shouldLog)
         {
-            DatabaseAccess.log.setCallerStackIndex(4);
+            Logger.global().setCallerStackIndex(4);
+
             if (text == null || text.isEmpty())
             {
-                DatabaseAccess.log.printEmpty();
+                System.out.println();
             }
             else
             {
-                DatabaseAccess.log.print(text);
+                System.out.println(text);
             }
-            DatabaseAccess.log.setCallerStackIndex(3);
+
+            Logger.global().setCallerStackIndex(3);
         }
     }
 

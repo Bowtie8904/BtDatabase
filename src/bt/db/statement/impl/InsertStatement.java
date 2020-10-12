@@ -410,8 +410,7 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
 
         if (this.setClauses.isEmpty() && this.dataSelect == null)
         {
-            DatabaseAccess.log.print(
-                                     "Can't execute insert statement without any values. Please define at least one column value.");
+            System.out.println("Can't execute insert statement without any values. Please define at least one column value.");
             return -1;
         }
 

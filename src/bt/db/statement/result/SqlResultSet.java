@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import bt.console.output.ConsoleTable;
-import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
 import bt.log.Logger;
 
@@ -91,8 +90,7 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
         }
         catch (SQLException e)
         {
-            DatabaseAccess.log.print(this,
-                                     e);
+            e.printStackTrace();
         }
     }
 

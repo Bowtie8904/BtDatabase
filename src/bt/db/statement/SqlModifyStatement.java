@@ -97,7 +97,7 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
 
     private int defaultFail(T statement, SqlExecutionException e)
     {
-        DatabaseAccess.log.print(statement.toString());
+        System.out.println(statement.toString());
         this.db.dispatchException(e);
         return -1;
     }

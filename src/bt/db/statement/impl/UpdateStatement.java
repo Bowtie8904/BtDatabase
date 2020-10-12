@@ -348,7 +348,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
 
         if (this.setClauses.isEmpty())
         {
-            DatabaseAccess.log.print("Can't execute update statement without any values. Please define at least one column value.");
+            System.out.println("Can't execute update statement without any values. Please define at least one column value.");
             return -1;
         }
 

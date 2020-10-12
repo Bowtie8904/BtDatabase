@@ -109,7 +109,7 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
             }
             catch (SQLSyntaxErrorException e)
             {
-                DatabaseAccess.log.print(e);
+                e.printStackTrace();
                 return this;
             }
         }
