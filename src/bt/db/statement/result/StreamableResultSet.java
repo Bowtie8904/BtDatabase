@@ -56,7 +56,7 @@ public class StreamableResultSet extends AbstractSpliterator<ResultSet> implemen
         }
         catch (SQLException e)
         {
-            Logger.global().print(e);
+            e.printStackTrace();
         }
 
         return advanced;
