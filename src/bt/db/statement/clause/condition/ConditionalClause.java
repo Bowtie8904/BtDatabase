@@ -480,6 +480,44 @@ public class ConditionalClause<T> implements Preparable
     }
 
     /**
+     * Adds the given column to the right side of this conditional to check against.
+     *
+     * <p>
+     * This conditional will then check whether both sides are EQUAL.
+     * </p>
+     *
+     * @param value
+     *            The column to check against.
+     * @return The caller that created this conditional.
+     */
+    public T equalColumn(String value)
+    {
+        this.operator = EQUALS;
+        this.value = value;
+        this.valueType = ValueType.COLUMN;
+        return this.caller;
+    }
+
+    /**
+     * Adds the given column to the right side of this conditional to check against.
+     *
+     * <p>
+     * This conditional will then check whether both sides are EQUAL.
+     * </p>
+     *
+     * @param value
+     *            The column to check against.
+     * @param postfix
+     *            A String that will be added after the expression. Can be used for parenthesis.
+     * @return The caller that created this conditional.
+     */
+    public T equalColumn(String value, String postfix)
+    {
+        this.postfix = postfix;
+        return equalColumn(value);
+    }
+
+    /**
      * Adds the given value to the right side of this conditional to check against.
      *
      * <p>
@@ -494,6 +532,25 @@ public class ConditionalClause<T> implements Preparable
     {
         this.operator = NOT_EQUAL;
         setValueVariables(value);
+        return this.caller;
+    }
+
+    /**
+     * Adds the given column to the right side of this conditional to check against.
+     *
+     * <p>
+     * This conditional will then check whether both sides are NOT EQUAL.
+     * </p>
+     *
+     * @param value
+     *            The value to check against.
+     * @return The caller that created this conditional.
+     */
+    public T notEqualColumn(String value)
+    {
+        this.operator = NOT_EQUAL;
+        this.value = value;
+        this.valueType = ValueType.COLUMN;
         return this.caller;
     }
 
@@ -514,6 +571,25 @@ public class ConditionalClause<T> implements Preparable
     {
         this.postfix = postfix;
         return notEqual(value);
+    }
+
+    /**
+     * Adds the given value to the right side of this conditional to check against.
+     *
+     * <p>
+     * This conditional will then check whether both sides are NOT EQUAL.
+     * </p>
+     *
+     * @param value
+     *            The value to check against.
+     * @param postfix
+     *            A String that will be added after the expression. Can be used for parenthesis.
+     * @return The caller that created this conditional.
+     */
+    public T notEqualColumn(String value, String postfix)
+    {
+        this.postfix = postfix;
+        return notEqualColumn(value);
     }
 
     /**
@@ -545,6 +621,25 @@ public class ConditionalClause<T> implements Preparable
      *
      * @param value
      *            The value to check against.
+     * @return The caller that created this conditional.
+     */
+    public T likeColumn(String value)
+    {
+        this.valueType = ValueType.COLUMN;
+        this.operator = LIKE;
+        this.value = value;
+        return this.caller;
+    }
+
+    /**
+     * Adds the given value to the right side of this conditional to check against.
+     *
+     * <p>
+     * This conditional will then check whether both sides are LIKE each other.
+     * </p>
+     *
+     * @param value
+     *            The value to check against.
      * @param postfix
      *            A String that will be added after the expression. Can be used for parenthesis.
      * @return The caller that created this conditional.
@@ -553,6 +648,25 @@ public class ConditionalClause<T> implements Preparable
     {
         this.postfix = postfix;
         return like(value);
+    }
+
+    /**
+     * Adds the given value to the right side of this conditional to check against.
+     *
+     * <p>
+     * This conditional will then check whether both sides are LIKE each other.
+     * </p>
+     *
+     * @param value
+     *            The value to check against.
+     * @param postfix
+     *            A String that will be added after the expression. Can be used for parenthesis.
+     * @return The caller that created this conditional.
+     */
+    public T likeColumn(String value, String postfix)
+    {
+        this.postfix = postfix;
+        return likeColumn(value);
     }
 
     /**
@@ -582,6 +696,25 @@ public class ConditionalClause<T> implements Preparable
      *
      * @param value
      *            The value to check against.
+     * @return The caller that created this conditional.
+     */
+    public T greaterThanColumn(String value)
+    {
+        this.operator = GREATER;
+        this.value = value;
+        this.valueType = ValueType.COLUMN;
+        return this.caller;
+    }
+
+    /**
+     * Adds the given value to the right side of this conditional to check against.
+     *
+     * <p>
+     * This conditional will then check whether the left side is GREATER THAN the right side.
+     * </p>
+     *
+     * @param value
+     *            The value to check against.
      * @param postfix
      *            A String that will be added after the expression. Can be used for parenthesis.
      * @return The caller that created this conditional.
@@ -590,6 +723,25 @@ public class ConditionalClause<T> implements Preparable
     {
         this.postfix = postfix;
         return greaterThan(value);
+    }
+
+    /**
+     * Adds the given value to the right side of this conditional to check against.
+     *
+     * <p>
+     * This conditional will then check whether the left side is GREATER THAN the right side.
+     * </p>
+     *
+     * @param value
+     *            The value to check against.
+     * @param postfix
+     *            A String that will be added after the expression. Can be used for parenthesis.
+     * @return The caller that created this conditional.
+     */
+    public T greaterThanColumn(String value, String postfix)
+    {
+        this.postfix = postfix;
+        return greaterThanColumn(value);
     }
 
     /**
@@ -619,6 +771,25 @@ public class ConditionalClause<T> implements Preparable
      *
      * @param value
      *            The value to check against.
+     * @return The caller that created this conditional.
+     */
+    public T lessThanColumn(String value)
+    {
+        this.operator = LESS;
+        this.value = value;
+        this.valueType = ValueType.COLUMN;
+        return this.caller;
+    }
+
+    /**
+     * Adds the given value to the right side of this conditional to check against.
+     *
+     * <p>
+     * This conditional will then check whether the left side is LESS THAN the right side.
+     * </p>
+     *
+     * @param value
+     *            The value to check against.
      * @param postfix
      *            A String that will be added after the expression. Can be used for parenthesis.
      * @return The caller that created this conditional.
@@ -627,6 +798,25 @@ public class ConditionalClause<T> implements Preparable
     {
         this.postfix = postfix;
         return lessThan(value);
+    }
+
+    /**
+     * Adds the given value to the right side of this conditional to check against.
+     *
+     * <p>
+     * This conditional will then check whether the left side is LESS THAN the right side.
+     * </p>
+     *
+     * @param value
+     *            The value to check against.
+     * @param postfix
+     *            A String that will be added after the expression. Can be used for parenthesis.
+     * @return The caller that created this conditional.
+     */
+    public T lessThanColumn(String value, String postfix)
+    {
+        this.postfix = postfix;
+        return lessThanColumn(value);
     }
 
     /**
@@ -656,6 +846,25 @@ public class ConditionalClause<T> implements Preparable
      *
      * @param value
      *            The value to check against.
+     * @return The caller that created this conditional.
+     */
+    public T greaterOrEqualColumn(String value)
+    {
+        this.operator = GREATER_EQUALS;
+        this.value = value;
+        this.valueType = ValueType.COLUMN;
+        return this.caller;
+    }
+
+    /**
+     * Adds the given value to the right side of this conditional to check against.
+     *
+     * <p>
+     * This conditional will then check whether the left side is GREATER OR EQUAL THAN the right side.
+     * </p>
+     *
+     * @param value
+     *            The value to check against.
      * @param postfix
      *            A String that will be added after the expression. Can be used for parenthesis.
      * @return The caller that created this conditional.
@@ -664,6 +873,25 @@ public class ConditionalClause<T> implements Preparable
     {
         this.postfix = postfix;
         return greaterOrEqual(value);
+    }
+
+    /**
+     * Adds the given value to the right side of this conditional to check against.
+     *
+     * <p>
+     * This conditional will then check whether the left side is GREATER OR EQUAL THAN the right side.
+     * </p>
+     *
+     * @param value
+     *            The value to check against.
+     * @param postfix
+     *            A String that will be added after the expression. Can be used for parenthesis.
+     * @return The caller that created this conditional.
+     */
+    public T greaterOrEqualColumn(String value, String postfix)
+    {
+        this.postfix = postfix;
+        return greaterOrEqualColumn(value);
     }
 
     /**
@@ -693,6 +921,25 @@ public class ConditionalClause<T> implements Preparable
      *
      * @param value
      *            The value to check against.
+     * @return The caller that created this conditional.
+     */
+    public T lessOrEqualColumn(String value)
+    {
+        this.operator = LESS_EQUALS;
+        this.value = value;
+        this.valueType = ValueType.COLUMN;
+        return this.caller;
+    }
+
+    /**
+     * Adds the given value to the right side of this conditional to check against.
+     *
+     * <p>
+     * This conditional will then check whether the left side is LESS OR EQUAL THAN the right side.
+     * </p>
+     *
+     * @param value
+     *            The value to check against.
      * @param postfix
      *            A String that will be added after the expression. Can be used for parenthesis.
      * @return The caller that created this conditional.
@@ -701,6 +948,25 @@ public class ConditionalClause<T> implements Preparable
     {
         this.postfix = postfix;
         return lessOrEqual(value);
+    }
+
+    /**
+     * Adds the given value to the right side of this conditional to check against.
+     *
+     * <p>
+     * This conditional will then check whether the left side is LESS OR EQUAL THAN the right side.
+     * </p>
+     *
+     * @param value
+     *            The value to check against.
+     * @param postfix
+     *            A String that will be added after the expression. Can be used for parenthesis.
+     * @return The caller that created this conditional.
+     */
+    public T lessOrEqualColumn(String value, String postfix)
+    {
+        this.postfix = postfix;
+        return lessOrEqualColumn(value);
     }
 
     /**

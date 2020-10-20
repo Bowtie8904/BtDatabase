@@ -18,7 +18,6 @@ import bt.db.statement.clause.FromClause;
 import bt.db.statement.clause.OrderByClause;
 import bt.db.statement.clause.condition.ConditionalClause;
 import bt.db.statement.clause.join.JoinClause;
-import bt.db.statement.clause.join.JoinConditionalClause;
 import bt.db.statement.result.SqlResultSet;
 import bt.db.statement.result.StreamableResultSet;
 import bt.db.statement.value.Preparable;
@@ -76,9 +75,6 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
 
     /** Holds all used chain clauses. */
     private List<ChainClause> chains;
-
-    /** An alias used if this select is used as a subselect. */
-    private String alias;
 
     private List<SelectStatement> subSelects;
 
@@ -171,11 +167,19 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
     }
 
     /**
-     * Sets an alias used if this select is a subselect.
+     * Sets an alias for the last table specified with a from clause.
      */
     public SelectStatement alias(String alias)
     {
-        this.alias = alias;
+        try
+        {
+            this.fromClauses.get(this.fromClauses.size() - 1).alias(alias);
+        }
+        catch (IndexOutOfBoundsException e)
+        {
+            new SQLSyntaxErrorException("Specify a from clause before setting an alias.").printStackTrace();
+        }
+
         return this;
     }
 
@@ -186,7 +190,23 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      */
     public String getAlias()
     {
-        return this.alias;
+        return getAlias(0);
+    }
+
+    public String getAlias(int index)
+    {
+        String alias = null;
+
+        try
+        {
+            this.fromClauses.get(index).getTableName();
+        }
+        catch (IndexOutOfBoundsException e)
+        {
+            new SQLSyntaxErrorException("No from clause present, cannot get an alias.").printStackTrace();
+        }
+
+        return alias;
     }
 
     /**
@@ -230,22 +250,19 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      *            The tables to select from.
      * @return This instance for chaining.
      */
-    public SelectStatement from(Object... tables)
+    public SelectStatement from(Object table)
     {
-        for (Object table : tables)
+        if (table instanceof SelectStatement)
         {
-            if (table instanceof SelectStatement)
+            SelectStatement select = (SelectStatement)table;
+
+            if (select.getAlias() == null)
             {
-                SelectStatement select = (SelectStatement)table;
-
-                if (select.getAlias() == null)
-                {
-                    new SQLSyntaxErrorException("Subselects must have an alias assigned.").printStackTrace();
-                }
+                new SQLSyntaxErrorException("Subselects must have an alias assigned.").printStackTrace();
             }
-
-            this.fromClauses.add(new FromClause(table));
         }
+
+        this.fromClauses.add(new FromClause(table));
 
         return this;
     }
@@ -264,7 +281,6 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
         {
             FromClause from = this.fromClauses.get(this.fromClauses.size() - 1);
             join = new JoinClause(this,
-                                  from.getTableName(),
                                   table);
             this.joins.add(join);
 
@@ -434,15 +450,13 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      *            The column to use in this condition.
      * @return The created JoinConditionalClause.
      */
-    public JoinConditionalClause andOn(String column)
+    public ConditionalClause<SelectStatement> andOn(String column)
     {
         JoinClause join = this.joins.get(this.joins.size() - 1);
 
-        JoinConditionalClause clause = new JoinConditionalClause(this,
-                                                                 column,
-                                                                 join.getFirstTable(),
-                                                                 join.getSecondTable(),
-                                                                 ConditionalClause.AND);
+        ConditionalClause<SelectStatement> clause = new ConditionalClause<>(this,
+                                                                            column,
+                                                                            ConditionalClause.AND);
         join.addConditionalClause(clause);
 
         return clause;
@@ -456,14 +470,12 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      *            The column to use in this condition.
      * @return The created JoinConditionalClause.
      */
-    public JoinConditionalClause orOn(String column)
+    public ConditionalClause<SelectStatement> orOn(String column)
     {
         JoinClause join = this.joins.get(this.joins.size() - 1);
-        JoinConditionalClause clause = new JoinConditionalClause(this,
-                                                                 column,
-                                                                 join.getFirstTable(),
-                                                                 join.getSecondTable(),
-                                                                 ConditionalClause.OR);
+        ConditionalClause<SelectStatement> clause = new ConditionalClause<>(this,
+                                                                            column,
+                                                                            ConditionalClause.OR);
         join.addConditionalClause(clause);
 
         return clause;

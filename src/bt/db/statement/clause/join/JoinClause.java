@@ -25,10 +25,12 @@ public class JoinClause implements Preparable
     protected SelectStatement statement;
 
     /** The involved tables. table1 = left side, table2 = right side. */
-    protected String table1, table2;
+    protected String table;
+
+    protected String tableAlias;
 
     /** Contains all {@link JoinConditionalClause}s which were used in this joins ON clause. */
-    protected List<JoinConditionalClause> conditionalClauses;
+    protected List<ConditionalClause<SelectStatement>> conditionalClauses;
 
     /** The type of this join. Default = INNER. */
     protected String joinType = INNER;
@@ -49,26 +51,25 @@ public class JoinClause implements Preparable
      * @param table2
      *            The second table (right side) of this join.
      */
-    public JoinClause(SelectStatement statement, String table1, String table2)
+    public JoinClause(SelectStatement statement, String table2)
     {
         this.statement = statement;
-        this.table1 = table1;
-        this.table2 = table2;
+        this.table = table2;
         this.conditionalClauses = new ArrayList<>();
     }
 
     public JoinClause alias(String alias)
     {
-        this.table2 = alias;
+        this.tableAlias = alias;
         return this;
     }
 
     /**
-     * Returns a list of {@link JoinConditionalClause}s that were used to create this join.
+     * Returns a list of {@link ConditionClause}s that were used to create this join.
      *
      * @return The list.
      */
-    public List<JoinConditionalClause> getConditionalClauses()
+    public List<ConditionalClause<SelectStatement>> getConditionalClauses()
     {
         return this.conditionalClauses;
     }
@@ -83,19 +84,9 @@ public class JoinClause implements Preparable
      *
      * @param condition
      */
-    public void addConditionalClause(JoinConditionalClause condition)
+    public void addConditionalClause(ConditionalClause<SelectStatement> condition)
     {
         this.conditionalClauses.add(condition);
-    }
-
-    /**
-     * Returns the name of the first table (left side).
-     *
-     * @return The name of the table.
-     */
-    public String getFirstTable()
-    {
-        return this.table1;
     }
 
     /**
@@ -103,9 +94,9 @@ public class JoinClause implements Preparable
      *
      * @return The name of the table.
      */
-    public String getSecondTable()
+    public String getTable()
     {
-        return this.table2;
+        return this.table;
     }
 
     /**
@@ -115,13 +106,11 @@ public class JoinClause implements Preparable
      *            The name of the column to join with.
      * @return The conditional clause.
      */
-    public JoinConditionalClause on(String column)
+    public ConditionalClause<SelectStatement> on(String column)
     {
-        JoinConditionalClause condition = new JoinConditionalClause(this.statement,
-                                                                    column,
-                                                                    this.table1,
-                                                                    this.table2,
-                                                                    ConditionalClause.ON);
+        ConditionalClause<SelectStatement> condition = new ConditionalClause<>(this.statement,
+                                                                                              column,
+                                                                                              ConditionalClause.ON);
         addConditionalClause(condition);
         this.statement.setLastConditionalType(ConditionalClause.ON);
         return condition;
@@ -204,7 +193,7 @@ public class JoinClause implements Preparable
      */
     public String toString(boolean prepared)
     {
-        String sql = this.joinType + " JOIN " + this.table2;
+        String sql = this.joinType + " JOIN " + this.table + (this.tableAlias != null ? " " + this.tableAlias : "");
 
         if (!this.joinType.equals(NATURAL) && !this.joinType.equals(CROSS))
         {
@@ -223,7 +212,7 @@ public class JoinClause implements Preparable
             }
             else
             {
-                for (JoinConditionalClause clause : this.conditionalClauses)
+                for (var clause : this.conditionalClauses)
                 {
                     sql += " " + clause.toString(prepared);
                 }
@@ -241,7 +230,7 @@ public class JoinClause implements Preparable
     {
         List<Value> values = new ArrayList<>();
 
-        for (JoinConditionalClause clause : this.conditionalClauses)
+        for (var clause : this.conditionalClauses)
         {
             values.addAll(clause.getValues());
         }

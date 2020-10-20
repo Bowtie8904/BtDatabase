@@ -15,13 +15,18 @@ import bt.db.statement.value.Value;
 public class FromClause implements Preparable
 {
     private List<JoinClause> joins;
-
+    private String alias;
     private Object table;
 
     public FromClause(Object table)
     {
         this.table = table;
         this.joins = new ArrayList<>();
+    }
+
+    public void alias(String alias)
+    {
+        this.alias = alias;
     }
 
     public void addJoin(JoinClause join)
@@ -37,7 +42,7 @@ public class FromClause implements Preparable
         }
         else
         {
-            return this.table.toString();
+            return this.alias != null ? this.alias : this.table.toString();
         }
     }
 
@@ -81,7 +86,7 @@ public class FromClause implements Preparable
         }
         else
         {
-            sql += this.table.toString();
+            sql += this.table.toString() + (this.alias != null ? " " + this.alias : "");
         }
 
         for (JoinClause join : this.joins)
