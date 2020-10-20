@@ -19,6 +19,7 @@ public class JoinClause implements Preparable
     protected static final String RIGHT = "RIGHT";
     protected static final String LEFT = "LEFT";
     protected static final String NATURAL = "NATURAL";
+    protected static final String CROSS = "CROSS";
 
     /** The statement which created this instance. */
     protected SelectStatement statement;
@@ -54,6 +55,12 @@ public class JoinClause implements Preparable
         this.table1 = table1;
         this.table2 = table2;
         this.conditionalClauses = new ArrayList<>();
+    }
+
+    public JoinClause alias(String alias)
+    {
+        this.table2 = alias;
+        return this;
     }
 
     /**
@@ -149,6 +156,12 @@ public class JoinClause implements Preparable
         return this.statement;
     }
 
+    public SelectStatement cross()
+    {
+        this.joinType = CROSS;
+        return this.statement;
+    }
+
     /**
      * Defines that this join should be treated as a right join clause.
      *
@@ -193,7 +206,7 @@ public class JoinClause implements Preparable
     {
         String sql = this.joinType + " JOIN " + this.table2;
 
-        if (!this.joinType.equals(NATURAL))
+        if (!this.joinType.equals(NATURAL) && !this.joinType.equals(CROSS))
         {
             if (this.using)
             {
@@ -204,8 +217,7 @@ public class JoinClause implements Preparable
                     sql += column + ", ";
                 }
 
-                sql = sql.substring(0,
-                                    sql.length() - 2);
+                sql = sql.substring(0, sql.length() - 2);
 
                 sql += ")";
             }
