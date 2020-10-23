@@ -11,10 +11,14 @@ import bt.db.func.SqlFunction;
  */
 public class GenerationClause
 {
-    /** The generation behavior. */
+    /**
+     * The generation behavior.
+     */
     private Generated generated;
 
-    /** The column for which this clause is used. */
+    /**
+     * The column for which this clause is used.
+     */
     private Column column;
 
     /**
@@ -27,16 +31,16 @@ public class GenerationClause
      */
     private boolean isIdentity;
 
-    /** Holds the generation value for a non-identity columns. */
+    /**
+     * Holds the generation value for a non-identity columns.
+     */
     private String value;
 
     /**
      * Creates a new instance.
      *
-     * @param generated
-     *            The generation behavior.
-     * @param column
-     *            The column that this clause is for.
+     * @param generated The generation behavior.
+     * @param column    The column that this clause is for.
      */
     public GenerationClause(Generated generated, Column column)
     {
@@ -55,8 +59,7 @@ public class GenerationClause
      * If nothing else is specified by {@link Column#autoIncrement(int)} the value will be incremented by 1 each time.
      * </p>
      *
-     * @param generated
-     *            Defines the behavior of the identity as either {@link Generated#ALWAYS} or {@link Generated#DEFAULT}.
+     * @param generated Defines the behavior of the identity as either {@link Generated#ALWAYS} or {@link Generated#DEFAULT}.
      * @return The Column for chaining.
      */
     public Column asIdentity()
@@ -132,7 +135,7 @@ public class GenerationClause
     @Override
     public String toString()
     {
-        String clause = "GENERATED " + (this.generated == Generated.ALWAYS ? "ALWAYS" : "DEFAULT");
+        String clause = "GENERATED " + (this.generated == Generated.ALWAYS ? "ALWAYS" : "BY DEFAULT");
 
         if (this.isIdentity)
         {

@@ -1,10 +1,5 @@
 package bt.db.statement.impl;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import bt.db.DatabaseAccess;
 import bt.db.EmbeddedDatabase;
 import bt.db.RemoteDatabase;
@@ -21,6 +16,11 @@ import bt.db.statement.clause.foreign.ForeignKey;
 import bt.db.statement.clause.foreign.TableForeignKey;
 import bt.utils.StringID;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Represents an SQL create table statement which can be extended through method chaining.
  *
@@ -28,43 +28,61 @@ import bt.utils.StringID;
  */
 public class CreateTableStatement extends CreateStatement<CreateTableStatement, CreateTableStatement>
 {
-    /** Indicates whether the default triggers should be created for this table. */
+    /**
+     * Indicates whether the default triggers should be created for this table.
+     */
     private boolean createDefaultTriggers = true;
 
-    /** Indicates whether the default delete trigger should be created for this table. */
+    /**
+     * Indicates whether the default delete trigger should be created for this table.
+     */
     private boolean createDefaultDeleteTrigger = true;
 
-    /** Indicates whether the default insert trigger should be created for this table. */
+    /**
+     * Indicates whether the default insert trigger should be created for this table.
+     */
     private boolean createDefaultInsertTrigger = true;
 
-    /** Indicates whether the default update trigger should be created for this table. */
+    /**
+     * Indicates whether the default update trigger should be created for this table.
+     */
     private boolean createDefaultUpdateTrigger = true;
 
-    /** The identity field used for the default triggers. */
+    /**
+     * The identity field used for the default triggers.
+     */
     private String identity;
 
-    /** The columns that will be added to the new table. */
+    /**
+     * The columns that will be added to the new table.
+     */
     private List<Column> tableColumns;
 
-    /** The select to create a copy table of. */
+    /**
+     * The select to create a copy table of.
+     */
     private SelectStatement asCopySelect;
 
-    /** Indicates whether a table copy should be created with data. */
+    /**
+     * Indicates whether a table copy should be created with data.
+     */
     private boolean copyData = true;
 
-    /** Contains all added table foreign keys. */
+    /**
+     * Contains all added table foreign keys.
+     */
     private List<TableForeignKey> foreignKeys;
 
-    /** Contains all added table checks. */
+    /**
+     * Contains all added table checks.
+     */
     private List<Check> checks;
 
     /**
      * Creates a new instance.
      *
-     * @param db
-     *            The database that should be used for the statement.
-     * @param name
-     *            The name of the table that should be created.
+     * @param db   The database that should be used for the statement.
+     * @param name The name of the table that should be created.
      */
     public CreateTableStatement(DatabaseAccess db, String name)
     {
@@ -78,10 +96,8 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
     /**
      * Creates a new column in this table which has the given name and the given sql type.
      *
-     * @param name
-     *            The name of the column.
-     * @param type
-     *            The {@link SqlType type} of the column.
+     * @param name The name of the column.
+     * @param type The {@link SqlType type} of the column.
      * @return The created column.
      */
     public CreateTableStatement column(Column column)
@@ -226,8 +242,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
     /**
      * Adds a table foreign key.
      *
-     * @param foreignKey
-     *            the foreign key.
+     * @param foreignKey the foreign key.
      * @return This instance for chaining.
      */
     public CreateTableStatement foreignKey(TableForeignKey foreignKey)
@@ -323,10 +338,10 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                        .oldAs("oldRow")
                        .forEachRow()
                        .execute(
-                                "INSERT INTO recent_triggers (triggerType, tableName, rowIdFieldName, idRow) values ('delete', '"
-                                + this.name.toUpperCase() + "', '" + this.identity + "', oldRow."
-                                + this.identity
-                                + ")")
+                               "INSERT INTO recent_triggers (triggerType, tableName, rowIdFieldName, idRow) values ('delete', '"
+                                       + this.name.toUpperCase() + "', '" + this.identity + "', oldRow."
+                                       + this.identity
+                                       + ")")
                        .replace()
                        .execute(printLogs);
             }
@@ -340,10 +355,10 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                        .newAs("newRow")
                        .forEachRow()
                        .execute(
-                                "INSERT INTO recent_triggers (triggerType, tableName, rowIdFieldName, idRow) values ('insert', '"
-                                + this.name.toUpperCase() + "', '" + this.identity + "', newRow."
-                                + this.identity
-                                + ")")
+                               "INSERT INTO recent_triggers (triggerType, tableName, rowIdFieldName, idRow) values ('insert', '"
+                                       + this.name.toUpperCase() + "', '" + this.identity + "', newRow."
+                                       + this.identity
+                                       + ")")
                        .replace()
                        .execute(printLogs);
             }
@@ -357,10 +372,10 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                        .newAs("newRow")
                        .forEachRow()
                        .execute(
-                                "INSERT INTO recent_triggers (triggerType, tableName, rowIdFieldName, idRow) values ('update', '"
-                                + this.name.toUpperCase() + "', '" + this.identity + "', newRow."
-                                + this.identity
-                                + ")")
+                               "INSERT INTO recent_triggers (triggerType, tableName, rowIdFieldName, idRow) values ('update', '"
+                                       + this.name.toUpperCase() + "', '" + this.identity + "', newRow."
+                                       + this.identity
+                                       + ")")
                        .replace()
                        .execute(printLogs);
             }
@@ -442,18 +457,18 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                        .set("object_name", this.name.toUpperCase())
                        .set("object_ddl", sql + ";")
                        .onDuplicateKey((s, e) ->
-                       {
-                           return this.db.update(DatabaseAccess.OBJECT_DATA_TABLE)
-                                  .set("instanceID", this.db.getInstanceID())
-                                  .set("object_name", this.name.toUpperCase())
-                                  .set("object_ddl", sql + ";")
-                                         .where(Sql.upper("object_name").toString()).equal(this.name.toUpperCase())
-                                         .onFail((st, ex) ->
-                                         {
-                                             return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));
-                                         })
-                                  .execute();
-                       })
+                                       {
+                                           return this.db.update(DatabaseAccess.OBJECT_DATA_TABLE)
+                                                         .set("instanceID", this.db.getInstanceID())
+                                                         .set("object_name", this.name.toUpperCase())
+                                                         .set("object_ddl", sql + ";")
+                                                         .where(Sql.upper("object_name").toString()).equal(this.name.toUpperCase())
+                                                         .onFail((st, ex) ->
+                                                                 {
+                                                                     return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));
+                                                                 })
+                                                         .execute();
+                                       })
                        .execute();
 
                 if (this.asCopySelect == null)
@@ -480,27 +495,27 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                 var drop = this.db.drop()
                                   .table(this.name)
                                   .onFail((s, ex) ->
-                                  {
-                                      return handleFail(new SqlExecutionException(e.getMessage(), sql, e));
-                                  })
+                                          {
+                                              return handleFail(new SqlExecutionException(e.getMessage(), sql, e));
+                                          })
                                   .onSuccess((s, i) ->
-                                  {
-                                      this.db.delete().from(DatabaseAccess.COLUMN_DATA)
-                                             .where(Sql.upper("table_name").toString()).equal(this.name)
-                                             .onFail((s2, ex) ->
                                              {
-                                                 return handleFail(new SqlExecutionException(e.getMessage(), sql, e));
-                                             })
-                                             .execute(printLogs);
+                                                 this.db.delete().from(DatabaseAccess.COLUMN_DATA)
+                                                        .where(Sql.upper("table_name").toString()).equal(this.name)
+                                                        .onFail((s2, ex) ->
+                                                                {
+                                                                    return handleFail(new SqlExecutionException(e.getMessage(), sql, e));
+                                                                })
+                                                        .execute(printLogs);
 
-                                      this.db.delete().from(DatabaseAccess.OBJECT_DATA_TABLE)
-                                             .where(Sql.upper("object_name").toString()).equal(this.name)
-                                             .onFail((s2, ex) ->
-                                             {
-                                                 return handleFail(new SqlExecutionException(e.getMessage(), sql, e));
-                                             })
-                                             .execute(printLogs);
-                                  });
+                                                 this.db.delete().from(DatabaseAccess.OBJECT_DATA_TABLE)
+                                                        .where(Sql.upper("object_name").toString()).equal(this.name)
+                                                        .onFail((s2, ex) ->
+                                                                {
+                                                                    return handleFail(new SqlExecutionException(e.getMessage(), sql, e));
+                                                                })
+                                                        .execute(printLogs);
+                                             });
 
                 if (drop.execute(printLogs) > 0)
                 {
@@ -538,18 +553,18 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                                    .set("object_name", this.name.toUpperCase())
                                    .set("object_ddl", sql + ";")
                                    .onDuplicateKey((s, e2) ->
-                                   {
-                                       return this.db.update(DatabaseAccess.OBJECT_DATA_TABLE)
-                                                     .set("instanceID", this.db.getInstanceID())
-                                                     .set("object_name", this.name.toUpperCase())
-                                                     .set("object_ddl", sql + ";")
-                                                     .where(Sql.upper("object_name").toString()).equal(this.name.toUpperCase())
-                                                     .onFail((st, ex) ->
-                                                     {
-                                                         return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));
-                                                     })
-                                                     .execute();
-                                   })
+                                                   {
+                                                       return this.db.update(DatabaseAccess.OBJECT_DATA_TABLE)
+                                                                     .set("instanceID", this.db.getInstanceID())
+                                                                     .set("object_name", this.name.toUpperCase())
+                                                                     .set("object_ddl", sql + ";")
+                                                                     .where(Sql.upper("object_name").toString()).equal(this.name.toUpperCase())
+                                                                     .onFail((st, ex) ->
+                                                                             {
+                                                                                 return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));
+                                                                             })
+                                                                     .execute();
+                                                   })
                                    .execute();
 
                             if (this.asCopySelect == null)
@@ -601,7 +616,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                     primary += col.getName() + ", ";
                 }
 
-                if (col.getGenerationCaluse() != null && col.isIdentity() && col.getGenerationCaluse().getGenerationType() == Generated.ALWAYS)
+                if (col.getGenerationCaluse() != null && col.isIdentity())
                 {
                     if (this.identity == null && (col.getType() == SqlType.LONG))
                     {
@@ -639,12 +654,14 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
             if (this.identity == null)
             {
                 // we always need a unique identity of type long for default triggers and automated persisting
-                Column defaultPrimary = new Column("DEFAULT_ID",
-                                                   SqlType.LONG).notNull()
-                                                                .generated(Generated.ALWAYS).asIdentity().autoIncrement(1);
+                Column defaultPrimary = new Column(this.name.toUpperCase() + "_ID", SqlType.LONG).notNull()
+                                                                                                 .generated(Generated.DEFAULT)
+                                                                                                 .asIdentity()
+                                                                                                 .autoIncrement(1)
+                                                                                                 .unique();
                 defaultPrimary.setStatement(this);
 
-                this.identity = "DEFAULT_ID";
+                this.identity = defaultPrimary.getName();
 
                 this.tableColumns.add(defaultPrimary);
 

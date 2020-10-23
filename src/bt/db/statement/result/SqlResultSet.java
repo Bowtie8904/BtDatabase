@@ -1,21 +1,18 @@
 package bt.db.statement.result;
 
+import bt.console.output.ConsoleTable;
+import bt.db.constants.SqlType;
+import bt.log.Logger;
+
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-
-import bt.console.output.ConsoleTable;
-import bt.db.constants.SqlType;
-import bt.log.Logger;
+import java.util.function.Function;
 
 /**
  * Wraps the values from the given ResultSet to make them more accessible and serializable.
@@ -38,8 +35,7 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
      * {@link #parse(ResultSet)} needs to be called before this instance is usable.
      * </p>
      *
-     * @param columnOrder
-     *            A list containing the names of the columns in correct order.
+     * @param columnOrder A list containing the names of the columns in correct order.
      */
     public SqlResultSet(List<String> columnOrder)
     {
@@ -50,7 +46,7 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
 
         this.defaultFormat = new int[this.colOrder.size()];
 
-        for (int i = 0; i < this.defaultFormat.length; i ++ )
+        for (int i = 0; i < this.defaultFormat.length; i++)
         {
             this.defaultFormat[i] = 25;
         }
@@ -63,8 +59,7 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
      * {@link #parse(ResultSet)} needs to be called before this instance is usable.
      * </p>
      *
-     * @param columnOrder
-     *            An array containing the names of the columns in correct order.
+     * @param columnOrder An array containing the names of the columns in correct order.
      */
     public SqlResultSet(String... columnOrder)
     {
@@ -74,8 +69,7 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
     /**
      * Creates a new instance and parses the given ResultSet.
      *
-     * @param set
-     *            The ResultSet to use.
+     * @param set The ResultSet to use.
      */
     public SqlResultSet(ResultSet set)
     {
@@ -97,8 +91,7 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
     /**
      * Sets the {@link SqlResult results} that should be wrapped by this instance.
      *
-     * @param results
-     *            A list containing all results that this instance should wrap.
+     * @param results A list containing all results that this instance should wrap.
      */
     public void setResults(List<SqlResult> results)
     {
@@ -138,8 +131,7 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
     /**
      * Sets the sql that was used to get this result.
      *
-     * @param sql
-     *            The sql statement.
+     * @param sql The sql statement.
      */
     public void setSql(String sql)
     {
@@ -159,8 +151,7 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
     /**
      * Sets a list of used values for the prepared statement that resulted in this set.
      *
-     * @param values
-     *            The list of values.
+     * @param values The list of values.
      */
     public void setValues(List<String> values)
     {
@@ -188,8 +179,7 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
     /**
      * Gets the result at the given index.
      *
-     * @param index
-     *            The index of the desired result.
+     * @param index The index of the desired result.
      * @return The requested result.
      */
     public SqlResult get(int index)
@@ -210,8 +200,7 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
     /**
      * Parses the given ResultSet.
      *
-     * @param set
-     *            The ResultSet whichs values should be
+     * @param set The ResultSet whichs values should be
      * @return
      * @throws SQLException
      */
@@ -238,7 +227,7 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
         int count = meta.getColumnCount();
         this.defaultFormat = new int[count];
 
-        for (int i = 1; i <= count; i ++ )
+        for (int i = 1; i <= count; i++)
         {
             String columnName = meta.getColumnName(i).toUpperCase();
             int valueType = meta.getColumnType(i);
@@ -425,6 +414,7 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
         }
 
         this.results = results;
+        set.close();
 
         return this;
     }
@@ -434,6 +424,18 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
         return this.defaultFormat;
     }
 
+    public <T> List<T> map(Function<SqlResult, T> mapFunction)
+    {
+        List<T> list = new ArrayList<>(size());
+
+        for (var result : this.results)
+        {
+            list.add(mapFunction.apply(result));
+        }
+
+        return list;
+    }
+
     /**
      * Prints a formatted table of the result.
      *
@@ -441,9 +443,8 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
      * The given values define the widths of the columns.
      * </p>
      *
-     * @param columnFormat
-     *            If only one number is given, all columns will have the same width. If more than one value is given,
-     *            there needs to be the same amount of numbers as there is columns.
+     * @param columnFormat If only one number is given, all columns will have the same width. If more than one value is given,
+     *                     there needs to be the same amount of numbers as there is columns.
      */
     public SqlResultSet print(int... columnFormat)
     {
@@ -480,9 +481,8 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
      * The given values define the widths of the columns.
      * </p>
      *
-     * @param columnFormat
-     *            If only one number is given, all columns will have the same width. If more than one value is given,
-     *            there needs to be the same amount of numbers as there is columns.
+     * @param columnFormat If only one number is given, all columns will have the same width. If more than one value is given,
+     *                     there needs to be the same amount of numbers as there is columns.
      * @return The formatted table.
      */
     public String toString(int... columnFormat)
@@ -493,7 +493,7 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
         {
             int[] format = new int[this.colOrder.size()];
 
-            for (int i = 0; i < format.length; i ++ )
+            for (int i = 0; i < format.length; i++)
             {
                 format[i] = columnFormat[0];
             }
