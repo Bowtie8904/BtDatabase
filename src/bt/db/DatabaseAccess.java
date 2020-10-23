@@ -200,8 +200,8 @@ public abstract class DatabaseAccess implements Killable
         }
         createDefaultProcedures();
         createDefaultFunctions();
-        System.out.printf("Setup database instance %s\n", this.instanceID);
-        System.out.printf("Using connection string: %s\n", this.dbConnectionString);
+        System.out.println(String.format("Setup database instance %s.", this.instanceID));
+        System.out.println(String.format("Using connection string: %s.", this.dbConnectionString));
     }
 
     /**
@@ -386,10 +386,10 @@ public abstract class DatabaseAccess implements Killable
         this.eventDispatcher.subscribeTo(listenFor,
                                          cons);
 
-        System.out.printf("Registered database listener of type '%s' for '%s' to instance %s.\n",
-                          listener.getClass().getName(),
-                          listenFor.getName(),
-                          this.getInstanceID());
+        System.out.println(String.format("Registered database listener of type '%s' for '%s' to instance %s.",
+                                         listener.getClass().getName(),
+                                         listenFor.getName(),
+                                         this.getInstanceID()));
 
         return cons;
     }
@@ -409,10 +409,10 @@ public abstract class DatabaseAccess implements Killable
         if (this.eventDispatcher.unsubscribeFrom(type,
                                                  listener))
         {
-            System.out.printf("Unregistered database listener of type '%s' for '%s' to instance %s.\n",
-                              listener.getClass().getName(),
-                              type.getName(),
-                              this.getInstanceID());
+            System.out.println(String.format("Unregistered database listener of type '%s' for '%s' to instance %s.",
+                                             listener.getClass().getName(),
+                                             type.getName(),
+                                             this.getInstanceID()));
         }
     }
 
@@ -426,10 +426,10 @@ public abstract class DatabaseAccess implements Killable
     {
         this.eventDispatcher.subscribeTo(SQLException.class, handler);
 
-        System.out.printf("Registered database exception handler of type '%s' for '%s' to instance %s.\n",
-                          handler.getClass().getName(),
-                          SQLException.class.getName(),
-                          this.getInstanceID());
+        System.out.println(String.format("Registered database exception handler of type '%s' for '%s' to instance %s.",
+                                         handler.getClass().getName(),
+                                         SQLException.class.getName(),
+                                         this.getInstanceID()));
     }
 
     /**
@@ -517,8 +517,8 @@ public abstract class DatabaseAccess implements Killable
                 {
                     DatabaseAccess.instances.remove(this.instanceID);
                 }
-                System.out.printf("Closed database %s.\n",
-                                  this.getInstanceID());
+                System.out.println(String.format("Closed database %s.",
+                                                 this.getInstanceID()));
             }
         }
         catch (SQLException e)
@@ -888,9 +888,9 @@ public abstract class DatabaseAccess implements Killable
             }
         }
 
-        System.out.printf("Imported %d rows from %s.\n",
-                          count,
-                          importFile.getAbsolutePath());
+        System.out.println(String.format("Imported %d rows from %s.",
+                                         count,
+                                         importFile.getAbsolutePath()));
     }
 
     /**
@@ -939,9 +939,9 @@ public abstract class DatabaseAccess implements Killable
                                           excludeColumns));
             }
 
-            System.out.printf("Exported %d rows to %s.\n",
-                              set.size(),
-                              exportFile.getAbsolutePath());
+            System.out.println(String.format("Exported %d rows to %s.",
+                                             set.size(),
+                                             exportFile.getAbsolutePath()));
         }
         catch (IOException e)
         {
