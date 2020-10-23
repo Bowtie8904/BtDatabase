@@ -1,25 +1,5 @@
 package bt.db;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Savepoint;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.Consumer;
-
 import bt.console.output.ConsoleTable;
 import bt.db.config.DatabaseConfiguration;
 import bt.db.constants.SqlType;
@@ -35,12 +15,7 @@ import bt.db.statement.Alter;
 import bt.db.statement.Create;
 import bt.db.statement.clause.Column;
 import bt.db.statement.clause.ColumnEntry;
-import bt.db.statement.impl.DeleteStatement;
-import bt.db.statement.impl.DropStatement;
-import bt.db.statement.impl.InsertStatement;
-import bt.db.statement.impl.SelectStatement;
-import bt.db.statement.impl.TruncateTableStatement;
-import bt.db.statement.impl.UpdateStatement;
+import bt.db.statement.impl.*;
 import bt.db.statement.result.SqlResult;
 import bt.db.statement.result.SqlResultSet;
 import bt.db.statement.result.StreamableResultSet;
@@ -52,11 +27,16 @@ import bt.types.Killable;
 import bt.types.SimpleTripple;
 import bt.types.Tripple;
 import bt.utils.Array;
-import bt.utils.DateUtils;
-import bt.utils.FileUtils;
-import bt.utils.NumberUtils;
-import bt.utils.StringID;
-import bt.utils.StringUtils;
+import bt.utils.*;
+
+import java.io.*;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.Consumer;
 
 /**
  * Base class for databases.
@@ -97,10 +77,14 @@ public abstract class DatabaseAccess implements Killable
      */
     public static final String OBJECT_DATA_TABLE = "bt_object_data";
 
-    /** The map of all currently active DatabaseAccess instances, mapped by their runtime unique ID. */
+    /**
+     * The map of all currently active DatabaseAccess instances, mapped by their runtime unique ID.
+     */
     protected static Map<String, DatabaseAccess> instances = new HashMap<>();
 
-    /** The URL of the database. */
+    /**
+     * The URL of the database.
+     */
     protected final String dbConnectionString;
 
     /**
@@ -109,7 +93,9 @@ public abstract class DatabaseAccess implements Killable
      */
     private String instanceID;
 
-    /** The connection to the database. */
+    /**
+     * The connection to the database.
+     */
     protected Connection connection;
 
     /**
@@ -118,25 +104,30 @@ public abstract class DatabaseAccess implements Killable
      */
     protected Dispatcher eventDispatcher;
 
-    /** A map containing savepoint-names mapped to their savepoint objects. */
+    /**
+     * A map containing savepoint-names mapped to their savepoint objects.
+     */
     protected Map<String, Savepoint> savepoints;
 
-    /** Indicates whether a message should be logged upon commit. */
+    /**
+     * Indicates whether a message should be logged upon commit.
+     */
     protected boolean logCommit = true;
 
-    /** An optional server to allow querying from outside the application. */
+    /**
+     * An optional server to allow querying from outside the application.
+     */
     protected QueryServer server;
 
     /**
      * Gets the instance with the given ID.
      *
-     * @param id
-     *            The ID of the instance to return.
+     * @param id The ID of the instance to return.
      * @return The instance that was mapped to the given ID or null if no such instance was found.
      */
     protected static DatabaseAccess getInstance(String id)
     {
-        return instances.get(id);
+        return DatabaseAccess.instances.get(id);
     }
 
     /**
@@ -150,8 +141,7 @@ public abstract class DatabaseAccess implements Killable
      * {@link #setup()} needs to be called to finish up the initialization.
      * </p>
      *
-     * @param dbURL
-     *            The URL for creation or connection of the database.
+     * @param dbURL The URL for creation or connection of the database.
      */
     protected DatabaseAccess(String dbURL)
     {
@@ -173,8 +163,7 @@ public abstract class DatabaseAccess implements Killable
      * {@link #setup()} needs to be called to finish up the initialization.
      * </p>
      *
-     * @param configuration
-     *            The configuration for this DB's connection.
+     * @param configuration The configuration for this DB's connection.
      */
     protected DatabaseAccess(DatabaseConfiguration configuration)
     {
@@ -188,7 +177,8 @@ public abstract class DatabaseAccess implements Killable
      * The methods being called for the setup are (in order):
      * <ul>
      * <li>{@link #createDatabase()}</li>
-     * <li>{@link #createCommentTable()}</li>
+     * <li>{@link #createObjectDataTable()}</li>
+     * <li>{@link #createColumnDataTable()}</li>
      * <li>{@link #createPropertiesTable()}</li>
      * <li>{@link #checkID()}</li>
      * <li>The instance is added to {@link #instances} with the unique id as key</li>
@@ -205,13 +195,13 @@ public abstract class DatabaseAccess implements Killable
         checkID();
         synchronized (DatabaseAccess.class)
         {
-            instances.put(this.instanceID,
-                          this);
+            DatabaseAccess.instances.put(this.instanceID,
+                                         this);
         }
         createDefaultProcedures();
         createDefaultFunctions();
-        System.out.printf("Setup database instance %s", this.instanceID);
-        System.out.printf("Using connection string: %s", this.dbConnectionString);
+        System.out.printf("Setup database instance %s\n", this.instanceID);
+        System.out.printf("Using connection string: %s\n", this.dbConnectionString);
     }
 
     /**
@@ -308,15 +298,11 @@ public abstract class DatabaseAccess implements Killable
      * </pre>
      * </p>
      *
-     * @param listenFor
-     *            The event type to listen for.
-     * @param listener
-     *            The runnable that should be called when the given event type is dispatched.
-     * @param tables
-     *            The tables for which the listener should be called.
-     *
+     * @param listenFor The event type to listen for.
+     * @param listener  The runnable that should be called when the given event type is dispatched.
+     * @param tables    The tables for which the listener should be called.
      * @return The consumer that the given listener was wrapped in. This consumer can be used to unregister the given
-     *         listener.
+     * listener.
      */
     public <T extends DatabaseChangeEvent> Consumer<T> registerListener(Class<T> listenFor, Runnable listener,
                                                                         String... tables)
@@ -362,15 +348,11 @@ public abstract class DatabaseAccess implements Killable
      * </pre>
      * </p>
      *
-     * @param listenFor
-     *            The event type to listen for.
-     * @param listener
-     *            The consumer method that should be called when the given event type is dispatched.
-     * @param tables
-     *            The tables for which the listener should be called.
-     *
+     * @param listenFor The event type to listen for.
+     * @param listener  The consumer method that should be called when the given event type is dispatched.
+     * @param tables    The tables for which the listener should be called.
      * @return The consumer that the given listener was wrapped in. This consumer can be used to unregister the given
-     *         listener.
+     * listener.
      */
     public <T extends DatabaseChangeEvent> Consumer<T> registerListener(Class<T> listenFor, Consumer<T> listener,
                                                                         String... tables)
@@ -404,7 +386,7 @@ public abstract class DatabaseAccess implements Killable
         this.eventDispatcher.subscribeTo(listenFor,
                                          cons);
 
-        System.out.printf("Registered database listener of type '%s' for '%s' to instance %s.",
+        System.out.printf("Registered database listener of type '%s' for '%s' to instance %s.\n",
                           listener.getClass().getName(),
                           listenFor.getName(),
                           this.getInstanceID());
@@ -427,7 +409,7 @@ public abstract class DatabaseAccess implements Killable
         if (this.eventDispatcher.unsubscribeFrom(type,
                                                  listener))
         {
-            System.out.printf("Unregistered database listener of type '%s' for '%s' to instance %s.",
+            System.out.printf("Unregistered database listener of type '%s' for '%s' to instance %s.\n",
                               listener.getClass().getName(),
                               type.getName(),
                               this.getInstanceID());
@@ -444,7 +426,7 @@ public abstract class DatabaseAccess implements Killable
     {
         this.eventDispatcher.subscribeTo(SQLException.class, handler);
 
-        System.out.printf("Registered database exception handler of type '%s' for '%s' to instance %s.",
+        System.out.printf("Registered database exception handler of type '%s' for '%s' to instance %s.\n",
                           handler.getClass().getName(),
                           SQLException.class.getName(),
                           this.getInstanceID());
@@ -453,8 +435,7 @@ public abstract class DatabaseAccess implements Killable
     /**
      * Gets a connection to the database.
      *
-     * @param autocommit
-     *            Indicates whether the returned connection should use autocommit or not.
+     * @param autocommit Indicates whether the returned connection should use autocommit or not.
      * @return The connection.
      */
     public Connection getConnection(boolean autocommit)
@@ -534,9 +515,9 @@ public abstract class DatabaseAccess implements Killable
                 this.connection.close();
                 synchronized (DatabaseAccess.class)
                 {
-                    instances.remove(this.instanceID);
+                    DatabaseAccess.instances.remove(this.instanceID);
                 }
-                System.out.printf("Closed database %s.",
+                System.out.printf("Closed database %s.\n",
                                   this.getInstanceID());
             }
         }
@@ -549,20 +530,18 @@ public abstract class DatabaseAccess implements Killable
     /**
      * Adds or updates the given property key with the given value.
      *
-     * @param key
-     *            The unique key of the property.
-     * @param value
-     *            The value of the property.
+     * @param key   The unique key of the property.
+     * @param value The value of the property.
      */
     public void setProperty(String key, String value)
     {
-        insert().into(PROPERTIES_TABLE)
+        insert().into(DatabaseAccess.PROPERTIES_TABLE)
                 .set("property_key", key)
                 .set("property_value", value)
-                .onDuplicateKey(update(PROPERTIES_TABLE).set("property_value", value)
-                                                        .where("property_key")
-                                                        .equal(key)
-                                                        .commit())
+                .onDuplicateKey(update(DatabaseAccess.PROPERTIES_TABLE).set("property_value", value)
+                                                                       .where("property_key")
+                                                                       .equal(key)
+                                                                       .commit())
                 .commit()
                 .execute();
     }
@@ -570,8 +549,7 @@ public abstract class DatabaseAccess implements Killable
     /**
      * Gets the property value for the given key from the {@link #PROPERTIES_TABLE}.
      *
-     * @param key
-     *            The key of the property to return.
+     * @param key The key of the property to return.
      * @return The value bound to the given key or null if the key was not found or null.
      */
     public String getProperty(String key)
@@ -581,7 +559,7 @@ public abstract class DatabaseAccess implements Killable
             return null;
         }
 
-        SqlResultSet result = select(Sql.column("property_value").as("value")).from(PROPERTIES_TABLE)
+        SqlResultSet result = select(Sql.column("property_value").as("value")).from(DatabaseAccess.PROPERTIES_TABLE)
                                                                               .where("property_key")
                                                                               .equal(key)
                                                                               .onLessThan(1,
@@ -604,7 +582,7 @@ public abstract class DatabaseAccess implements Killable
      */
     protected void createPropertiesTable()
     {
-        int success = create().table(PROPERTIES_TABLE)
+        int success = create().table(DatabaseAccess.PROPERTIES_TABLE)
                               .column(new Column("property_key", SqlType.VARCHAR).size(200).primaryKey()
                                                                                  .comment("The unique key of the key-value mapping."))
 
@@ -613,13 +591,13 @@ public abstract class DatabaseAccess implements Killable
 
                               .createDefaultTriggers(false)
                               .onAlreadyExists((s, e) ->
-                              {
-                                  return 0;
-                              })
+                                               {
+                                                   return 0;
+                                               })
                               .onSuccess((s, i) ->
-                              {
-                                  System.out.println("Created properties table in " + s.getExecutionTime() + "ms.");
-                              })
+                                         {
+                                             System.out.println("Created properties table in " + s.getExecutionTime() + "ms.");
+                                         })
                               .execute();
 
         if (success == 1)
@@ -634,7 +612,7 @@ public abstract class DatabaseAccess implements Killable
      */
     protected void createColumnDataTable()
     {
-        create().table(COLUMN_DATA)
+        create().table(DatabaseAccess.COLUMN_DATA)
                 .column(new Column("instanceID", SqlType.VARCHAR).size(100)
                                                                  .comment("The instance ID of the creating database."))
                 .column(new Column("table_name", SqlType.VARCHAR).size(100).primaryKey()
@@ -667,13 +645,13 @@ public abstract class DatabaseAccess implements Killable
                                                                 .comment("Indicates when this entry was last updated."))
                 .createDefaultTriggers(false)
                 .onAlreadyExists((s, e) ->
-                {
-                    return 0;
-                })
+                                 {
+                                     return 0;
+                                 })
                 .onSuccess((s, i) ->
-                {
-                    System.out.println("Created column data table in " + s.getExecutionTime() + "ms.");
-                })
+                           {
+                               System.out.println("Created column data table in " + s.getExecutionTime() + "ms.");
+                           })
                 .commit()
                 .execute();
     }
@@ -683,7 +661,7 @@ public abstract class DatabaseAccess implements Killable
      */
     protected void createObjectDataTable()
     {
-        create().table(OBJECT_DATA_TABLE)
+        create().table(DatabaseAccess.OBJECT_DATA_TABLE)
                 .column(new Column("instanceID", SqlType.VARCHAR).size(500))
                 .column(new Column("object_Name", SqlType.VARCHAR).size(50).primaryKey())
                 .column(new Column("object_ddl", SqlType.VARCHAR).size(9999))
@@ -692,13 +670,13 @@ public abstract class DatabaseAccess implements Killable
                 .createDefaultTriggers(false)
                 .saveObjectData(false)
                 .onAlreadyExists((s, e) ->
-                {
-                    return 0;
-                })
+                                 {
+                                     return 0;
+                                 })
                 .onSuccess((s, i) ->
-                {
-                    System.out.println("Created object data table in " + s.getExecutionTime() + "ms.");
-                })
+                           {
+                               System.out.println("Created object data table in " + s.getExecutionTime() + "ms.");
+                           })
                 .commit()
                 .execute();
     }
@@ -706,8 +684,7 @@ public abstract class DatabaseAccess implements Killable
     /**
      * Executes the given raw SQL String of a modify (update, insert, delete, alter, drop, ...) statement.
      *
-     * @param sql
-     *            The raw SQL String to execute.
+     * @param sql The raw SQL String to execute.
      * @return The return value of the statement execution. See {@link Statement#executeUpdate(String)}.
      * @throws SQLException
      */
@@ -717,17 +694,12 @@ public abstract class DatabaseAccess implements Killable
         {
             return statement.executeUpdate(sql);
         }
-        catch (SQLException e)
-        {
-            throw e;
-        }
     }
 
     /**
      * Executes the given raw SQL String of a select statement.
      *
-     * @param sql
-     *            The raw SQL String to execute.
+     * @param sql The raw SQL String to execute.
      * @return The {@link SqlResultSet} resulting from the query or null if an error occured.
      * @throws SQLException
      */
@@ -738,17 +710,12 @@ public abstract class DatabaseAccess implements Killable
         {
             return new SqlResultSet(statement.executeQuery(sql));
         }
-        catch (SQLException e)
-        {
-            throw e;
-        }
     }
 
     /**
      * Executes the given raw SQL String of a select statement and returns a streamable result set.
      *
-     * @param sql
-     *            The raw SQL String to execute.
+     * @param sql The raw SQL String to execute.
      * @return The {@link StreamableResultSet} resulting from the query.
      * @throws SQLException
      */
@@ -792,8 +759,7 @@ public abstract class DatabaseAccess implements Killable
      * been set via {@link #savepoint(String)}.
      * </p>
      *
-     * @param savepoint
-     *            The case-insensitive name of the savepoint to roll back to.
+     * @param savepoint The case-insensitive name of the savepoint to roll back to.
      */
     public void rollback(String savepoint)
     {
@@ -867,8 +833,7 @@ public abstract class DatabaseAccess implements Killable
      * Use {@link #rollback(String)} to roll back to a savepoint set via this method.
      * </p>
      *
-     * @param name
-     *            The name of the new savepoint.
+     * @param name The name of the new savepoint.
      */
     public void savepoint(String name)
     {
@@ -902,8 +867,7 @@ public abstract class DatabaseAccess implements Killable
      * unique constraints will be skipped.
      * </p>
      *
-     * @param importFile
-     *            The file from where to import.
+     * @param importFile The file from where to import.
      * @throws IOException
      * @throws FileNotFoundException
      */
@@ -924,7 +888,7 @@ public abstract class DatabaseAccess implements Killable
             }
         }
 
-        System.out.printf("Imported %d rows from %s.",
+        System.out.printf("Imported %d rows from %s.\n",
                           count,
                           importFile.getAbsolutePath());
     }
@@ -937,25 +901,20 @@ public abstract class DatabaseAccess implements Killable
      * columns of the given table except the ones that are passed in excludeColumns (case insensitive).
      * </p>
      *
-     * @param table
-     *            The name of the table whichs data should be exported.
-     * @param exportFile
-     *            The file to save the insert statements to. If the file does not exist it will be created.
-     * @param excludeColumns
-     *            An array of column names which should not be included in the exported insert statements. Keep in mind
-     *            that all tables created by this library will have an id column 'DEFAULT_ID' unless a fitting id column
-     *            was explicitly added. These columns will be 'generated always as identity' meaning that values can't
-     *            be manually added or changed, which means they can't be used in insert statements.
+     * @param table          The name of the table whichs data should be exported.
+     * @param exportFile     The file to save the insert statements to. If the file does not exist it will be created.
+     * @param excludeColumns An array of column names which should not be included in the exported insert statements. Keep in mind
+     *                       that all tables created by this library will have an id column 'DEFAULT_ID' unless a fitting id column
+     *                       was explicitly added. These columns will be 'generated always as identity' meaning that values can't
+     *                       be manually added or changed, which means they can't be used in insert statements.
      */
     public void exportData(String table, File exportFile, String... excludeColumns)
     {
-        SqlResultSet set = select()
-                                   .from(table)
-                                   .onLessThan(1,
-                                               (num, res) ->
-                                               {
-                                                   return res;
-                                               })
+        SqlResultSet set = select().from(table)
+                                   .onLessThan(1, (num, res) ->
+                                   {
+                                       return res;
+                                   })
                                    .execute();
 
         if (!exportFile.exists())
@@ -980,7 +939,7 @@ public abstract class DatabaseAccess implements Killable
                                           excludeColumns));
             }
 
-            System.out.printf("Exported %d rows to %s.",
+            System.out.printf("Exported %d rows to %s.\n",
                               set.size(),
                               exportFile.getAbsolutePath());
         }
@@ -999,11 +958,10 @@ public abstract class DatabaseAccess implements Killable
      * include all columns of the respective table except the ones that are passed in excludeColumns (case insensitive).
      * </p>
      *
-     * @param excludeColumns
-     *            An array of column names which should not be included in the exported insert statements. Keep in mind
-     *            that all tables created by this library will have an id column 'DEFAULT_ID' unless a fitting id column
-     *            was explicitly added. These columns will be 'generated always as identity' meaning that values can't
-     *            be manually added or changed, which means they can't be used in insert statements.
+     * @param excludeColumns An array of column names which should not be included in the exported insert statements. Keep in mind
+     *                       that all tables created by this library will have an id column 'DEFAULT_ID' unless a fitting id column
+     *                       was explicitly added. These columns will be 'generated always as identity' meaning that values can't
+     *                       be manually added or changed, which means they can't be used in insert statements.
      */
     public void exportData(String... excludeColumns)
     {
@@ -1095,7 +1053,7 @@ public abstract class DatabaseAccess implements Killable
     {
         String[] columns = new String[values.length];
 
-        for (int i = 0; i < values.length; i ++ )
+        for (int i = 0; i < values.length; i++)
         {
             columns[i] = values[i].toString();
         }
@@ -1138,8 +1096,7 @@ public abstract class DatabaseAccess implements Killable
     /**
      * Creates an update statement for the given table.
      *
-     * @param table
-     *            The table to update.
+     * @param table The table to update.
      * @return The statement.
      */
     public UpdateStatement update(String table)
@@ -1151,8 +1108,7 @@ public abstract class DatabaseAccess implements Killable
     /**
      * Creates a truncate table statement for the given table.
      *
-     * @param table
-     *            The table to truncate.
+     * @param table The table to truncate.
      * @return The statement.
      */
     public TruncateTableStatement truncate(String table)
@@ -1238,14 +1194,14 @@ public abstract class DatabaseAccess implements Killable
     private List<Tripple<String, String, String>> columnInfo(String table)
     {
         List<Entry<String, String>> columnTypes = select()
-                                                          .from(table)
-                                                          .onLessThan(1,
-                                                                      (num, res) ->
-                                                                      {
-                                                                          return res;
-                                                                      })
-                                                          .execute()
-                                                          .getColumnTypes();
+                .from(table)
+                .onLessThan(1,
+                            (num, res) ->
+                            {
+                                return res;
+                            })
+                .execute()
+                .getColumnTypes();
         Map<String, String> typeMap = new HashMap<>();
 
         for (Entry<String, String> column : columnTypes)
@@ -1257,15 +1213,15 @@ public abstract class DatabaseAccess implements Killable
         List<Tripple<String, String, String>> columnInfo = new ArrayList<>();
 
         SqlResultSet set = select()
-                                   .from(COLUMN_DATA)
-                                   .where("table_name")
-                                   .equal(table.toUpperCase())
-                                   .onLessThan(1,
-                                               (num, res) ->
-                                               {
-                                                   return res;
-                                               })
-                                   .execute();
+                .from(DatabaseAccess.COLUMN_DATA)
+                .where("table_name")
+                .equal(table.toUpperCase())
+                .onLessThan(1,
+                            (num, res) ->
+                            {
+                                return res;
+                            })
+                .execute();
 
         for (SqlResult result : set)
         {
@@ -1282,18 +1238,14 @@ public abstract class DatabaseAccess implements Killable
     /**
      * Calls {@link #onInsert(InsertEvent)} of the database with the given instanceID.
      *
-     * @param instanceID
-     *            The instanceID of the database that is concerned.
-     * @param table
-     *            The table that has been inserted into.
-     * @param idFieldName
-     *            The name of the identity field inside the table.
-     * @param id
-     *            The id (identity value of the new row).
+     * @param instanceID  The instanceID of the database that is concerned.
+     * @param table       The table that has been inserted into.
+     * @param idFieldName The name of the identity field inside the table.
+     * @param id          The id (identity value of the new row).
      */
     public synchronized static void onInsert(String instanceID, String table, String idFieldName, long id)
     {
-        DatabaseAccess instance = getInstance(instanceID);
+        DatabaseAccess instance = DatabaseAccess.getInstance(instanceID);
 
         if (instance != null)
         {
@@ -1312,8 +1264,7 @@ public abstract class DatabaseAccess implements Killable
      * overriding of this logic.
      * </p>
      *
-     * @param event
-     *            The event to dispatch.
+     * @param event The event to dispatch.
      */
     protected void onInsert(InsertEvent event)
     {
@@ -1323,18 +1274,14 @@ public abstract class DatabaseAccess implements Killable
     /**
      * Calls {@link #onUpdate(UpdateEvent)} of the database with the given instanceID.
      *
-     * @param instanceID
-     *            The instanceID of the database that is concerned.
-     * @param table
-     *            The table that has been updated.
-     * @param idFieldName
-     *            The name of the identity field inside the table.
-     * @param id
-     *            The id (identity value of the updated row).
+     * @param instanceID  The instanceID of the database that is concerned.
+     * @param table       The table that has been updated.
+     * @param idFieldName The name of the identity field inside the table.
+     * @param id          The id (identity value of the updated row).
      */
     public synchronized static void onUpdate(String instanceID, String table, String idFieldName, long id)
     {
-        DatabaseAccess instance = getInstance(instanceID);
+        DatabaseAccess instance = DatabaseAccess.getInstance(instanceID);
 
         if (instance != null)
         {
@@ -1353,8 +1300,7 @@ public abstract class DatabaseAccess implements Killable
      * overriding of this logic.
      * </p>
      *
-     * @param event
-     *            The event to dispatch.
+     * @param event The event to dispatch.
      */
     protected void onUpdate(UpdateEvent event)
     {
@@ -1364,18 +1310,14 @@ public abstract class DatabaseAccess implements Killable
     /**
      * Calls {@link #onDelete(DeleteEvent)} of the database with the given instanceID.
      *
-     * @param instanceID
-     *            The instanceID of the database that is concerned.
-     * @param table
-     *            The table that has been deleted from.
-     * @param idFieldName
-     *            The name of the identity field inside the table.
-     * @param id
-     *            The id (identity value of the deleted row).
+     * @param instanceID  The instanceID of the database that is concerned.
+     * @param table       The table that has been deleted from.
+     * @param idFieldName The name of the identity field inside the table.
+     * @param id          The id (identity value of the deleted row).
      */
     public synchronized static void onDelete(String instanceID, String table, String idFieldName, long id)
     {
-        DatabaseAccess instance = getInstance(instanceID);
+        DatabaseAccess instance = DatabaseAccess.getInstance(instanceID);
 
         if (instance != null)
         {
@@ -1394,8 +1336,7 @@ public abstract class DatabaseAccess implements Killable
      * overriding of this logic.
      * </p>
      *
-     * @param event
-     *            The event to dispatch.
+     * @param event The event to dispatch.
      */
     protected void onDelete(DeleteEvent event)
     {
@@ -1408,13 +1349,13 @@ public abstract class DatabaseAccess implements Killable
                 .call(NumberUtils.class, "decimalToHex", long.class)
                 .returnNullOnNull()
                 .onAlreadyExists((s, e) ->
-                {
-                    return 0;
-                })
+                                 {
+                                     return 0;
+                                 })
                 .onSuccess((s, i) ->
-                {
-                    System.out.println("Created function " + s.getName() + ".");
-                })
+                           {
+                               System.out.println("Created function " + s.getName() + ".");
+                           })
                 .commit()
                 .execute();
 
@@ -1422,13 +1363,13 @@ public abstract class DatabaseAccess implements Killable
                 .call(NumberUtils.class, "decimalToOctal", long.class)
                 .returnNullOnNull()
                 .onAlreadyExists((s, e) ->
-                {
-                    return 0;
-                })
+                                 {
+                                     return 0;
+                                 })
                 .onSuccess((s, i) ->
-                {
-                    System.out.println("Created function " + s.getName() + ".");
-                })
+                           {
+                               System.out.println("Created function " + s.getName() + ".");
+                           })
                 .commit()
                 .execute();
 
@@ -1436,13 +1377,13 @@ public abstract class DatabaseAccess implements Killable
                 .call(NumberUtils.class, "decimalToBinary", long.class)
                 .returnNullOnNull()
                 .onAlreadyExists((s, e) ->
-                {
-                    return 0;
-                })
+                                 {
+                                     return 0;
+                                 })
                 .onSuccess((s, i) ->
-                {
-                    System.out.println("Created function " + s.getName() + ".");
-                })
+                           {
+                               System.out.println("Created function " + s.getName() + ".");
+                           })
                 .commit()
                 .execute();
 
@@ -1450,13 +1391,13 @@ public abstract class DatabaseAccess implements Killable
                 .call(NumberUtils.class, "hexToDecimal", String.class)
                 .returnNullOnNull()
                 .onAlreadyExists((s, e) ->
-                {
-                    return 0;
-                })
+                                 {
+                                     return 0;
+                                 })
                 .onSuccess((s, i) ->
-                {
-                    System.out.println("Created function " + s.getName() + ".");
-                })
+                           {
+                               System.out.println("Created function " + s.getName() + ".");
+                           })
                 .commit()
                 .execute();
 
@@ -1464,13 +1405,13 @@ public abstract class DatabaseAccess implements Killable
                 .call(NumberUtils.class, "hexToOctal", String.class)
                 .returnNullOnNull()
                 .onAlreadyExists((s, e) ->
-                {
-                    return 0;
-                })
+                                 {
+                                     return 0;
+                                 })
                 .onSuccess((s, i) ->
-                {
-                    System.out.println("Created function " + s.getName() + ".");
-                })
+                           {
+                               System.out.println("Created function " + s.getName() + ".");
+                           })
                 .commit()
                 .execute();
 
@@ -1478,13 +1419,13 @@ public abstract class DatabaseAccess implements Killable
                 .call(NumberUtils.class, "hexToBinary", String.class)
                 .returnNullOnNull()
                 .onAlreadyExists((s, e) ->
-                {
-                    return 0;
-                })
+                                 {
+                                     return 0;
+                                 })
                 .onSuccess((s, i) ->
-                {
-                    System.out.println("Created function " + s.getName() + ".");
-                })
+                           {
+                               System.out.println("Created function " + s.getName() + ".");
+                           })
                 .commit()
                 .execute();
 
@@ -1492,13 +1433,13 @@ public abstract class DatabaseAccess implements Killable
                 .call(NumberUtils.class, "binaryToDecimal", String.class)
                 .returnNullOnNull()
                 .onAlreadyExists((s, e) ->
-                {
-                    return 0;
-                })
+                                 {
+                                     return 0;
+                                 })
                 .onSuccess((s, i) ->
-                {
-                    System.out.println("Created function " + s.getName() + ".");
-                })
+                           {
+                               System.out.println("Created function " + s.getName() + ".");
+                           })
                 .commit()
                 .execute();
 
@@ -1506,13 +1447,13 @@ public abstract class DatabaseAccess implements Killable
                 .call(NumberUtils.class, "binaryToOctal", String.class)
                 .returnNullOnNull()
                 .onAlreadyExists((s, e) ->
-                {
-                    return 0;
-                })
+                                 {
+                                     return 0;
+                                 })
                 .onSuccess((s, i) ->
-                {
-                    System.out.println("Created function " + s.getName() + ".");
-                })
+                           {
+                               System.out.println("Created function " + s.getName() + ".");
+                           })
                 .commit()
                 .execute();
 
@@ -1520,13 +1461,13 @@ public abstract class DatabaseAccess implements Killable
                 .call(NumberUtils.class, "binaryToHex", String.class)
                 .returnNullOnNull()
                 .onAlreadyExists((s, e) ->
-                {
-                    return 0;
-                })
+                                 {
+                                     return 0;
+                                 })
                 .onSuccess((s, i) ->
-                {
-                    System.out.println("Created function " + s.getName() + ".");
-                })
+                           {
+                               System.out.println("Created function " + s.getName() + ".");
+                           })
                 .commit()
                 .execute();
 
@@ -1534,13 +1475,13 @@ public abstract class DatabaseAccess implements Killable
                 .call(NumberUtils.class, "octalToDecimal", String.class)
                 .returnNullOnNull()
                 .onAlreadyExists((s, e) ->
-                {
-                    return 0;
-                })
+                                 {
+                                     return 0;
+                                 })
                 .onSuccess((s, i) ->
-                {
-                    System.out.println("Created function " + s.getName() + ".");
-                })
+                           {
+                               System.out.println("Created function " + s.getName() + ".");
+                           })
                 .commit()
                 .execute();
 
@@ -1548,13 +1489,13 @@ public abstract class DatabaseAccess implements Killable
                 .call(NumberUtils.class, "octalToBinary", String.class)
                 .returnNullOnNull()
                 .onAlreadyExists((s, e) ->
-                {
-                    return 0;
-                })
+                                 {
+                                     return 0;
+                                 })
                 .onSuccess((s, i) ->
-                {
-                    System.out.println("Created function " + s.getName() + ".");
-                })
+                           {
+                               System.out.println("Created function " + s.getName() + ".");
+                           })
                 .commit()
                 .execute();
 
@@ -1562,13 +1503,13 @@ public abstract class DatabaseAccess implements Killable
                 .call(NumberUtils.class, "octalToHex", String.class)
                 .returnNullOnNull()
                 .onAlreadyExists((s, e) ->
-                {
-                    return 0;
-                })
+                                 {
+                                     return 0;
+                                 })
                 .onSuccess((s, i) ->
-                {
-                    System.out.println("Created function " + s.getName() + ".");
-                })
+                           {
+                               System.out.println("Created function " + s.getName() + ".");
+                           })
                 .commit()
                 .execute();
 
@@ -1576,13 +1517,13 @@ public abstract class DatabaseAccess implements Killable
                 .call(StringUtils.class, "leftPad", String.class, int.class, String.class)
                 .returnNullOnNull()
                 .onAlreadyExists((s, e) ->
-                {
-                    return 0;
-                })
+                                 {
+                                     return 0;
+                                 })
                 .onSuccess((s, i) ->
-                {
-                    System.out.println("Created function " + s.getName() + ".");
-                })
+                           {
+                               System.out.println("Created function " + s.getName() + ".");
+                           })
                 .commit()
                 .execute();
 
@@ -1590,13 +1531,13 @@ public abstract class DatabaseAccess implements Killable
                 .call(StringUtils.class, "rightPad", String.class, int.class, String.class)
                 .returnNullOnNull()
                 .onAlreadyExists((s, e) ->
-                {
-                    return 0;
-                })
+                                 {
+                                     return 0;
+                                 })
                 .onSuccess((s, i) ->
-                {
-                    System.out.println("Created function " + s.getName() + ".");
-                })
+                           {
+                               System.out.println("Created function " + s.getName() + ".");
+                           })
                 .commit()
                 .execute();
 
@@ -1604,13 +1545,13 @@ public abstract class DatabaseAccess implements Killable
                 .call(DateUtils.class, "addDays", Timestamp.class, int.class)
                 .returnNullOnNull()
                 .onAlreadyExists((s, e) ->
-                {
-                    return 0;
-                })
+                                 {
+                                     return 0;
+                                 })
                 .onSuccess((s, i) ->
-                {
-                    System.out.println("Created function " + s.getName() + ".");
-                })
+                           {
+                               System.out.println("Created function " + s.getName() + ".");
+                           })
                 .commit()
                 .execute();
 
@@ -1618,13 +1559,13 @@ public abstract class DatabaseAccess implements Killable
                 .call(DateUtils.class, "addHours", Timestamp.class, int.class)
                 .returnNullOnNull()
                 .onAlreadyExists((s, e) ->
-                {
-                    return 0;
-                })
+                                 {
+                                     return 0;
+                                 })
                 .onSuccess((s, i) ->
-                {
-                    System.out.println("Created function " + s.getName() + ".");
-                })
+                           {
+                               System.out.println("Created function " + s.getName() + ".");
+                           })
                 .commit()
                 .execute();
 
@@ -1632,13 +1573,13 @@ public abstract class DatabaseAccess implements Killable
                 .call(DateUtils.class, "addMinutes", Timestamp.class, int.class)
                 .returnNullOnNull()
                 .onAlreadyExists((s, e) ->
-                {
-                    return 0;
-                })
+                                 {
+                                     return 0;
+                                 })
                 .onSuccess((s, i) ->
-                {
-                    System.out.println("Created function " + s.getName() + ".");
-                })
+                           {
+                               System.out.println("Created function " + s.getName() + ".");
+                           })
                 .commit()
                 .execute();
 
@@ -1646,13 +1587,13 @@ public abstract class DatabaseAccess implements Killable
                 .call(DateUtils.class, "addSeconds", Timestamp.class, int.class)
                 .returnNullOnNull()
                 .onAlreadyExists((s, e) ->
-                {
-                    return 0;
-                })
+                                 {
+                                     return 0;
+                                 })
                 .onSuccess((s, i) ->
-                {
-                    System.out.println("Created function " + s.getName() + ".");
-                })
+                           {
+                               System.out.println("Created function " + s.getName() + ".");
+                           })
                 .commit()
                 .execute();
     }

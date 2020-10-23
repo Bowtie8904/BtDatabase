@@ -1,13 +1,13 @@
 package bt.db;
 
+import bt.db.config.DatabaseConfiguration;
+import bt.db.constants.SqlType;
+
 import java.io.File;
 import java.net.URLDecoder;
 import java.security.CodeSource;
 import java.sql.CallableStatement;
 import java.sql.SQLException;
-
-import bt.db.config.DatabaseConfiguration;
-import bt.db.constants.SqlType;
 
 /**
  * A class which creates and keeps a connection to an embedded database.
@@ -16,7 +16,9 @@ import bt.db.constants.SqlType;
  */
 public abstract class EmbeddedDatabase extends DatabaseAccess
 {
-    /** The set derby home path. */
+    /**
+     * The set derby home path.
+     */
     protected static String derbyHome;
 
     /**
@@ -24,14 +26,13 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
      */
     public EmbeddedDatabase()
     {
-        this(DEFAULT_LOCAL_DB);
+        this(DatabaseAccess.DEFAULT_LOCAL_DB);
     }
 
     /**
      * Creates a new instance which uses the given connection string.
      *
-     * @param dbURL
-     *            The DB connection string.
+     * @param dbURL The DB connection string.
      */
     public EmbeddedDatabase(String dbURL)
     {
@@ -40,7 +41,7 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
         addJarToDerby();
         setup();
         setProperty("derby_home",
-                    derbyHome);
+                    EmbeddedDatabase.derbyHome);
         createTables();
     }
 
@@ -69,9 +70,9 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
                               .call(this.getClass().getName() + ".onInsert")
                               .replace()
                               .onFail((s, e) ->
-                              {
-                                  return 0;
-                              })
+                                      {
+                                          return 0;
+                                      })
                               .execute();
 
         if (success == 1)
@@ -95,9 +96,9 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
                           .call(this.getClass().getName() + ".onDelete")
                           .replace()
                           .onFail((s, e) ->
-                          {
-                              return 0;
-                          })
+                                  {
+                                      return 0;
+                                  })
                           .execute();
 
         if (success == 1)
@@ -121,9 +122,9 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
                           .call(this.getClass().getName() + ".onUpdate")
                           .replace()
                           .onFail((s, e) ->
-                          {
-                              return 0;
-                          })
+                                  {
+                                      return 0;
+                                  })
                           .execute();
 
         if (success == 1)
@@ -161,11 +162,11 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
                                                 "UTF-8");
                 jarFile = new File(jarFilePath);
             }
-            derbyHome = jarFile.getParentFile().getAbsolutePath();
+            EmbeddedDatabase.derbyHome = jarFile.getParentFile().getAbsolutePath();
             System.setProperty("derby.system.home",
-                               derbyHome);
-            System.out.printf("Set derby home to %s",
-                              derbyHome);
+                               EmbeddedDatabase.derbyHome);
+            System.out.printf("Set derby home to %s\n",
+                              EmbeddedDatabase.derbyHome);
         }
         catch (Exception e)
         {
@@ -213,7 +214,7 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
             try (CallableStatement statement = getConnection().prepareCall(sql))
             {
                 statement.executeUpdate();
-                System.out.printf("Added %s to the database.",
+                System.out.printf("Added %s to the database.\n",
                                   path);
             }
             catch (SQLException e)
@@ -223,11 +224,12 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
                 try (CallableStatement statement = getConnection().prepareCall(sql))
                 {
                     statement.executeUpdate();
-                    System.out.printf("Replaced %s in the database.",
+                    System.out.printf("Replaced %s in the database.\n",
                                       path);
                 }
                 catch (SQLException e1)
-                {}
+                {
+                }
             }
 
             sql = "CALL syscs_util.syscs_set_database_property('derby.database.classpath', 'APP.BowtieDatabase')";
@@ -238,7 +240,8 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
                 System.out.println("Added classpath to the database.");
             }
             catch (SQLException e1)
-            {}
+            {
+            }
         }
         catch (Exception ex)
         {
@@ -253,6 +256,6 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
      */
     public static String getDerbyHome()
     {
-        return derbyHome;
+        return EmbeddedDatabase.derbyHome;
     }
 }
