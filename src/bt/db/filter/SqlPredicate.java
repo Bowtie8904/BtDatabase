@@ -142,7 +142,7 @@ public abstract class SqlPredicate<T> implements Predicate<T>
                 }
                 else
                 {
-                    result = fieldValue.equals(value1);
+                    result = attemptGetNumericValue(fieldValue).equals(attemptGetNumericValue(value1));
                 }
                 break;
             case SqlPredicate.NOT_EQUAL:
@@ -152,7 +152,7 @@ public abstract class SqlPredicate<T> implements Predicate<T>
                 }
                 else
                 {
-                    result = !fieldValue.equals(value1);
+                    result = !attemptGetNumericValue(fieldValue).equals(attemptGetNumericValue(value1));
                 }
                 break;
             case SqlPredicate.GREATER_THAN:

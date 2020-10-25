@@ -1,5 +1,6 @@
 package bt.db.filter;
 
+import bt.db.filter.parse.SqlPredicateColumn;
 import bt.reflect.field.Fields;
 
 import java.lang.reflect.Field;
@@ -69,24 +70,24 @@ public class ClassFieldSqlPredicate extends SqlPredicate<Object>
     @Override
     protected boolean check(Object o)
     {
-        Field field = findField(o);
-        Object val = null;
+        Object val = this.field;
 
-        if (field != null)
+        if (this.field instanceof SqlPredicateColumn)
         {
-            try
+            Field field = findField(o);
+
+            if (field != null)
             {
-                field.setAccessible(true);
-                val = field.get(o);
+                try
+                {
+                    field.setAccessible(true);
+                    val = field.get(o);
+                }
+                catch (IllegalAccessException e)
+                {
+                    e.printStackTrace();
+                }
             }
-            catch (IllegalAccessException e)
-            {
-                e.printStackTrace();
-            }
-        }
-        else
-        {
-            val = this.field;
         }
 
         if (val instanceof String)

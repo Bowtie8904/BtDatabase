@@ -71,7 +71,7 @@ public class WhereClauseParser implements SelectVisitor, ExpressionVisitor
     @Override
     public void visit(OrExpression orExpression)
     {
-        Logger.global().print(orExpression.getClass().getSimpleName() + "  " + orExpression);
+        //Logger.global().print(orExpression.getClass().getSimpleName() + "  " + orExpression);
         var cond = new ConditionalParser(orExpression);
         this.conditionals.add(cond);
         orExpression.getLeftExpression().accept(this);
