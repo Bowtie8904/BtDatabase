@@ -1,7 +1,6 @@
 package bt.db.filter.parse;
 
 import bt.db.exc.UnsupportedSqlException;
-import bt.log.Logger;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.arithmetic.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
@@ -51,7 +50,7 @@ public class FunctionParser implements ExpressionVisitor, ItemsListVisitor
 
     public void handle(Expression e)
     {
-        Logger.global().print(e.getClass().getSimpleName());
+        //Logger.global().print(e.getClass().getSimpleName());
     }
 
     /**

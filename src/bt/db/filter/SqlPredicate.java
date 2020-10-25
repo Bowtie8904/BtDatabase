@@ -49,15 +49,6 @@ public abstract class SqlPredicate<T> implements Predicate<T>
         {
             compileLikePattern();
         }
-        print(field != null ? field : new Object(), operation != null ? operation : "", value != null ? value : new Object(), value2 != null ? value2 : new Object());
-    }
-
-    private void print(Object field, String operation, Object value, Object value2)
-    {
-        System.out.println(field + "(" + field.getClass().getName() + ")  "
-                                   + operation + "(" + operation.getClass().getName() + ")  "
-                                   + value + "(" + value.getClass().getName() + ")  "
-                                   + value2 + "(" + value2.getClass().getName() + ")  ");
     }
 
     public SqlPredicate(boolean defaultValue)

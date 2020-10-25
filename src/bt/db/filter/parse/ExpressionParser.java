@@ -3,7 +3,6 @@ package bt.db.filter.parse;
 import bt.db.exc.UnsupportedSqlException;
 import bt.db.filter.SqlPredicate;
 import bt.db.filter.SqlPredicateBuilder;
-import bt.log.Logger;
 import bt.utils.NumberUtils;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.arithmetic.*;
@@ -22,6 +21,8 @@ import java.util.List;
 import java.util.function.Predicate;
 
 /**
+ * The type Expression parser.
+ *
  * @author &#8904
  */
 public class ExpressionParser implements ExpressionVisitor, ItemsListVisitor
@@ -33,6 +34,12 @@ public class ExpressionParser implements ExpressionVisitor, ItemsListVisitor
     private boolean not;
     private String appliedValueFunction;
 
+    /**
+     * Instantiates a new Expression parser.
+     *
+     * @param keyword    the keyword
+     * @param expression the expression
+     */
     public ExpressionParser(String keyword, Expression expression)
     {
         this.keyword = keyword;
@@ -40,6 +47,9 @@ public class ExpressionParser implements ExpressionVisitor, ItemsListVisitor
         prepare();
     }
 
+    /**
+     * Prepare.
+     */
     public void prepare()
     {
         if (this.expression != null)
@@ -49,11 +59,27 @@ public class ExpressionParser implements ExpressionVisitor, ItemsListVisitor
         }
     }
 
+    /**
+     * Gets applied value function.
+     *
+     * @return the applied value function
+     */
     public String getAppliedValueFunction()
     {
         return this.appliedValueFunction;
     }
 
+    /**
+     * Gets predicate.
+     *
+     * @param <T>           the type parameter
+     * @param <K>           the type parameter
+     * @param predicateType the predicate type
+     * @return the predicate
+     * @throws InstantiationException    the instantiation exception
+     * @throws NoSuchMethodException     the no such method exception
+     * @throws InvocationTargetException the invocation target exception
+     */
     public <T extends SqlPredicate<K>, K> Predicate<K> getPredicate(Class<T> predicateType) throws InstantiationException, NoSuchMethodException, InvocationTargetException
     {
         Predicate<K> clause = null;
@@ -222,12 +248,19 @@ public class ExpressionParser implements ExpressionVisitor, ItemsListVisitor
         return clause;
     }
 
+    /**
+     * Gets values.
+     *
+     * @return the values
+     */
     public List<Object> getValues()
     {
         return this.values;
     }
 
     /**
+     * Gets keyword.
+     *
      * @return the keyword
      */
     public String getKeyword()
@@ -236,6 +269,8 @@ public class ExpressionParser implements ExpressionVisitor, ItemsListVisitor
     }
 
     /**
+     * Sets keyword.
+     *
      * @param keyword the keyword to set
      */
     public void setKeyword(String keyword)
@@ -243,17 +278,29 @@ public class ExpressionParser implements ExpressionVisitor, ItemsListVisitor
         this.keyword = keyword;
     }
 
+    /**
+     * Gets column.
+     *
+     * @return the column
+     */
     public Object getColumn()
     {
         return this.column;
     }
 
+    /**
+     * Sets column.
+     *
+     * @param column the column
+     */
     public void setColumn(Object column)
     {
         this.column = column;
     }
 
     /**
+     * Gets expression.
+     *
      * @return the expression
      */
     public Expression getExpression()
@@ -262,6 +309,8 @@ public class ExpressionParser implements ExpressionVisitor, ItemsListVisitor
     }
 
     /**
+     * Sets expression.
+     *
      * @param expression the expression to set
      */
     public void setExpression(Expression expression)
@@ -269,9 +318,14 @@ public class ExpressionParser implements ExpressionVisitor, ItemsListVisitor
         this.expression = expression;
     }
 
+    /**
+     * Handle.
+     *
+     * @param e the e
+     */
     public void handle(Expression e)
     {
-        Logger.global().print(e.getClass().getSimpleName());
+        // Logger.global().print(e.getClass().getSimpleName());
     }
 
     /**

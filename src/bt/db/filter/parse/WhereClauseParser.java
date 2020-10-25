@@ -47,7 +47,7 @@ public class WhereClauseParser implements SelectVisitor, ExpressionVisitor
 
     public void handleExpression(Expression e)
     {
-        Logger.global().print(e.getClass().getSimpleName() + "  " + e);
+        //Logger.global().print(e.getClass().getSimpleName() + "  " + e);
         var cond = new ConditionalParser(ConditionalClause.AND);
         cond.addExpression(new ExpressionParser(ConditionalClause.AND, e));
         this.conditionals.add(cond);
@@ -59,7 +59,7 @@ public class WhereClauseParser implements SelectVisitor, ExpressionVisitor
     @Override
     public void visit(AndExpression andExpression)
     {
-        Logger.global().print(andExpression.getClass().getSimpleName() + "  " + andExpression);
+        //Logger.global().print(andExpression.getClass().getSimpleName() + "  " + andExpression);
         var cond = new ConditionalParser(andExpression);
         this.conditionals.add(cond);
         andExpression.getLeftExpression().accept(this);
@@ -92,7 +92,7 @@ public class WhereClauseParser implements SelectVisitor, ExpressionVisitor
     @Override
     public void visit(PlainSelect plainSelect)
     {
-        Logger.global().print(plainSelect);
+        //Logger.global().print(plainSelect);
         if (plainSelect.getWhere() != null)
         {
             plainSelect.getWhere().accept(this);

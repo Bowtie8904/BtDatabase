@@ -1,7 +1,6 @@
 package bt.db.filter.parse;
 
 import bt.db.statement.clause.condition.ConditionalClause;
-import bt.log.Logger;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.arithmetic.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
@@ -65,7 +64,7 @@ public class ConditionalParser implements ExpressionVisitor
 
     public void handleExpression(Expression e)
     {
-        Logger.global().print(e.getClass().getSimpleName() + "  " + e);
+        //Logger.global().print(e.getClass().getSimpleName() + "  " + e);
         addExpression(new ExpressionParser(this.lastKeyword, e));
     }
 
@@ -75,7 +74,7 @@ public class ConditionalParser implements ExpressionVisitor
     @Override
     public void visit(AndExpression andExpression)
     {
-        Logger.global().print(andExpression.getClass().getSimpleName() + "  " + andExpression);
+        //Logger.global().print(andExpression.getClass().getSimpleName() + "  " + andExpression);
         this.lastKeyword = ConditionalClause.AND;
         andExpression.getLeftExpression().accept(this);
         andExpression.getRightExpression().accept(this);
@@ -87,7 +86,7 @@ public class ConditionalParser implements ExpressionVisitor
     @Override
     public void visit(OrExpression orExpression)
     {
-        Logger.global().print(orExpression.getClass().getSimpleName() + "  " + orExpression);
+        // Logger.global().print(orExpression.getClass().getSimpleName() + "  " + orExpression);
         this.lastKeyword = ConditionalClause.OR;
         orExpression.getLeftExpression().accept(this);
         orExpression.getRightExpression().accept(this);
