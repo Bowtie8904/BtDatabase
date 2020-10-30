@@ -3,6 +3,7 @@ package bt.db.statement.result;
 import bt.console.output.ConsoleTable;
 import bt.db.constants.SqlType;
 import bt.log.Logger;
+import bt.reflect.classes.Classes;
 
 import java.io.Serializable;
 import java.sql.ResultSet;
@@ -424,6 +425,17 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
         return this.defaultFormat;
     }
 
+    /**
+     * This method applies each row of this resultset to the given function.
+     *
+     * <p>
+     * The return values of each function call will be added to a list and returned as such.
+     * </p>
+     *
+     * @param mapFunction
+     * @param <T>
+     * @return The list of function results.
+     */
     public <T> List<T> map(Function<SqlResult, T> mapFunction)
     {
         List<T> list = new ArrayList<>(size());
@@ -431,6 +443,54 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
         for (var result : this.results)
         {
             list.add(mapFunction.apply(result));
+        }
+
+        return list;
+    }
+
+    /**
+     * Attempts to create a new instance of the given class for each row in this resultset.
+     * This method will then use the {@link SqlResult#applyValues(Object)} method to apply
+     * the values from the resultset to the instances fields.
+     *
+     * <p>
+     * Note that only works with
+     * <ul>
+     *     <li>normal classes</li>
+     *     <li>anonymous classes in a static context</li>
+     *     <li>static nested classes</li>
+     * </ul>
+     * </p>
+     *
+     * @param mappingClass
+     * @param <T>
+     * @return A list containing all created instances.
+     */
+    public <T> List<T> map(Class<T> mappingClass)
+    {
+        List<T> list = new ArrayList<>(size());
+
+        for (var result : this.results)
+        {
+            T obj = Classes.newInstance(mappingClass);
+
+            if (obj != null)
+            {
+                list.add(obj);
+
+                try
+                {
+                    result.applyValues(obj);
+                }
+                catch (IllegalAccessException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            else
+            {
+                throw new IllegalArgumentException("Given class offers no valid no argument constructor.");
+            }
         }
 
         return list;
