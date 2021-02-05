@@ -42,22 +42,22 @@
         <dependency>
             <groupId>com.github.Bowtie8904</groupId>
             <artifactId>BtCommons</artifactId>
-            <version>master-SNAPSHOT</version>
+            <version>11ead9cbc6</version>
         </dependency>
         <dependency>
             <groupId>com.github.Bowtie8904</groupId>
             <artifactId>BtRemote</artifactId>
-            <version>master-SNAPSHOT</version>
+            <version>f467058666</version>
         </dependency>
         <dependency>
             <groupId>com.github.Bowtie8904</groupId>
             <artifactId>BtConsole</artifactId>
-            <version>master-SNAPSHOT</version>
+            <version>9d0c522d9e</version>
         </dependency>
         <dependency>
             <groupId>com.github.Bowtie8904</groupId>
             <artifactId>BtReflection</artifactId>
-            <version>master-SNAPSHOT</version>
+            <version>21e4fe990e</version>
         </dependency>
         <dependency>
             <groupId>org.apache.derby</groupId>
