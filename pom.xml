@@ -47,7 +47,7 @@
         <dependency>
             <groupId>com.github.Bowtie8904</groupId>
             <artifactId>BtRemote</artifactId>
-            <version>f467058666</version>
+            <version>3484d35</version>
         </dependency>
         <dependency>
             <groupId>com.github.Bowtie8904</groupId>

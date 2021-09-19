@@ -1,12 +1,5 @@
 package bt.db.server;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.Socket;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 import bt.async.Data;
 import bt.db.DatabaseAccess;
 import bt.db.statement.result.SqlResultSet;
@@ -14,9 +7,15 @@ import bt.remote.socket.Server;
 import bt.remote.socket.ServerClient;
 import bt.remote.socket.data.DataProcessor;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.Socket;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 /**
  * @author &#8904
- *
  */
 public class QueryServer extends Server implements DataProcessor
 {
@@ -36,7 +35,7 @@ public class QueryServer extends Server implements DataProcessor
     protected ServerClient createClient(Socket socket) throws IOException
     {
         ServerClient client = super.createClient(socket);
-        client.setRequestProcessor(this);
+        client.setDataProcessor(this);
 
         System.out.println("New QueryServer connection established to " + client.getHost() + ":" + client.getPort());
 

@@ -16,11 +16,7 @@ public class SqlPredicateBuilder
     /**
      * Creates a default {@link ClassFieldSqlPredicate} by parsing the given SQL select statement.
      *
-     * @param searchCondition A full select statement. Full means that it is not enough to pass the where conditions.
-     *                        The select must be syntactically correct, however it can contain references to non-existend tables.
-     *                        <p>
-     *                        select * from dummy where 1 = 1;
-     *                        </p>
+     * @param searchCondition The condition part of an SQL where condition. This String should contain the text that comes after the where keyword in a select.
      * @return The created predicate.
      * @throws JSQLParserException If the given SQL could not be parsed correctly.
      */
@@ -43,11 +39,7 @@ public class SqlPredicateBuilder
      *
      * @param predicateType   A class reference to the subtype of {@link SqlPredicate} which should be used. The subtype needs
      *                        to implements all constructors of {@link SqlPredicate}.
-     * @param searchCondition A full select statement. Full means that it is not enough to pass the where conditions.
-     *                        The select must be syntactically correct, however it can contain references to non-existend tables.
-     *                        <p>
-     *                        select * from dummy where 1 = 1;
-     *                        </p>
+     * @param searchCondition The condition part of an SQL where condition. This String should contain the text that comes after the where keyword in a select.
      * @param <T>
      * @param <K>
      * @return The created predicate.
@@ -64,7 +56,7 @@ public class SqlPredicateBuilder
             return SqlPredicateBuilder.createInstance(predicateType, new Class[] { boolean.class }, new Object[] { false });
         }
 
-        var conditionals = WhereClauseParser.parse(searchCondition);
+        var conditionals = WhereClauseParser.parse("select * from dual where " + searchCondition);
 
         if (conditionals != null)
         {
