@@ -70,6 +70,15 @@ public class QueryServer extends Server implements DataProcessor
                 this.db.backup(backup);
                 ret = "Created backup under " + backup.getAbsolutePath();
             }
+            else if (incoming.get().toString().trim().toLowerCase().startsWith("info"))
+            {
+                String table = incoming.get().toString().split(" ")[1];
+                ret = this.db.info(table);
+            }
+            else if (incoming.get().toString().trim().equalsIgnoreCase("select * from tables"))
+            {
+                ret = executeSql("select * from sys.systables");
+            }
             else
             {
                 ret = executeSql(incoming.get().toString());
