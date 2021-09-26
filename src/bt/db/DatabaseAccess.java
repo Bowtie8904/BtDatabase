@@ -1176,10 +1176,9 @@ public abstract class DatabaseAccess implements Killable
         ConsoleTable rows = new ConsoleTable(20,
                                              18,
                                              Column.COMMENT_SIZE + 2);
-        rows.setTitle(true,
-                      Array.of("Column",
-                               "Type",
-                               "Comment"));
+        rows.setCenteredTitle(Array.of("Column",
+                                       "Type",
+                                       "Comment"));
 
         for (Tripple<String, String, String> column : columnInfo)
         {
