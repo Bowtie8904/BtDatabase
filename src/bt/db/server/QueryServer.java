@@ -72,8 +72,17 @@ public class QueryServer extends Server implements DataProcessor
             }
             else if (incoming.get().toString().trim().toLowerCase().startsWith("info"))
             {
-                String table = incoming.get().toString().split(" ")[1];
-                ret = this.db.info(table);
+                String[] parts = incoming.get().toString().split(" ");
+
+                if (parts.length < 2)
+                {
+                    ret = "Format: info <tablename>";
+                }
+                else
+                {
+                    String table = parts[1];
+                    ret = this.db.info(table);
+                }
             }
             else if (incoming.get().toString().trim().equalsIgnoreCase("select * from tables"))
             {
