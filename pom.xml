@@ -47,12 +47,12 @@
         <dependency>
             <groupId>com.github.Bowtie8904</groupId>
             <artifactId>BtRemote</artifactId>
-            <version>cf3f0e4</version>
+            <version>137d7d36</version>
         </dependency>
         <dependency>
             <groupId>com.github.Bowtie8904</groupId>
             <artifactId>BtConsole</artifactId>
-            <version>9d0c522d9e</version>
+            <version>c3dc3a82</version>
         </dependency>
         <dependency>
             <groupId>com.github.Bowtie8904</groupId>
