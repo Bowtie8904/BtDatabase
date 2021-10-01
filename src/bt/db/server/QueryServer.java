@@ -97,7 +97,8 @@ public class QueryServer extends Server implements DataProcessor
                                          Sql.column("created"),
                                          Sql.column("updated"))
                                  .from(DatabaseAccess.COLUMN_DATA)
-                                 .where("table_name").equal(table.toUpperCase());
+                                 .where("table_name").equal(table.toUpperCase())
+                                 .execute();
                 }
             }
             else if (incoming.get().toString().trim().equalsIgnoreCase("select * from tables"))
