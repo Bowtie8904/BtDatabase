@@ -102,6 +102,20 @@ public class QueryServer extends Server implements DataProcessor
                                      .from(DatabaseAccess.COLUMN_DATA)
                                      .where("table_name").equal(table.toUpperCase())
                                      .execute();
+
+                        ((SqlResultSet)ret).setColumnSizes(20,
+                                                           20,
+                                                           130,
+                                                           10,
+                                                           10,
+                                                           80,
+                                                           10,
+                                                           10,
+                                                           30,
+                                                           100,
+                                                           100,
+                                                           30,
+                                                           30);
                     }
                     catch (Exception e)
                     {

@@ -425,6 +425,11 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
         return this.defaultFormat;
     }
 
+    public void setColumnSizes(int... columnsizes)
+    {
+        this.defaultFormat = columnsizes;
+    }
+
     /**
      * This method applies each row of this resultset to the given function.
      *
