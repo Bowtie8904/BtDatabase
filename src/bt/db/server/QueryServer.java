@@ -83,22 +83,30 @@ public class QueryServer extends Server implements DataProcessor
                 else
                 {
                     String table = parts[1];
-                    ret = this.db.select(Sql.column("column_name").as("column"),
-                                         Sql.column("data_type").as("type"),
-                                         Sql.column("comment"),
-                                         Sql.column("primary_key").as("is_primary_key"),
-                                         Sql.column("is_identity"),
-                                         Sql.column("generation"),
-                                         Sql.column("not_null"),
-                                         Sql.column("is_unique").as("unique"),
-                                         Sql.column("default_value").as("default"),
-                                         Sql.column("foreign_keys"),
-                                         Sql.column("checks"),
-                                         Sql.column("created"),
-                                         Sql.column("updated"))
-                                 .from(DatabaseAccess.COLUMN_DATA)
-                                 .where("table_name").equal(table.toUpperCase())
-                                 .execute();
+
+                    try
+                    {
+                        ret = this.db.select(Sql.column("column_name"),
+                                             Sql.column("data_type").as("type"),
+                                             Sql.column("comment"),
+                                             Sql.column("primary_key"),
+                                             Sql.column("is_identity"),
+                                             Sql.column("generation"),
+                                             Sql.column("not_null"),
+                                             Sql.column("is_unique"),
+                                             Sql.column("default_value"),
+                                             Sql.column("foreign_keys"),
+                                             Sql.column("checks"),
+                                             Sql.column("created"),
+                                             Sql.column("updated"))
+                                     .from(DatabaseAccess.COLUMN_DATA)
+                                     .where("table_name").equal(table.toUpperCase())
+                                     .execute();
+                    }
+                    catch (Exception e)
+                    {
+                        ret = e;
+                    }
                 }
             }
             else if (incoming.get().toString().trim().equalsIgnoreCase("select * from tables"))

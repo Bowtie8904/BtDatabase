@@ -480,7 +480,7 @@ public abstract class DatabaseAccess implements Killable
      */
     protected void handleException(SQLException e)
     {
-        e.printStackTrace();
+        throw new RuntimeException(e);
     }
 
     /**

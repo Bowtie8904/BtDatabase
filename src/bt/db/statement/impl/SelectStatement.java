@@ -1,14 +1,5 @@
 package bt.db.statement.impl;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.SQLSyntaxErrorException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-
 import bt.db.DatabaseAccess;
 import bt.db.exc.SqlExecutionException;
 import bt.db.statement.SqlModifyStatement;
@@ -24,6 +15,15 @@ import bt.db.statement.value.Preparable;
 import bt.db.statement.value.Value;
 import bt.utils.Null;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.SQLSyntaxErrorException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+
 /**
  * Represents an SQL select statement which can be extended through method chaining.
  *
@@ -31,22 +31,34 @@ import bt.utils.Null;
  */
 public class SelectStatement extends SqlStatement<SelectStatement> implements Preparable
 {
-    /** Executed if the select returned less rows than specified. */
+    /**
+     * Executed if the select returned less rows than specified.
+     */
     private BiFunction<Integer, SqlResultSet, SqlResultSet> onLessThan;
 
-    /** Executed if the select returned more rows than specified. */
+    /**
+     * Executed if the select returned more rows than specified.
+     */
     private BiFunction<Integer, SqlResultSet, SqlResultSet> onMoreThan;
 
-    /** A defined method that is called if the statement execution finishes successfully. */
+    /**
+     * A defined method that is called if the statement execution finishes successfully.
+     */
     protected BiConsumer<SelectStatement, SqlResultSet> onSuccess;
 
-    /** A defined function that is called if the statement execution fails for any reason. */
+    /**
+     * A defined function that is called if the statement execution fails for any reason.
+     */
     protected BiFunction<SelectStatement, SqlExecutionException, SqlResultSet> onFail;
 
-    /** Threshhold for {@link #onLessThan} */
+    /**
+     * Threshhold for {@link #onLessThan}
+     */
     private int lowerThreshhold;
 
-    /** Threshhold for {@link #onMoreThan} */
+    /**
+     * Threshhold for {@link #onMoreThan}
+     */
     private int higherThreshhold;
 
     /**
@@ -55,39 +67,54 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      */
     private String lastConditionalType = ConditionalClause.WHERE;
 
-    /** The order by clause used by this select. */
+    /**
+     * The order by clause used by this select.
+     */
     private OrderByClause orderBy;
 
-    /** The column names by which this selects result should be grouped. */
+    /**
+     * The column names by which this selects result should be grouped.
+     */
     private String[] groupBy;
 
-    /** Indicates how many rows from the first should be returned. -1 = all rows. */
+    /**
+     * Indicates how many rows from the first should be returned. -1 = all rows.
+     */
     private int first = -1;
 
-    /** Indicates how many rows should be skipped from the top of the result set. */
+    /**
+     * Indicates how many rows should be skipped from the top of the result set.
+     */
     private int offset = -1;
 
-    /** Contains all joins used in this statement. */
+    /**
+     * Contains all joins used in this statement.
+     */
     private List<JoinClause> joins;
 
-    /** Indictaes that * is selected. */
+    /**
+     * Indictaes that * is selected.
+     */
     private boolean selectAll;
 
-    /** Holds all used chain clauses. */
+    /**
+     * Holds all used chain clauses.
+     */
     private List<ChainClause> chains;
 
     private List<SelectStatement> subSelects;
 
     private List<FromClause> fromClauses;
 
-    /** The object that is used for SELECT INTO clauses. */
+    /**
+     * The object that is used for SELECT INTO clauses.
+     */
     private Object intoObject;
 
     /**
      * Creates a new instance which selects all columns (*) and will log an error message if no rows are returned.
      *
-     * @param db
-     *            The database that should be used for the statement.
+     * @param db The database that should be used for the statement.
      */
     public SelectStatement(DatabaseAccess db)
     {
@@ -97,10 +124,8 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
     /**
      * Creates a new instance which selects the given columns and will log an error message if no rows are returned.
      *
-     * @param db
-     *            The database that should be used for the statement.
-     * @param columns
-     *            All columns that should be selected.
+     * @param db      The database that should be used for the statement.
+     * @param columns All columns that should be selected.
      */
     public SelectStatement(DatabaseAccess db, String... columns)
     {
@@ -246,8 +271,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
     /**
      * Defines the tables to select from.
      *
-     * @param tables
-     *            The tables to select from.
+     * @param tables The tables to select from.
      * @return This instance for chaining.
      */
     public SelectStatement from(Object table)
@@ -270,8 +294,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
     /**
      * Creates a join with the given table.
      *
-     * @param table
-     *            The table to join with.
+     * @param table The table to join with.
      * @return The created JoinClause.
      */
     public JoinClause join(String table)
@@ -298,8 +321,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
     /**
      * Creates a new where conditional clause using the given column for this statement.
      *
-     * @param column
-     *            The column to use in this condition.
+     * @param column The column to use in this condition.
      * @return The created ConditionalClause.
      */
     public ConditionalClause<SelectStatement> where(String column)
@@ -315,10 +337,8 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
     /**
      * Creates a new where conditional clause using the given column for this statement.
      *
-     * @param column
-     *            The column to use in this condition.
-     * @param prefix
-     *            A String that will be put in front of the expression. Can be used for parenthesis.
+     * @param column The column to use in this condition.
+     * @param prefix A String that will be put in front of the expression. Can be used for parenthesis.
      * @return The created ConditionalClause.
      */
     public ConditionalClause<SelectStatement> where(String prefix, String column)
@@ -336,8 +356,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * Creates a new conditional clause to chain with an existing where or having clause using the given column for this
      * statement.
      *
-     * @param column
-     *            The column to use in this condition.
+     * @param column The column to use in this condition.
      * @return The created ConditionalClause.
      */
     public ConditionalClause<SelectStatement> and(String column)
@@ -362,10 +381,8 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * Creates a new conditional clause to chain with an existing where or having clause using the given column for this
      * statement.
      *
-     * @param column
-     *            The column to use in this condition.
-     * @param prefix
-     *            A String that will be put in front of the expression. Can be used for parenthesis.
+     * @param column The column to use in this condition.
+     * @param prefix A String that will be put in front of the expression. Can be used for parenthesis.
      * @return The created ConditionalClause.
      */
     public ConditionalClause<SelectStatement> and(String prefix, String column)
@@ -391,8 +408,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * Creates a new conditional clause to chain with an existing where or having clause using the given column for this
      * statement.
      *
-     * @param column
-     *            The column to use in this condition.
+     * @param column The column to use in this condition.
      * @return The created ConditionalClause.
      */
     public ConditionalClause<SelectStatement> or(String column)
@@ -417,10 +433,8 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * Creates a new conditional clause to chain with an existing where or having clause using the given column for this
      * statement.
      *
-     * @param column
-     *            The column to use in this condition.
-     * @param prefix
-     *            A String that will be put in front of the expression. Can be used for parenthesis.
+     * @param column The column to use in this condition.
+     * @param prefix A String that will be put in front of the expression. Can be used for parenthesis.
      * @return The created ConditionalClause.
      */
     public ConditionalClause<SelectStatement> or(String prefix, String column)
@@ -446,8 +460,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * Creates a new join conditional clause to chain with an existing (join) on clause using the given column for this
      * statement.
      *
-     * @param column
-     *            The column to use in this condition.
+     * @param column The column to use in this condition.
      * @return The created JoinConditionalClause.
      */
     public ConditionalClause<SelectStatement> andOn(String column)
@@ -466,8 +479,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * Creates a new join conditional clause to chain with an existing (join) on clause using the given column for this
      * statement.
      *
-     * @param column
-     *            The column to use in this condition.
+     * @param column The column to use in this condition.
      * @return The created JoinConditionalClause.
      */
     public ConditionalClause<SelectStatement> orOn(String column)
@@ -483,11 +495,10 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
 
     /**
      * Creates a new having conditional clause using the given column for this statement.
-     *
+     * <p>
      * A group by expression must be before this call.
      *
-     * @param column
-     *            The column to use in this condition.
+     * @param column The column to use in this condition.
      * @return The created ConditionalClause.
      */
     public ConditionalClause<SelectStatement> having(String column)
@@ -516,8 +527,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
     /**
      * Defines the columns to order the result by.
      *
-     * @param columns
-     *            The columns to order by.
+     * @param columns The columns to order by.
      * @return The created OrderByClause.
      */
     public OrderByClause orderBy(String... columns)
@@ -531,8 +541,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
     /**
      * Defines the column to order the result by.
      *
-     * @param column
-     *            The number of the column.
+     * @param column The number of the column.
      * @return The created OrderByClause.
      */
     public OrderByClause orderBy(int column)
@@ -562,8 +571,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * If an {@link #offset(int) offset} was defined then the first <i>n</i> rows starting from the offset are returned.
      * </p>
      *
-     * @param n
-     *            The number of rows to return.
+     * @param n The number of rows to return.
      * @return This instance for chaining.
      */
     public SelectStatement first(int n)
@@ -579,8 +587,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * <i> n <= 0 </i> means all rows will be returned.
      * </p>
      *
-     * @param n
-     *            The offest, number of rows to skip.
+     * @param n The offest, number of rows to skip.
      * @return This instance for chaining.
      */
     public SelectStatement offset(int n)
@@ -592,8 +599,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
     /**
      * Defines the columns to group by.
      *
-     * @param columns
-     *            The columns to group by.
+     * @param columns The columns to group by.
      * @return This instance for chaining.
      */
     public SelectStatement groupBy(String... columns)
@@ -609,8 +615,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * The first parameter (SelectStatement) will be this statement instance, the second one is the resultset.
      * </p>
      *
-     * @param onSuccess
-     *            The function to execute.
+     * @param onSuccess The function to execute.
      * @return This instance for chaining.
      */
     public SelectStatement onSuccess(BiConsumer<SelectStatement, SqlResultSet> onSuccess)
@@ -623,10 +628,8 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * Defines a select statement which will be executed (and whichs resultset will be returned by {@link #execute()})
      * if the original select returned less rows than the given lower threshhold.
      *
-     * @param lowerThreshhold
-     *            The threshhold to check.
-     * @param statement
-     *            The statement to execute.
+     * @param lowerThreshhold The threshhold to check.
+     * @param statement       The statement to execute.
      * @return This instance for chaining.
      */
     public SelectStatement onLessThan(int lowerThreshhold, SelectStatement statement)
@@ -643,10 +646,8 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * Defines a data modifying statement (insert, update, delete) to execute if the original select returned less rows
      * than the given lower threshhold.
      *
-     * @param lowerThreshhold
-     *            The threshhold to check.
-     * @param statement
-     *            The statement to execute.
+     * @param lowerThreshhold The threshhold to check.
+     * @param statement       The statement to execute.
      * @return This instance for chaining.
      */
     public SelectStatement onLessThan(int lowerThreshhold, SqlModifyStatement statement)
@@ -669,10 +670,8 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * original select. The return value (SqlResultSet) will be returned by this instances {@link #execute()}.
      * </p>
      *
-     * @param lowerThreshhold
-     *            The threshhold to check.
-     * @param onLessThan
-     *            The BiFunction to execute.
+     * @param lowerThreshhold The threshhold to check.
+     * @param onLessThan      The BiFunction to execute.
      * @return This instance for chaining.
      */
     public SelectStatement onLessThan(int lowerThreshhold, BiFunction<Integer, SqlResultSet, SqlResultSet> onLessThan)
@@ -686,10 +685,8 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * Defines a select statement which will be executed (and whichs resultset will be returned by {@link #execute()})
      * if the original select returned more rows than the given higher threshhold.
      *
-     * @param higherThreshhold
-     *            The threshhold to check.
-     * @param statement
-     *            The statement to execute.
+     * @param higherThreshhold The threshhold to check.
+     * @param statement        The statement to execute.
      * @return This instance for chaining.
      */
     public SelectStatement onMoreThan(int higherThreshhold, SelectStatement statement)
@@ -706,10 +703,8 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * Defines a data modifying statement (insert, update, delete) to execute if the original select returned more rows
      * than the given higher threshhold.
      *
-     * @param higherThreshhold
-     *            The threshhold to check.
-     * @param statement
-     *            The statement to execute.
+     * @param higherThreshhold The threshhold to check.
+     * @param statement        The statement to execute.
      * @return This instance for chaining.
      */
     public SelectStatement onMoreThan(int higherThreshhold, SqlModifyStatement statement)
@@ -732,10 +727,8 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * original select. The return value (SqlResultSet) will be returned by this instances {@link #execute()}.
      * </p>
      *
-     * @param higherThreshhold
-     *            The threshhold to check.
-     * @param onLessThan
-     *            The BiFunction to execute.
+     * @param higherThreshhold The threshhold to check.
+     * @param onLessThan       The BiFunction to execute.
      * @return This instance for chaining.
      */
     public SelectStatement onMoreThan(int higherThreshhold, BiFunction<Integer, SqlResultSet, SqlResultSet> onMoreThan)
@@ -752,8 +745,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * This method is called automatically and should not be used during the actual creation of a select statement.
      * </p>
      *
-     * @param type
-     *            The conditional type (where, having, on, ...).
+     * @param type The conditional type (where, having, on, ...).
      */
     public void setLastConditionalType(String type)
     {
@@ -764,8 +756,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * Defines a SelectStatement which will be executed and whichs SqlResultSet will be returned if there was an error
      * during the execution of the original select.
      *
-     * @param onFail
-     *            The SelectStatement to execute instead.
+     * @param onFail The SelectStatement to execute instead.
      * @return This instance for chaining.
      */
     public SelectStatement onFail(SelectStatement onFail)
@@ -787,8 +778,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * {@link #execute()}.
      * </p>
      *
-     * @param onFail
-     *            The BiFunction to execute.
+     * @param onFail The BiFunction to execute.
      * @return This instance for chaining.
      */
     public SelectStatement onFail(BiFunction<SelectStatement, SqlExecutionException, SqlResultSet> onFail)
@@ -835,8 +825,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * The SqlResultSet of this select will contain all rows out of all unioned selects.
      * </p>
      *
-     * @param select
-     *            The select to append to this one.
+     * @param select The select to append to this one.
      * @return This instance for chaining.
      */
     public SelectStatement unionAll(SelectStatement select)
@@ -857,8 +846,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * The SqlResultSet of this select will only contain unique rows out of all unioned selects.
      * </p>
      *
-     * @param select
-     *            The select to append to this one.
+     * @param select The select to append to this one.
      * @return This instance for chaining.
      */
     public SelectStatement union(SelectStatement select)
@@ -879,8 +867,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * The SqlResultSet of this select will contain all rows that occur in both selects.
      * </p>
      *
-     * @param select
-     *            The select to append to this one.
+     * @param select The select to append to this one.
      * @return This instance for chaining.
      */
     public SelectStatement intersectAll(SelectStatement select)
@@ -901,8 +888,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * The SqlResultSet of this select will only contain unique rows that occur in both selects.
      * </p>
      *
-     * @param select
-     *            The select to append to this one.
+     * @param select The select to append to this one.
      * @return This instance for chaining.
      */
     public SelectStatement intersect(SelectStatement select)
@@ -923,8 +909,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * The SqlResultSet of this select will contain all rows that occur only in this select and not in the given one.
      * </p>
      *
-     * @param select
-     *            The select to append to this one.
+     * @param select The select to append to this one.
      * @return This instance for chaining.
      */
     public SelectStatement exceptAll(SelectStatement select)
@@ -946,8 +931,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * one.
      * </p>
      *
-     * @param select
-     *            The select to append to this one.
+     * @param select The select to append to this one.
      * @return This instance for chaining.
      */
     public SelectStatement except(SelectStatement select)
@@ -960,10 +944,8 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
     /**
      * Creates a new UnionClause and adds it to the list.
      *
-     * @param unionType
-     *            {@link ChainClause#UNION} or {@link ChainClause#UNION_ALL}.
-     * @param select
-     *            The select to append.
+     * @param unionType {@link ChainClause#UNION} or {@link ChainClause#UNION_ALL}.
+     * @param select    The select to append.
      */
     private void createChain(String chainType, SelectStatement select)
     {
@@ -991,14 +973,14 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * Executes the select and returns the resultset. Depending on the number of rows returned, the defined onLessThan
      * or onMoreThan might be executed. If there is an error during this execution, the onFail function is called.
      *
-     * @param printLogs
-     *            true if information such as the full statement and paramaters should be printed.
+     * @param printLogs true if information such as the full statement and paramaters should be printed.
      * @return The result.
      */
     public SqlResultSet execute(boolean printLogs)
     {
         startExecutionTime();
         String sql = toString();
+        System.out.println(sql);
         SqlResultSet result = null;
 
         try (PreparedStatement statement = this.db.getConnection()
@@ -1025,7 +1007,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
 
                 Value val = null;
 
-                for (int j = 0; j < values.size(); j ++ )
+                for (int j = 0; j < values.size(); j++)
                 {
                     val = values.get(j);
                     log("p" + (j + 1) + " [" + val.getType().toString() + "] = " + val.getValue(), printLogs);
@@ -1139,7 +1121,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
 
                 Value val = null;
 
-                for (int j = 0; j < values.size(); j ++ )
+                for (int j = 0; j < values.size(); j++)
                 {
                     val = values.get(j);
                     log("p" + (j + 1) + " [" + val.getType().toString() + "] = " + val.getValue(), printLogs);
