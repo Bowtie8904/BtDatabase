@@ -1,6 +1,7 @@
 package bt.db.server;
 
 import bt.async.Data;
+import bt.console.output.styled.Style;
 import bt.db.DatabaseAccess;
 import bt.db.statement.result.SqlResultSet;
 import bt.remote.socket.Server;
@@ -57,18 +58,18 @@ public class QueryServer extends Server implements DataProcessor
             if (incoming.get().toString().trim().equalsIgnoreCase("commit"))
             {
                 this.db.commit();
-                ret = "Comitted transaction.";
+                ret = Style.apply("Comitted transaction.", "lime");
             }
             else if (incoming.get().toString().trim().equalsIgnoreCase("rollback"))
             {
                 this.db.rollback();
-                ret = "Rolled transaction back.";
+                ret = Style.apply("Rolled transaction back.", "lime");
             }
             else if (incoming.get().toString().trim().equalsIgnoreCase("backup"))
             {
                 File backup = new File("./backup/" + System.currentTimeMillis());
                 this.db.backup(backup);
-                ret = "Created backup under " + backup.getAbsolutePath();
+                ret = Style.apply("Created backup under " + backup.getAbsolutePath(), "lime");
             }
             else if (incoming.get().toString().trim().toLowerCase().startsWith("info"))
             {
@@ -76,7 +77,7 @@ public class QueryServer extends Server implements DataProcessor
 
                 if (parts.length < 2)
                 {
-                    ret = "Format: info <tablename>";
+                    ret = Style.apply("Format: info <tablename>", "red", "bold");
                 }
                 else
                 {
@@ -112,11 +113,11 @@ public class QueryServer extends Server implements DataProcessor
             }
             else if (updateCount >= 0)
             {
-                ret = "Updated " + updateCount + " rows.";
+                ret = Style.apply("Updated " + updateCount + " rows.", "lime");
             }
             else
             {
-                ret = "Executed successfully.";
+                ret = Style.apply("Executed successfully.", "lime");
             }
         }
         catch (SQLException e)

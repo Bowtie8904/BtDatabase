@@ -547,6 +547,11 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
      */
     public String toString(int... columnFormat)
     {
+        return toString(new String[0], new String[0], columnFormat);
+    }
+
+    public String toString(String[] separatorStyles, String[] dataStyles, int... columnFormat)
+    {
         ConsoleTable consoleRows;
 
         if (columnFormat.length == 1)
@@ -565,6 +570,8 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
             consoleRows = new ConsoleTable(columnFormat);
         }
 
+        consoleRows.setDataStyles(dataStyles);
+        consoleRows.setTableLineStyles(separatorStyles);
         consoleRows.setCenteredTitle(this.colOrder.toArray(new Object[] {}));
 
         for (SqlResult result : this.results)
