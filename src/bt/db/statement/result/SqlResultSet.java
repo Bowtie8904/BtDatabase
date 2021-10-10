@@ -487,6 +487,7 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
     public String toString(String[] separatorStyles, String[] dataStyles)
     {
         ConsoleTable table = new ConsoleTable();
+        table.setMultiline(true);
         table.setDefaultHeaderStyles(dataStyles);
         table.setDefaultValueStyles(dataStyles);
         table.setSeparatorStyles(separatorStyles);
