@@ -1,6 +1,7 @@
 package bt.db.statement.result;
 
 import bt.console.output.table.ConsoleTable;
+import bt.console.output.table.render.Alignment;
 import bt.db.constants.SqlType;
 import bt.log.Logger;
 import bt.reflect.classes.Classes;
@@ -494,7 +495,23 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
 
         for (String colName : this.colOrder)
         {
-            table.addColumn(colName);
+            var col = table.addColumn(colName);
+
+            SqlType type = SqlType.convert(this.valueTypes.get(colName));
+
+            if (type == SqlType.BOOLEAN)
+            {
+                col.setValueAlignment(Alignment.CENTER);
+            }
+            else if (List.of(SqlType.INTEGER, SqlType.LONG,
+                             SqlType.FLOAT, SqlType.DOUBLE).contains(type))
+            {
+                col.setValueAlignment(Alignment.RIGHT);
+            }
+            else
+            {
+                col.setValueAlignment(Alignment.LEFT);
+            }
         }
 
         for (SqlResult result : this.results)
