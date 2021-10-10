@@ -1,5 +1,8 @@
 package bt.db.statement.result;
 
+import bt.log.Logger;
+import bt.types.UncheckedCloseable;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -9,12 +12,8 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import bt.log.Logger;
-import bt.types.UncheckedCloseable;
-
 /**
  * @author &#8904
- *
  */
 public class StreamableResultSet extends AbstractSpliterator<ResultSet> implements UncheckedCloseable
 {
@@ -79,27 +78,6 @@ public class StreamableResultSet extends AbstractSpliterator<ResultSet> implemen
         }
 
         return this.printableResultSet;
-    }
-
-    /**
-     * Prints a formatted table of the result.
-     *
-     * <p>
-     * The given values define the widths of the columns.
-     * </p>
-     *
-     * <p>
-     * <b>NOTE</b> that this operation invalidates the stream meaning that it can not be traversed again.
-     * </p>
-     *
-     * @param columnFormat
-     *            If only one number is given, all columns will have the same width. If more than one value is given,
-     *            there needs to be the same amount of numbers as there is columns.
-     */
-    public StreamableResultSet print(int... columnFormat)
-    {
-        getPrintableResultSet().print(columnFormat);
-        return this;
     }
 
     /**

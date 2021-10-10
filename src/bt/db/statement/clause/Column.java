@@ -1,8 +1,5 @@
 package bt.db.statement.clause;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import bt.db.DatabaseAccess;
 import bt.db.constants.Generated;
 import bt.db.constants.Index;
@@ -12,6 +9,9 @@ import bt.db.statement.clause.foreign.ColumnForeignKey;
 import bt.db.statement.clause.foreign.ForeignKey;
 import bt.db.statement.impl.CreateStatement;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Represents a column in a CREATE statement.
  *
@@ -19,25 +19,39 @@ import bt.db.statement.impl.CreateStatement;
  */
 public class Column
 {
-    /** The maximum size of a column comment. */
+    /**
+     * The maximum size of a column comment.
+     */
     public static final int COMMENT_SIZE = 120;
 
-    /** The statement that created this column. */
+    /**
+     * The statement that created this column.
+     */
     private CreateStatement statement;
 
-    /** The sql value type of this column. */
+    /**
+     * The sql value type of this column.
+     */
     private SqlType type;
 
-    /** The name of this column. */
+    /**
+     * The name of this column.
+     */
     private String name;
 
-    /** Indicates whether this column contains a primary key. true = primary key, false = not a primary key. */
+    /**
+     * Indicates whether this column contains a primary key. true = primary key, false = not a primary key.
+     */
     private boolean primaryKey;
 
-    /** Defines the generate behavior. */
+    /**
+     * Defines the generate behavior.
+     */
     private GenerationClause generated;
 
-    /** The pameters to create an index for this column. */
+    /**
+     * The pameters to create an index for this column.
+     */
     private Index[] indexParams = new Index[] {};
 
     private boolean shouldIndex;
@@ -47,7 +61,9 @@ public class Column
      */
     private boolean notNull;
 
-    /** Indicates whether values in this column have to be unique. */
+    /**
+     * Indicates whether values in this column have to be unique.
+     */
     private boolean unique;
 
     /**
@@ -68,13 +84,19 @@ public class Column
      */
     private int[] size = new int[] {};
 
-    /** The comment on this column which will be added to the COLLUMN_COMMENTS table. */
+    /**
+     * The comment on this column which will be added to the COLLUMN_COMMENTS table.
+     */
     private String comment;
 
-    /** Defined foreign keys for this column. */
+    /**
+     * Defined foreign keys for this column.
+     */
     private List<ColumnForeignKey> foreignKeys;
 
-    /** Defined checks for this column. */
+    /**
+     * Defined checks for this column.
+     */
     private List<Check> checks;
 
     public static Column column(String name, SqlType type)
@@ -85,12 +107,9 @@ public class Column
     /**
      * Creates a new instance and initializes the fields.
      *
-     * @param statement
-     *            The statement that created this column.
-     * @param name
-     *            The name of this column.
-     * @param type
-     *            The sql type of this column.
+     * @param statement The statement that created this column.
+     * @param name      The name of this column.
+     * @param type      The sql type of this column.
      */
     public Column(CreateStatement statement, String name, SqlType type)
     {
@@ -102,10 +121,8 @@ public class Column
     /**
      * Creates a new instance and initializes the fields.
      *
-     * @param name
-     *            The name of this column.
-     * @param type
-     *            The sql type of this column.
+     * @param name The name of this column.
+     * @param type The sql type of this column.
      */
     public Column(String name, SqlType type)
     {
@@ -125,16 +142,15 @@ public class Column
      * If the given String is longer than {@link #COMMENT_SIZE} only a substring (0 - COMMENT_SIZE) will be used.
      * </p>
      *
-     * @param text
-     *            The comment.
+     * @param text The comment.
      * @return This instance for chaining.
      */
     public Column comment(String text)
     {
-        if (text.length() > COMMENT_SIZE)
+        if (text.length() > Column.COMMENT_SIZE)
         {
             text = text.substring(0,
-                                  COMMENT_SIZE);
+                                  Column.COMMENT_SIZE);
         }
 
         this.comment = text;
@@ -162,28 +178,28 @@ public class Column
 
         if (isPrimaryKey())
         {
-            defaultComment += "primary key, ";
+            defaultComment += System.lineSeparator() + "primary key, ";
         }
 
         if (isNotNull())
         {
-            defaultComment += "not null, ";
+            defaultComment += System.lineSeparator() + "not null, ";
         }
 
         if (isUnique())
         {
-            defaultComment += "unique, ";
+            defaultComment += System.lineSeparator() + "unique, ";
         }
 
         if (this.generated != null)
         {
             if (this.generated.getGenerationType() == Generated.ALWAYS)
             {
-                defaultComment += "always ";
+                defaultComment += System.lineSeparator() + "always ";
             }
             else if (this.generated.getGenerationType() == Generated.DEFAULT)
             {
-                defaultComment += "default ";
+                defaultComment += System.lineSeparator() + "default ";
             }
 
             if (isIdentity())
@@ -198,14 +214,14 @@ public class Column
 
         if (getDefaultValue() != null)
         {
-            defaultComment += "default = " + getDefaultValue() + ", ";
+            defaultComment += System.lineSeparator() + "default = " + getDefaultValue() + ", ";
         }
 
         if (this.foreignKeys != null)
         {
             for (ForeignKey fk : this.foreignKeys)
             {
-                defaultComment += "foreign key (" + fk.getName() + "), ";
+                defaultComment += System.lineSeparator() + "foreign key (" + fk.getName() + "), ";
             }
         }
 
@@ -213,7 +229,7 @@ public class Column
         {
             for (Check check : this.checks)
             {
-                defaultComment += "check (" + check.getName() + "), ";
+                defaultComment += System.lineSeparator() + "check (" + check.getName() + "), ";
             }
         }
 
@@ -232,8 +248,7 @@ public class Column
      * This has to be used on VARCHAR columns to limit the length of inserted values.
      * </p>
      *
-     * @param values
-     *            The sizes. For VARCHAR only one size can be given.
+     * @param values The sizes. For VARCHAR only one size can be given.
      * @return This instance for chaining.
      */
     public Column size(int... values)
@@ -376,8 +391,7 @@ public class Column
      * This only has an effect on column marked {@link #asIdentity(Generated)}.
      * </p>
      *
-     * @param n
-     *            The number by which the identity value should be incremented each insert.
+     * @param n The number by which the identity value should be incremented each insert.
      * @return This instance for chaining.
      */
     public Column autoIncrement(int n)
@@ -400,8 +414,7 @@ public class Column
     /**
      * Sets the default value of this column.
      *
-     * @param defaultValue
-     *            The value that should be used if nothing else is specified.
+     * @param defaultValue The value that should be used if nothing else is specified.
      * @return This instance for chaining.
      */
     public Column defaultValue(Object defaultValue)
@@ -685,7 +698,7 @@ public class Column
 
         if (this.unique)
         {
-            sql += ", CONSTRAINT " + this.statement.getName() + "_" + this.name + "_UQ UNIQUE(" + this.name + ")";
+            sql += System.lineSeparator() + ", CONSTRAINT " + this.statement.getName() + "_" + this.name + "_UQ UNIQUE(" + this.name + ")";
         }
 
         return sql;

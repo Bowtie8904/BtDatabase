@@ -1,6 +1,6 @@
 package bt.db.statement.result;
 
-import bt.console.output.ConsoleTable;
+import bt.console.output.table.ConsoleTable;
 import bt.db.constants.SqlType;
 import bt.log.Logger;
 import bt.reflect.classes.Classes;
@@ -27,7 +27,6 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
     private String sql;
     private List<String> values;
     private Map<String, String> valueTypes;
-    private int[] defaultFormat;
 
     /**
      * Creates a new instance.
@@ -44,13 +43,6 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
         this.results = new ArrayList<>();
         this.values = new ArrayList<>();
         this.valueTypes = new HashMap<>();
-
-        this.defaultFormat = new int[this.colOrder.size()];
-
-        for (int i = 0; i < this.defaultFormat.length; i++)
-        {
-            this.defaultFormat[i] = 25;
-        }
     }
 
     /**
@@ -226,7 +218,6 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
 
         ResultSetMetaData meta = set.getMetaData();
         int count = meta.getColumnCount();
-        this.defaultFormat = new int[count];
 
         for (int i = 1; i <= count; i++)
         {
@@ -235,19 +226,6 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
             this.colOrder.add(columnName);
             this.valueTypes.put(columnName,
                                 SqlType.convert(valueType).toString());
-            int width = meta.getColumnDisplaySize(i) + 4 > 50 ? 50 : meta.getColumnDisplaySize(i) + 4;
-
-            if (width < columnName.length() + 2)
-            {
-                width = columnName.length() + 2;
-            }
-
-            if (width < 10)
-            {
-                width = 10;
-            }
-
-            this.defaultFormat[i - 1] = width;
 
             switch (valueType)
             {
@@ -420,16 +398,6 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
         return this;
     }
 
-    public int[] getColumnSizes()
-    {
-        return this.defaultFormat;
-    }
-
-    public void setColumnSizes(int... columnsizes)
-    {
-        this.defaultFormat = columnsizes;
-    }
-
     /**
      * This method applies each row of this resultset to the given function.
      *
@@ -503,88 +471,37 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
 
     /**
      * Prints a formatted table of the result.
-     *
-     * <p>
-     * The given values define the widths of the columns.
-     * </p>
-     *
-     * @param columnFormat If only one number is given, all columns will have the same width. If more than one value is given,
-     *                     there needs to be the same amount of numbers as there is columns.
-     */
-    public SqlResultSet print(int... columnFormat)
-    {
-        if (columnFormat == null)
-        {
-            System.out.println(toString(this.defaultFormat));
-        }
-        else
-        {
-            System.out.println(toString(columnFormat));
-        }
-        return this;
-    }
-
-    /**
-     * Prints a formatted table of the result.
      */
     public SqlResultSet print()
     {
-        System.out.println(toString(this.defaultFormat));
+        System.out.println(this);
         return this;
     }
 
     public SqlResultSet print(Logger log)
     {
-        log.print("\n" + toString(this.defaultFormat));
+        log.print("\n" + this);
         return this;
     }
 
-    /**
-     * Formats a table of the results.
-     *
-     * <p>
-     * The given values define the widths of the columns.
-     * </p>
-     *
-     * @param columnFormat If only one number is given, all columns will have the same width. If more than one value is given,
-     *                     there needs to be the same amount of numbers as there is columns.
-     * @return The formatted table.
-     */
-    public String toString(int... columnFormat)
+    public String toString(String[] separatorStyles, String[] dataStyles)
     {
-        return toString(new String[0], new String[0], columnFormat);
-    }
+        ConsoleTable table = new ConsoleTable();
+        table.setDefaultHeaderStyles(dataStyles);
+        table.setDefaultValueStyles(dataStyles);
+        table.setSeparatorStyles(separatorStyles);
 
-    public String toString(String[] separatorStyles, String[] dataStyles, int... columnFormat)
-    {
-        ConsoleTable consoleRows;
-
-        if (columnFormat.length == 1)
+        for (String colName : this.colOrder)
         {
-            int[] format = new int[this.colOrder.size()];
-
-            for (int i = 0; i < format.length; i++)
-            {
-                format[i] = columnFormat[0];
-            }
-
-            consoleRows = new ConsoleTable(format);
+            table.addColumn(colName);
         }
-        else
-        {
-            consoleRows = new ConsoleTable(columnFormat);
-        }
-
-        consoleRows.setDataStyles(dataStyles);
-        consoleRows.setTableLineStyles(separatorStyles);
-        consoleRows.setCenteredTitle(this.colOrder.toArray(new Object[] {}));
 
         for (SqlResult result : this.results)
         {
-            consoleRows.addCenteredRow(result.getValueArray());
+            table.addRow(result.getValueArray());
         }
 
-        return consoleRows.toString();
+        return table.toString();
     }
 
     /**
@@ -593,7 +510,7 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
     @Override
     public String toString()
     {
-        return toString(this.defaultFormat);
+        return toString(new String[0], new String[0]);
     }
 
     /**

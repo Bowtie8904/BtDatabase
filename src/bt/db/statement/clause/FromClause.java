@@ -1,16 +1,15 @@
 package bt.db.statement.clause;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import bt.db.statement.clause.join.JoinClause;
 import bt.db.statement.impl.SelectStatement;
 import bt.db.statement.value.Preparable;
 import bt.db.statement.value.Value;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author &#8904
- *
  */
 public class FromClause implements Preparable
 {
@@ -91,7 +90,7 @@ public class FromClause implements Preparable
 
         for (JoinClause join : this.joins)
         {
-            sql += " " + join.toString(prepared);
+            sql += System.lineSeparator() + " " + join.toString(prepared);
         }
 
         return sql;

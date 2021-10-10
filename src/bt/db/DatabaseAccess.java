@@ -1,6 +1,5 @@
 package bt.db;
 
-import bt.console.output.ConsoleTable;
 import bt.db.config.DatabaseConfiguration;
 import bt.db.constants.SqlType;
 import bt.db.constants.SqlValue;
@@ -24,18 +23,12 @@ import bt.log.Logger;
 import bt.runtime.InstanceKiller;
 import bt.runtime.evnt.Dispatcher;
 import bt.types.Killable;
-import bt.types.SimpleTripple;
-import bt.types.Tripple;
-import bt.utils.Array;
 import bt.utils.*;
 
 import java.io.*;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Consumer;
 
 /**
@@ -1153,85 +1146,6 @@ public abstract class DatabaseAccess implements Killable
             SqlEntry.init(this,
                           entry);
         }
-    }
-
-    /**
-     * Formats a String table containing information about the columns of the table with the given name.
-     *
-     * <p>
-     * The contained information are:
-     * <ul>
-     * <li>Column name</li>
-     * <li>Data type</li>
-     * <li>Comment</li>
-     * </ul>
-     *
-     * @param table
-     * @return
-     */
-    public String info(String table)
-    {
-        List<Tripple<String, String, String>> columnInfo = columnInfo(table);
-
-        ConsoleTable rows = new ConsoleTable(20,
-                                             18,
-                                             Column.COMMENT_SIZE + 2);
-        rows.setCenteredTitle(Array.of("Column",
-                                       "Type",
-                                       "Comment"));
-
-        for (Tripple<String, String, String> column : columnInfo)
-        {
-            rows.addRow(column.getKey(),
-                        column.getFirstValue(),
-                        column.getSecondValue() == null ? "" : column.getSecondValue());
-        }
-
-        return rows.toString();
-    }
-
-    private List<Tripple<String, String, String>> columnInfo(String table)
-    {
-        List<Entry<String, String>> columnTypes = select()
-                .from(table)
-                .onLessThan(1,
-                            (num, res) ->
-                            {
-                                return res;
-                            })
-                .execute()
-                .getColumnTypes();
-        Map<String, String> typeMap = new HashMap<>();
-
-        for (Entry<String, String> column : columnTypes)
-        {
-            typeMap.put(column.getKey().toUpperCase(),
-                        column.getValue());
-        }
-
-        List<Tripple<String, String, String>> columnInfo = new ArrayList<>();
-
-        SqlResultSet set = select()
-                .from(DatabaseAccess.COLUMN_DATA)
-                .where("table_name")
-                .equal(table.toUpperCase())
-                .onLessThan(1,
-                            (num, res) ->
-                            {
-                                return res;
-                            })
-                .execute();
-
-        for (SqlResult result : set)
-        {
-            String col = result.getString("column_name").toUpperCase();
-            String type = typeMap.get(col);
-            columnInfo.add(new SimpleTripple<>(col,
-                                               type,
-                                               result.getString("comment")));
-        }
-
-        return columnInfo;
     }
 
     /**

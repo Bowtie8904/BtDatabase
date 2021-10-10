@@ -624,7 +624,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                     }
                 }
 
-                sql += col.toString() + ", ";
+                sql += System.lineSeparator() + col + ", ";
             }
 
             sql = sql.substring(0, sql.length() - 2);
@@ -632,14 +632,14 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
             if (primary.length() != 0)
             {
                 primary = primary.substring(0, primary.length() - 2);
-                sql += ", CONSTRAINT " + this.name + "_PK PRIMARY KEY (" + primary + ")";
+                sql += System.lineSeparator() + ", CONSTRAINT " + this.name + "_PK PRIMARY KEY (" + primary + ")";
             }
 
             if (this.checks != null)
             {
                 for (Check check : this.checks)
                 {
-                    sql += ", " + check.toString();
+                    sql += System.lineSeparator() + ", " + check.toString();
                 }
             }
 
@@ -647,7 +647,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
             {
                 for (ForeignKey fk : this.foreignKeys)
                 {
-                    sql += ", " + fk.toString();
+                    sql += System.lineSeparator() + ", " + fk.toString();
                 }
             }
 
@@ -668,11 +668,11 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                 return toString();
             }
 
-            sql += ")";
+            sql += System.lineSeparator() + ")";
         }
         else
         {
-            sql = this.statementKeyword + " " + this.name + " AS " + this.asCopySelect.toString() + " WITH NO DATA";
+            sql = this.statementKeyword + " " + this.name + " AS " + this.asCopySelect + " WITH NO DATA";
         }
 
         return sql;

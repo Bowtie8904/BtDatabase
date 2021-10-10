@@ -1171,7 +1171,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
 
         sql = sql.substring(0, sql.length() - 2);
 
-        sql += " FROM ";
+        sql += System.lineSeparator() + " FROM ";
 
         for (FromClause table : this.fromClauses)
         {
@@ -1182,12 +1182,12 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
 
         for (ConditionalClause<SelectStatement> where : this.whereClauses)
         {
-            sql += " " + where.toString(this.prepared);
+            sql += System.lineSeparator() + " " + where.toString(this.prepared);
         }
 
         if (this.groupBy != null)
         {
-            sql += " GROUP BY ";
+            sql += System.lineSeparator() + " GROUP BY ";
 
             for (String column : this.groupBy)
             {
@@ -1198,7 +1198,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
 
             for (ConditionalClause<SelectStatement> having : this.havingClauses)
             {
-                sql += " " + having.toString(this.prepared);
+                sql += System.lineSeparator() + " " + having.toString(this.prepared);
             }
         }
 
@@ -1206,24 +1206,24 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
         {
             for (ChainClause union : this.chains)
             {
-                sql += " " + union.toString(this.prepared);
+                sql += System.lineSeparator() + " " + union.toString(this.prepared);
             }
         }
 
         if (this.orderBy != null)
         {
-            sql += " " + this.orderBy.toString();
+            sql += System.lineSeparator() + " " + this.orderBy;
         }
 
         if (this.offset > 0)
         {
             if (this.offset == 1)
             {
-                sql += " OFFSET 1 ROW";
+                sql += System.lineSeparator() + " OFFSET 1 ROW";
             }
             else
             {
-                sql += " OFFSET " + this.offset + " ROWS";
+                sql += System.lineSeparator() + " OFFSET " + this.offset + " ROWS";
             }
         }
 
@@ -1231,11 +1231,11 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
         {
             if (this.first == 1)
             {
-                sql += " FETCH FIRST ROW ONLY";
+                sql += System.lineSeparator() + " FETCH FIRST ROW ONLY";
             }
             else
             {
-                sql += " FETCH FIRST " + this.first + " ROWS ONLY";
+                sql += System.lineSeparator() + " FETCH FIRST " + this.first + " ROWS ONLY";
             }
         }
 
