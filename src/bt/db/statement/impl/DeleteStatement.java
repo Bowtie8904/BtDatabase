@@ -1,16 +1,16 @@
 package bt.db.statement.impl;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import bt.db.DatabaseAccess;
 import bt.db.exc.SqlExecutionException;
 import bt.db.statement.SqlModifyStatement;
 import bt.db.statement.clause.condition.ConditionalClause;
 import bt.db.statement.value.Preparable;
 import bt.db.statement.value.Value;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents an SQL delete statement which can be extended through method chaining.
@@ -22,8 +22,7 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
     /**
      * Creates a new instance.
      *
-     * @param db
-     *            The database that should be used for the statement.
+     * @param db The database that should be used for the statement.
      */
     public DeleteStatement(DatabaseAccess db)
     {
@@ -34,16 +33,15 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
     /**
      * Defines the table to delete from.
      *
-     * @param table
-     *            The table name.
+     * @param table The table name.
      * @return This instance for chaining.
      */
     public DeleteStatement from(String table)
     {
         this.tables = new String[]
-        {
-          table.toUpperCase()
-        };
+                {
+                        table.toUpperCase()
+                };
         return this;
     }
 
@@ -60,15 +58,14 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
     /**
      * Creates a new where conditional clause using the given column for this statement.
      *
-     * @param column
-     *            The column to use in this condition.
+     * @param column The column to use in this condition.
      * @return The created ConditionalClause.
      */
     public ConditionalClause<DeleteStatement> where(String column)
     {
         ConditionalClause<DeleteStatement> where = new ConditionalClause<>(this,
-                                                           column,
-                                                           ConditionalClause.WHERE);
+                                                                           column,
+                                                                           ConditionalClause.WHERE);
         addWhereClause(where);
         return where;
     }
@@ -77,15 +74,14 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
      * Creates a new conditional clause to chain with an existing where or having clause using the given column for this
      * statement.
      *
-     * @param column
-     *            The column to use in this condition.
+     * @param column The column to use in this condition.
      * @return The created ConditionalClause.
      */
     public ConditionalClause<DeleteStatement> and(String column)
     {
         ConditionalClause<DeleteStatement> where = new ConditionalClause<>(this,
-                                                           column,
-                                                           ConditionalClause.AND);
+                                                                           column,
+                                                                           ConditionalClause.AND);
         addWhereClause(where);
         return where;
     }
@@ -94,15 +90,14 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
      * Creates a new conditional clause to chain with an existing where or having clause using the given column for this
      * statement.
      *
-     * @param column
-     *            The column to use in this condition.
+     * @param column The column to use in this condition.
      * @return The created ConditionalClause.
      */
     public ConditionalClause<DeleteStatement> or(String column)
     {
         ConditionalClause<DeleteStatement> where = new ConditionalClause<>(this,
-                                                           column,
-                                                           ConditionalClause.OR);
+                                                                           column,
+                                                                           ConditionalClause.OR);
         addWhereClause(where);
         return where;
     }
@@ -122,7 +117,6 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
             log("Executing: " + sql,
                 printLogs);
 
-
             if (this.prepared)
             {
                 List<Value> values = getValues();
@@ -136,7 +130,7 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
 
                 Value val = null;
 
-                for (int i = 0; i < values.size(); i ++ )
+                for (int i = 0; i < values.size(); i++)
                 {
                     val = values.get(i);
                     log("p" + (i + 1) + " = " + val.getValue() + " [" + val.getType().toString() + "]", printLogs);
@@ -181,7 +175,7 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
 
         for (ConditionalClause<DeleteStatement> where : this.whereClauses)
         {
-            sql += " " + where.toString(this.prepared);
+            sql += " " + System.lineSeparator() + where.toString(this.prepared);
         }
 
         return sql;

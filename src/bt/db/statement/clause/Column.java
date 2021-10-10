@@ -178,50 +178,50 @@ public class Column
 
         if (isPrimaryKey())
         {
-            defaultComment += System.lineSeparator() + "primary key, ";
+            defaultComment += "primary key, " + System.lineSeparator();
         }
 
         if (isNotNull())
         {
-            defaultComment += System.lineSeparator() + "not null, ";
+            defaultComment += "not null, " + System.lineSeparator();
         }
 
         if (isUnique())
         {
-            defaultComment += System.lineSeparator() + "unique, ";
+            defaultComment += "unique, " + System.lineSeparator();
         }
 
         if (this.generated != null)
         {
             if (this.generated.getGenerationType() == Generated.ALWAYS)
             {
-                defaultComment += System.lineSeparator() + "always ";
+                defaultComment += "always ";
             }
             else if (this.generated.getGenerationType() == Generated.DEFAULT)
             {
-                defaultComment += System.lineSeparator() + "default ";
+                defaultComment += "default ";
             }
 
             if (isIdentity())
             {
-                defaultComment += "generated as identity, incremented by " + getAutoIncrement() + ", ";
+                defaultComment += "generated as identity, incremented by " + getAutoIncrement() + ", " + System.lineSeparator();
             }
             else
             {
-                defaultComment += this.generated.getValueDetail();
+                defaultComment += this.generated.getValueDetail() + System.lineSeparator();
             }
         }
 
         if (getDefaultValue() != null)
         {
-            defaultComment += System.lineSeparator() + "default = " + getDefaultValue() + ", ";
+            defaultComment += "default = " + getDefaultValue() + ", " + System.lineSeparator();
         }
 
         if (this.foreignKeys != null)
         {
             for (ForeignKey fk : this.foreignKeys)
             {
-                defaultComment += System.lineSeparator() + "foreign key (" + fk.getName() + "), ";
+                defaultComment += "foreign key (" + fk.getName() + "), " + System.lineSeparator();
             }
         }
 
@@ -229,13 +229,13 @@ public class Column
         {
             for (Check check : this.checks)
             {
-                defaultComment += System.lineSeparator() + "check (" + check.getName() + "), ";
+                defaultComment += "check (" + check.getName() + "), " + System.lineSeparator();
             }
         }
 
         if (!defaultComment.isBlank())
         {
-            defaultComment = defaultComment.substring(0, defaultComment.length() - 2);
+            defaultComment = defaultComment.substring(0, defaultComment.length() - 4);
         }
 
         return defaultComment;
@@ -662,17 +662,17 @@ public class Column
 
         if (this.defaultValue != null)
         {
-            sql += " DEFAULT " + this.defaultValue;
+            sql += System.lineSeparator() + " DEFAULT " + this.defaultValue;
         }
 
         if (this.notNull)
         {
-            sql += " NOT NULL";
+            sql += System.lineSeparator() + " NOT NULL";
         }
 
         if (this.generated != null)
         {
-            sql += " " + this.generated.toString();
+            sql += System.lineSeparator() + " " + this.generated;
 
             if (this.autoIncrement > 0)
             {
@@ -684,7 +684,7 @@ public class Column
         {
             for (Check check : this.checks)
             {
-                sql += " " + check.toString();
+                sql += System.lineSeparator() + " " + check.toString();
             }
         }
 
@@ -692,13 +692,13 @@ public class Column
         {
             for (ForeignKey fk : this.foreignKeys)
             {
-                sql += " " + fk.toString();
+                sql += System.lineSeparator() + " " + fk.toString();
             }
         }
 
         if (this.unique)
         {
-            sql += System.lineSeparator() + ", CONSTRAINT " + this.statement.getName() + "_" + this.name + "_UQ UNIQUE(" + this.name + ")";
+            sql += ", " + System.lineSeparator() + "CONSTRAINT " + this.statement.getName() + "_" + this.name + "_UQ UNIQUE(" + this.name + ")";
         }
 
         return sql;

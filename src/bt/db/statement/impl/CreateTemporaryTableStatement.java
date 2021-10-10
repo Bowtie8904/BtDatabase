@@ -1,29 +1,34 @@
 package bt.db.statement.impl;
 
+import bt.db.DatabaseAccess;
+import bt.db.constants.SqlType;
+import bt.db.exc.SqlExecutionException;
+import bt.db.statement.clause.Column;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
-import bt.db.DatabaseAccess;
-import bt.db.constants.SqlType;
-import bt.db.exc.SqlExecutionException;
-import bt.db.statement.clause.Column;
-
 /**
  * @author &#8904
- *
  */
 public class CreateTemporaryTableStatement extends CreateStatement<CreateTemporaryTableStatement, CreateTemporaryTableStatement>
 {
-    /** The columns that will be added to the new table. */
+    /**
+     * The columns that will be added to the new table.
+     */
     private List<Column> tableColumns;
 
-    /** The select to create a copy table of. */
+    /**
+     * The select to create a copy table of.
+     */
     private SelectStatement asCopySelect;
 
-    /** Indicates whether a table copy should be created with data. */
+    /**
+     * Indicates whether a table copy should be created with data.
+     */
     private boolean copyData = true;
 
     private boolean preserve;
@@ -31,10 +36,8 @@ public class CreateTemporaryTableStatement extends CreateStatement<CreateTempora
     /**
      * Creates a new instance.
      *
-     * @param db
-     *            The database that should be used for the statement.
-     * @param name
-     *            The name of the table that should be created.
+     * @param db   The database that should be used for the statement.
+     * @param name The name of the table that should be created.
      */
     public CreateTemporaryTableStatement(DatabaseAccess db, String name)
     {
@@ -47,10 +50,8 @@ public class CreateTemporaryTableStatement extends CreateStatement<CreateTempora
     /**
      * Creates a new column in this table which has the given name and the given sql type.
      *
-     * @param name
-     *            The name of the column.
-     * @param type
-     *            The {@link SqlType type} of the column.
+     * @param name The name of the column.
+     * @param type The {@link SqlType type} of the column.
      * @return The created column.
      */
     public CreateTemporaryTableStatement column(Column column)
@@ -218,15 +219,15 @@ public class CreateTemporaryTableStatement extends CreateStatement<CreateTempora
 
         for (Column col : this.tableColumns)
         {
-            sql += col.toString() + ", ";
+            sql += col.toString() + ", " + System.lineSeparator();
         }
 
-        sql = sql.substring(0, sql.length() - 2);
+        sql = sql.substring(0, sql.length() - 4) + System.lineSeparator();
         sql += ")";
 
         if (this.preserve)
         {
-            sql += " ON COMMIT PRESERVE ROWS";
+            sql += " ON COMMIT PRESERVE ROWS" + System.lineSeparator();
         }
 
         sql += " NOT LOGGED";

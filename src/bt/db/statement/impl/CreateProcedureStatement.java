@@ -1,17 +1,17 @@
 package bt.db.statement.impl;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-
 import bt.db.DatabaseAccess;
 import bt.db.constants.SqlState;
 import bt.db.constants.SqlType;
 import bt.db.exc.SqlExecutionException;
 import bt.db.func.Sql;
 import bt.utils.Null;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents an SQL CREATE PROCEDURE statement which can be extended through method chaining.
@@ -30,10 +30,8 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
     /**
      * Creates a new instance.
      *
-     * @param db
-     *            The database on which the procedure will be created.
-     * @param name
-     *            The name of the procedure.
+     * @param db   The database on which the procedure will be created.
+     * @param name The name of the procedure.
      */
     public CreateProcedureStatement(DatabaseAccess db, String name)
     {
@@ -46,18 +44,16 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
     /**
      * Adds a parameter to the procedure.
      *
-     * @param name
-     *            The name of the parameter.
-     * @param type
-     *            The {@link SqlType} of the parameter.
+     * @param name The name of the parameter.
+     * @param type The {@link SqlType} of the parameter.
      * @return This instance for chaining.
      */
     public CreateProcedureStatement parameter(String name, SqlType type)
     {
         this.parameters.add(new String[]
-        {
-          name, type.toString()
-        });
+                                    {
+                                            name, type.toString()
+                                    });
 
         return this;
     }
@@ -95,8 +91,7 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
     /**
      * Sets the java method that should be called by this procedure.
      *
-     * @param javaMethod
-     *            The full method name (class name + methodname).
+     * @param javaMethod The full method name (class name + methodname).
      * @return This instance for chaining.
      */
     public CreateProcedureStatement call(String javaMethod)
@@ -132,18 +127,18 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
                        .set("object_name", this.name.toUpperCase())
                        .set("object_ddl", sql + ";")
                        .onDuplicateKey((s, e2) ->
-                       {
-                           return this.db.update(DatabaseAccess.OBJECT_DATA_TABLE)
-                                         .set("instanceID", this.db.getInstanceID())
-                                         .set("object_name", this.name.toUpperCase())
-                                         .set("object_ddl", sql + ";")
-                                         .where(Sql.upper("object_name").toString()).equal(this.name.toUpperCase())
-                                         .onFail((st, ex) ->
-                                         {
-                                             return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));
-                                         })
-                                         .execute();
-                       })
+                                       {
+                                           return this.db.update(DatabaseAccess.OBJECT_DATA_TABLE)
+                                                         .set("instanceID", this.db.getInstanceID())
+                                                         .set("object_name", this.name.toUpperCase())
+                                                         .set("object_ddl", sql + ";")
+                                                         .where(Sql.upper("object_name").toString()).equal(this.name.toUpperCase())
+                                                         .onFail((st, ex) ->
+                                                                 {
+                                                                     return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));
+                                                                 })
+                                                         .execute();
+                                       })
                        .execute();
             }
 
@@ -163,10 +158,10 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
                 DropStatement drop = this.db.drop()
                                             .procedure(this.name)
                                             .onFail((s, ex) ->
-                                            {
-                                                handleFail(new SqlExecutionException(e.getMessage(), sql, e));
-                                                return 0;
-                                            });
+                                                    {
+                                                        handleFail(new SqlExecutionException(e.getMessage(), sql, e));
+                                                        return 0;
+                                                    });
 
                 if (drop.execute(printLogs) > 0)
                 {
@@ -184,18 +179,18 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
                                    .set("object_name", this.name.toUpperCase())
                                    .set("object_ddl", sql + ";")
                                    .onDuplicateKey((s, e2) ->
-                                   {
-                                       return this.db.update(DatabaseAccess.OBJECT_DATA_TABLE)
-                                                     .set("instanceID", this.db.getInstanceID())
-                                                     .set("object_name", this.name.toUpperCase())
-                                                     .set("object_ddl", sql + ";")
-                                                     .where(Sql.upper("object_name").toString()).equal(this.name.toUpperCase())
-                                                     .onFail((st, ex) ->
-                                                     {
-                                                         return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));
-                                                     })
-                                                     .execute();
-                                   })
+                                                   {
+                                                       return this.db.update(DatabaseAccess.OBJECT_DATA_TABLE)
+                                                                     .set("instanceID", this.db.getInstanceID())
+                                                                     .set("object_name", this.name.toUpperCase())
+                                                                     .set("object_ddl", sql + ";")
+                                                                     .where(Sql.upper("object_name").toString()).equal(this.name.toUpperCase())
+                                                                     .onFail((st, ex) ->
+                                                                             {
+                                                                                 return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));
+                                                                             })
+                                                                     .execute();
+                                                   })
                                    .execute();
                         }
 
@@ -237,8 +232,8 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
         }
 
         sql = sql.substring(0,
-                            sql.length() - 2);
-        sql += ") PARAMETER STYLE JAVA LANGUAGE JAVA DYNAMIC RESULT SETS 0 EXTERNAL NAME '" + this.method + "'";
+                            sql.length() - 2) + ")" + System.lineSeparator();
+        sql += " PARAMETER STYLE JAVA LANGUAGE JAVA DYNAMIC RESULT SETS 0 EXTERNAL NAME '" + this.method + "'";
 
         return sql;
     }

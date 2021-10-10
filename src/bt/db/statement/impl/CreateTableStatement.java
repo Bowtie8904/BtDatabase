@@ -632,14 +632,14 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
             if (primary.length() != 0)
             {
                 primary = primary.substring(0, primary.length() - 2);
-                sql += System.lineSeparator() + ", CONSTRAINT " + this.name + "_PK PRIMARY KEY (" + primary + ")";
+                sql += ", " + System.lineSeparator() + "CONSTRAINT " + this.name + "_PK PRIMARY KEY (" + primary + ")";
             }
 
             if (this.checks != null)
             {
                 for (Check check : this.checks)
                 {
-                    sql += System.lineSeparator() + ", " + check.toString();
+                    sql += ", " + System.lineSeparator() + check.toString();
                 }
             }
 
@@ -647,7 +647,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
             {
                 for (ForeignKey fk : this.foreignKeys)
                 {
-                    sql += System.lineSeparator() + ", " + fk.toString();
+                    sql += ", " + System.lineSeparator() + fk.toString();
                 }
             }
 

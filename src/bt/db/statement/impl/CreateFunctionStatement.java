@@ -1,5 +1,12 @@
 package bt.db.statement.impl;
 
+import bt.db.DatabaseAccess;
+import bt.db.constants.SqlState;
+import bt.db.constants.SqlType;
+import bt.db.exc.SqlExecutionException;
+import bt.db.func.Sql;
+import bt.utils.Null;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.sql.PreparedStatement;
@@ -7,13 +14,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-
-import bt.db.DatabaseAccess;
-import bt.db.constants.SqlState;
-import bt.db.constants.SqlType;
-import bt.db.exc.SqlExecutionException;
-import bt.db.func.Sql;
-import bt.utils.Null;
 
 /**
  * A statement to define an SQL function which calls a java method.
@@ -42,8 +42,7 @@ public class CreateFunctionStatement extends CreateStatement<CreateFunctionState
     /**
      * Defines the public static java method that is called.
      *
-     * @param method
-     *            The method that should be called.
+     * @param method The method that should be called.
      * @return This instance for chaining.
      */
     public CreateFunctionStatement call(Method method)
@@ -60,9 +59,9 @@ public class CreateFunctionStatement extends CreateStatement<CreateFunctionState
             }
 
             this.parameters.add(new String[]
-            {
-              p.getName(), parameterType
-            });
+                                        {
+                                                p.getName(), parameterType
+                                        });
         }
         return this;
     }
@@ -70,12 +69,9 @@ public class CreateFunctionStatement extends CreateStatement<CreateFunctionState
     /**
      * Defines the public static java method that is called.
      *
-     * @param cls
-     *            The class that contains the method.
-     * @param methodName
-     *            The case-sensitive name of the method.
-     * @param parameterTypes
-     *            The parameter types in the correct order.
+     * @param cls            The class that contains the method.
+     * @param methodName     The case-sensitive name of the method.
+     * @param parameterTypes The parameter types in the correct order.
      * @return This instance for chaining.
      */
     public CreateFunctionStatement call(Class<?> cls, String methodName, Class<?>... parameterTypes)
@@ -131,18 +127,18 @@ public class CreateFunctionStatement extends CreateStatement<CreateFunctionState
                        .set("object_name", this.name.toUpperCase())
                        .set("object_ddl", sql + ";")
                        .onDuplicateKey((s, e2) ->
-                       {
-                           return this.db.update(DatabaseAccess.OBJECT_DATA_TABLE)
-                                         .set("instanceID", this.db.getInstanceID())
-                                         .set("object_name", this.name.toUpperCase())
-                                         .set("object_ddl", sql + ";")
-                                         .where(Sql.upper("object_name").toString()).equal(this.name.toUpperCase())
-                                         .onFail((st, ex) ->
-                                         {
-                                             return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));
-                                         })
-                                         .execute();
-                       })
+                                       {
+                                           return this.db.update(DatabaseAccess.OBJECT_DATA_TABLE)
+                                                         .set("instanceID", this.db.getInstanceID())
+                                                         .set("object_name", this.name.toUpperCase())
+                                                         .set("object_ddl", sql + ";")
+                                                         .where(Sql.upper("object_name").toString()).equal(this.name.toUpperCase())
+                                                         .onFail((st, ex) ->
+                                                                 {
+                                                                     return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));
+                                                                 })
+                                                         .execute();
+                                       })
                        .execute();
             }
 
@@ -162,10 +158,10 @@ public class CreateFunctionStatement extends CreateStatement<CreateFunctionState
                 DropStatement drop = this.db.drop()
                                             .function(this.name)
                                             .onFail((s, ex) ->
-                                            {
-                                                handleFail(new SqlExecutionException(e.getMessage(), sql, e));
-                                                return 0;
-                                            });
+                                                    {
+                                                        handleFail(new SqlExecutionException(e.getMessage(), sql, e));
+                                                        return 0;
+                                                    });
 
                 if (drop.execute(printLogs) > 0)
                 {
@@ -183,18 +179,18 @@ public class CreateFunctionStatement extends CreateStatement<CreateFunctionState
                                    .set("object_name", this.name.toUpperCase())
                                    .set("object_ddl", sql + ";")
                                    .onDuplicateKey((s, e2) ->
-                                   {
-                                       return this.db.update(DatabaseAccess.OBJECT_DATA_TABLE)
-                                                     .set("instanceID", this.db.getInstanceID())
-                                                     .set("object_name", this.name.toUpperCase())
-                                                     .set("object_ddl", sql + ";")
-                                                     .where(Sql.upper("object_name").toString()).equal(this.name.toUpperCase())
-                                                     .onFail((st, ex) ->
-                                                     {
-                                                         return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));
-                                                     })
-                                                     .execute();
-                                   })
+                                                   {
+                                                       return this.db.update(DatabaseAccess.OBJECT_DATA_TABLE)
+                                                                     .set("instanceID", this.db.getInstanceID())
+                                                                     .set("object_name", this.name.toUpperCase())
+                                                                     .set("object_ddl", sql + ";")
+                                                                     .where(Sql.upper("object_name").toString()).equal(this.name.toUpperCase())
+                                                                     .onFail((st, ex) ->
+                                                                             {
+                                                                                 return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));
+                                                                             })
+                                                                     .execute();
+                                                   })
                                    .execute();
                         }
 
@@ -235,7 +231,7 @@ public class CreateFunctionStatement extends CreateStatement<CreateFunctionState
             sql += param[0] + " " + param[1] + ", ";
         }
 
-        sql = sql.substring(0, sql.length() - 2);
+        sql = sql.substring(0, sql.length() - 2) + ")" + System.lineSeparator();
 
         String returnType = SqlType.convert(this.method.getReturnType()).toString();
 
@@ -244,7 +240,7 @@ public class CreateFunctionStatement extends CreateStatement<CreateFunctionState
             returnType += "(9999)";
         }
 
-        sql += ") RETURNS " + returnType;
+        sql += " RETURNS " + returnType + System.lineSeparator();
         sql += " PARAMETER STYLE JAVA LANGUAGE JAVA EXTERNAL NAME '" + this.method.getDeclaringClass().getName() + "." + this.method.getName() + "'";
 
         if (this.returnNullOnNull)

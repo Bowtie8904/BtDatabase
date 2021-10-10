@@ -185,6 +185,7 @@ public abstract class DatabaseAccess implements Killable
         createObjectDataTable();
         createColumnDataTable();
         createPropertiesTable();
+        createDualTable();
         checkID();
         synchronized (DatabaseAccess.class)
         {
@@ -568,6 +569,31 @@ public abstract class DatabaseAccess implements Killable
         }
 
         return null;
+    }
+
+    protected void createDualTable()
+    {
+        int success = create().table("dual")
+                              .column(new Column("dummy", SqlType.VARCHAR).size(1).comment("Dummy value as a single entry."))
+                              .createDefaultTriggers(false)
+                              .onAlreadyExists((s, e) ->
+                                               {
+                                                   return 0;
+                                               })
+                              .onSuccess((s, i) ->
+                                         {
+                                             System.out.println("Created dual table in " + s.getExecutionTime() + "ms.");
+                                         })
+                              .execute();
+
+        if (success == 1)
+        {
+            insert().into("dual")
+                    .set("dummy", "X")
+                    .unprepared()
+                    .commit()
+                    .execute();
+        }
     }
 
     /**

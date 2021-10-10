@@ -1,14 +1,14 @@
 package bt.db.statement.impl;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.SQLSyntaxErrorException;
-
 import bt.db.DatabaseAccess;
 import bt.db.constants.SqlState;
 import bt.db.exc.SqlExecutionException;
 import bt.db.func.Sql;
 import bt.db.statement.clause.TriggerAction;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.SQLSyntaxErrorException;
 
 /**
  * Represents an SQL CREATE TRIGGER statement which can be extended through method chaining.
@@ -26,10 +26,8 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
     /**
      * Creates a new instance.
      *
-     * @param db
-     *            The database on which the trigger will be created.
-     * @param name
-     *            The name of the trigger.
+     * @param db   The database on which the trigger will be created.
+     * @param name The name of the trigger.
      */
     public CreateTriggerStatement(DatabaseAccess db, String name)
     {
@@ -50,8 +48,7 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
      * </ul>
      * </p>
      *
-     * @param action
-     *            The action which should cause this trigger to be executed. Either 'insert', 'update' or 'delete'.
+     * @param action The action which should cause this trigger to be executed. Either 'insert', 'update' or 'delete'.
      * @return This instance for chaining.
      */
     public CreateTriggerStatement after(String action)
@@ -73,8 +70,7 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
      * </ul>
      * </p>
      *
-     * @param action
-     *            The action which should cause this trigger to be executed. Either 'insert', 'update' or 'delete'.
+     * @param action The action which should cause this trigger to be executed. Either 'insert', 'update' or 'delete'.
      * @return This instance for chaining.
      */
     public CreateTriggerStatement before(String action)
@@ -95,8 +91,7 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
      * Not calling this method to specify columns means that all columns will cause a trigger execution on update.
      * </p>
      *
-     * @param columns
-     *            The names of the columns.
+     * @param columns The names of the columns.
      * @return This instance for chaining.
      */
     public CreateTriggerStatement of(String... columns)
@@ -121,16 +116,15 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
     /**
      * Sets the table that this trigger should listen on.
      *
-     * @param table
-     *            The name of the table.
+     * @param table The name of the table.
      * @return This instance for chaining.
      */
     public CreateTriggerStatement on(String table)
     {
         this.tables = new String[]
-        {
-          table
-        };
+                {
+                        table
+                };
 
         return this;
     }
@@ -142,8 +136,7 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
      * Sets an alias for the newly inserted/updated row.
      * </p>
      *
-     * @param alias
-     *            The alias of the row.
+     * @param alias The alias of the row.
      * @return This instance for chaining.
      */
     public CreateTriggerStatement newAs(String alias)
@@ -159,8 +152,7 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
      * Sets an alias for the old deleted/updated row.
      * </p>
      *
-     * @param alias
-     *            The alias of the row.
+     * @param alias The alias of the row.
      * @return This instance for chaining.
      */
     public CreateTriggerStatement oldAs(String alias)
@@ -229,18 +221,18 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
                        .set("object_name", this.name.toUpperCase())
                        .set("object_ddl", sql + ";")
                        .onDuplicateKey((s, e) ->
-                       {
-                           return this.db.update(DatabaseAccess.OBJECT_DATA_TABLE)
-                                         .set("instanceID", this.db.getInstanceID())
-                                         .set("object_name", this.name.toUpperCase())
-                                         .set("object_ddl", sql + ";")
-                                         .where(Sql.upper("object_name").toString()).equal(this.name.toUpperCase())
-                                         .onFail((st, ex) ->
-                                         {
-                                             return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));
-                                         })
-                                         .execute();
-                       })
+                                       {
+                                           return this.db.update(DatabaseAccess.OBJECT_DATA_TABLE)
+                                                         .set("instanceID", this.db.getInstanceID())
+                                                         .set("object_name", this.name.toUpperCase())
+                                                         .set("object_ddl", sql + ";")
+                                                         .where(Sql.upper("object_name").toString()).equal(this.name.toUpperCase())
+                                                         .onFail((st, ex) ->
+                                                                 {
+                                                                     return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));
+                                                                 })
+                                                         .execute();
+                                       })
                        .execute();
             }
 
@@ -258,10 +250,10 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
                 var drop = this.db.drop()
                                   .trigger(this.name)
                                   .onFail((s, ex) ->
-                                  {
-                                      handleFail(new SqlExecutionException(e.getMessage(), sql, e));
-                                      return 0;
-                                  });
+                                          {
+                                              handleFail(new SqlExecutionException(e.getMessage(), sql, e));
+                                              return 0;
+                                          });
 
                 if (drop.execute(printLogs) > 0)
                 {
@@ -281,18 +273,18 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
                                    .set("object_name", this.name.toUpperCase())
                                    .set("object_ddl", sql + ";")
                                    .onDuplicateKey((s, e2) ->
-                                   {
-                                       return this.db.update(DatabaseAccess.OBJECT_DATA_TABLE)
-                                                     .set("instanceID", this.db.getInstanceID())
-                                                     .set("object_name", this.name.toUpperCase())
-                                                     .set("object_ddl", sql + ";")
-                                                     .where(Sql.upper("object_name").toString()).equal(this.name.toUpperCase())
-                                                     .onFail((st, ex) ->
-                                                     {
-                                                         return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));
-                                                     })
-                                                     .execute();
-                                   })
+                                                   {
+                                                       return this.db.update(DatabaseAccess.OBJECT_DATA_TABLE)
+                                                                     .set("instanceID", this.db.getInstanceID())
+                                                                     .set("object_name", this.name.toUpperCase())
+                                                                     .set("object_ddl", sql + ";")
+                                                                     .where(Sql.upper("object_name").toString()).equal(this.name.toUpperCase())
+                                                                     .onFail((st, ex) ->
+                                                                             {
+                                                                                 return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));
+                                                                             })
+                                                                     .execute();
+                                                   })
                                    .execute();
                         }
 
@@ -325,8 +317,8 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
     @Override
     public String toString()
     {
-        String sql = this.statementKeyword + " " + this.name + " " + this.when + " " + this.triggerKeyword + " ON "
-                     + this.tables[0];
+        String sql = this.statementKeyword + " " + this.name + " " + System.lineSeparator() + this.when + " " + this.triggerKeyword + " ON "
+                + this.tables[0];
 
         if (this.newAlias != null || this.oldAlias != null)
         {
@@ -341,9 +333,11 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
             {
                 sql += " OLD AS " + this.oldAlias;
             }
+
+            sql += System.lineSeparator();
         }
 
-        sql += " FOR EACH " + (this.forEachRow ? "ROW " : "STATEMENT ");
+        sql += " FOR EACH " + (this.forEachRow ? "ROW " : "STATEMENT ") + System.lineSeparator();
 
         if (this.triggerAction != null)
         {

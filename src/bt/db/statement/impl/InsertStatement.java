@@ -1,18 +1,5 @@
 package bt.db.statement.impl;
 
-import java.math.BigDecimal;
-import java.sql.Blob;
-import java.sql.Clob;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-
 import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
 import bt.db.exc.SqlExecutionException;
@@ -20,6 +7,12 @@ import bt.db.func.Sql;
 import bt.db.func.SqlFunction;
 import bt.db.statement.SqlModifyStatement;
 import bt.db.statement.clause.SetClause;
+
+import java.math.BigDecimal;
+import java.sql.*;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * Represents an SQL insert statement which can be extended through method chaining.
@@ -37,8 +30,7 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     /**
      * Creates a new instance. On duplicate key this will log an error message and return -1.
      *
-     * @param db
-     *            The database that should be used for this statement.
+     * @param db The database that should be used for this statement.
      */
     public InsertStatement(DatabaseAccess db)
     {
@@ -59,16 +51,15 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     /**
      * Defines the table to insert into.
      *
-     * @param table
-     *            The name of the table.
+     * @param table The name of the table.
      * @return This instance for chaining.
      */
     public InsertStatement into(String table)
     {
         this.tables = new String[]
-        {
-          table.toUpperCase()
-        };
+                {
+                        table.toUpperCase()
+                };
 
         return this;
     }
@@ -108,9 +99,8 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
      * This might distort returned error codes of the execute method if executions of some (or all) statements fails.
      * </p>
      *
-     * @param repeats
-     *            The number of executions including the first one. repeats=0 would result in no executions and
-     *            repeats=1 has the same effect as not calling this method.
+     * @param repeats The number of executions including the first one. repeats=0 would result in no executions and
+     *                repeats=1 has the same effect as not calling this method.
      * @return This instance for chaining.
      */
     public InsertStatement repeat(int repeats)
@@ -122,10 +112,8 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     /**
      * Sets the value of the given column to <i>null</i>.
      *
-     * @param column
-     *            The column whichs value should be set to null.
-     * @param sqlType
-     *            The sql value type of the column. This uses standard {@link Types}.
+     * @param column  The column whichs value should be set to null.
+     * @param sqlType The sql value type of the column. This uses standard {@link Types}.
      * @return This instance for chaining.
      */
     public InsertStatement setNull(String column, SqlType sqlType)
@@ -138,12 +126,9 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     /**
      * Sets the given column to the given value.
      *
-     * @param column
-     *            The column whichs value should be set.
-     * @param value
-     *            The value to use.
-     * @param sqlType
-     *            The type of the column.
+     * @param column  The column whichs value should be set.
+     * @param value   The value to use.
+     * @param sqlType The type of the column.
      * @return This instance for chaining.
      */
     public InsertStatement set(String column, Object value, SqlType sqlType)
@@ -159,10 +144,8 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     /**
      * Uses the given supplier to retrieve a value for the given column when this statement is prepared for execution.
      *
-     * @param column
-     *            The column whichs value should be set.
-     * @param valueSupplier
-     *            The supplier that offers a value for the given column.
+     * @param column        The column whichs value should be set.
+     * @param valueSupplier The supplier that offers a value for the given column.
      * @return This instance for chaining.
      */
     public InsertStatement set(String column, SqlType sqlType, Supplier<?> valueSupplier)
@@ -178,10 +161,8 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     /**
      * Sets the given column to the given value.
      *
-     * @param column
-     *            The column whichs value should be set.
-     * @param value
-     *            The value to use.
+     * @param column The column whichs value should be set.
+     * @param value  The value to use.
      * @return This instance for chaining.
      */
     public InsertStatement set(String column, SqlFunction value)
@@ -194,10 +175,8 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     /**
      * Sets the given column to the given value.
      *
-     * @param column
-     *            The column whichs value should be set.
-     * @param value
-     *            The value to use.
+     * @param column The column whichs value should be set.
+     * @param value  The value to use.
      * @return This instance for chaining.
      */
     public InsertStatement set(String column, Date value)
@@ -210,10 +189,8 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     /**
      * Sets the given column to the given value.
      *
-     * @param column
-     *            The column whichs value should be set.
-     * @param value
-     *            The value to use.
+     * @param column The column whichs value should be set.
+     * @param value  The value to use.
      * @return This instance for chaining.
      */
     public InsertStatement set(String column, Time value)
@@ -226,10 +203,8 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     /**
      * Sets the given column to the given value.
      *
-     * @param column
-     *            The column whichs value should be set.
-     * @param value
-     *            The value to use.
+     * @param column The column whichs value should be set.
+     * @param value  The value to use.
      * @return This instance for chaining.
      */
     public InsertStatement set(String column, Timestamp value)
@@ -242,10 +217,8 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     /**
      * Sets the given column to the given value.
      *
-     * @param column
-     *            The column whichs value should be set.
-     * @param value
-     *            The value to use.
+     * @param column The column whichs value should be set.
+     * @param value  The value to use.
      * @return This instance for chaining.
      */
     public InsertStatement set(String column, int value)
@@ -258,10 +231,8 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     /**
      * Sets the given column to the given value.
      *
-     * @param column
-     *            The column whichs value should be set.
-     * @param value
-     *            The value to use.
+     * @param column The column whichs value should be set.
+     * @param value  The value to use.
      * @return This instance for chaining.
      */
     public InsertStatement set(String column, long value)
@@ -274,10 +245,8 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     /**
      * Sets the given column to the given value.
      *
-     * @param column
-     *            The column whichs value should be set.
-     * @param value
-     *            The value to use.
+     * @param column The column whichs value should be set.
+     * @param value  The value to use.
      * @return This instance for chaining.
      */
     public InsertStatement set(String column, double value)
@@ -290,10 +259,8 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     /**
      * Sets the given column to the given value.
      *
-     * @param column
-     *            The column whichs value should be set.
-     * @param value
-     *            The value to use.
+     * @param column The column whichs value should be set.
+     * @param value  The value to use.
      * @return This instance for chaining.
      */
     public InsertStatement set(String column, float value)
@@ -306,10 +273,8 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     /**
      * Sets the given column to the given value.
      *
-     * @param column
-     *            The column whichs value should be set.
-     * @param value
-     *            The value to use.
+     * @param column The column whichs value should be set.
+     * @param value  The value to use.
      * @return This instance for chaining.
      */
     public InsertStatement set(String column, boolean value)
@@ -322,10 +287,8 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     /**
      * Sets the given column to the given value.
      *
-     * @param column
-     *            The column whichs value should be set.
-     * @param value
-     *            The value to use.
+     * @param column The column whichs value should be set.
+     * @param value  The value to use.
      * @return This instance for chaining.
      */
     public InsertStatement set(String column, String value)
@@ -338,10 +301,8 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     /**
      * Sets the given column to the given value.
      *
-     * @param column
-     *            The column whichs value should be set.
-     * @param value
-     *            The value to use.
+     * @param column The column whichs value should be set.
+     * @param value  The value to use.
      * @return This instance for chaining.
      */
     public InsertStatement set(String column, Blob value)
@@ -354,10 +315,8 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     /**
      * Sets the given column to the given value.
      *
-     * @param column
-     *            The column whichs value should be set.
-     * @param value
-     *            The value to use.
+     * @param column The column whichs value should be set.
+     * @param value  The value to use.
      * @return This instance for chaining.
      */
     public InsertStatement set(String column, Clob value)
@@ -381,8 +340,7 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
 
     /**
      * @return The number of affected rows or an error code (usually -1, can be customized for different errors via the
-     *         fail methods).
-     *
+     * fail methods).
      * @see bt.db.statement.SqlModifyStatement#execute(boolean)
      */
     @Override
@@ -391,7 +349,7 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
         startExecutionTime();
         int result = 0;
 
-        for (int i = 0; i < this.repeats; i ++ )
+        for (int i = 0; i < this.repeats; i++)
         {
             result += executeStatement(printLogs);
         }
@@ -431,7 +389,7 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
                         printLogs);
                 }
 
-                for (int i = 0; i < reducedList.size(); i ++ )
+                for (int i = 0; i < reducedList.size(); i++)
                 {
                     SetClause<InsertStatement> set = reducedList.get(i);
                     log("p" + (i + 1) + " = " + set.prepareValue(statement,
@@ -479,7 +437,7 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
     @Override
     public String toString()
     {
-        String sql = this.statementKeyword + " ";
+        String sql = this.statementKeyword + " " + System.lineSeparator();
 
         sql += this.tables[0];
 
@@ -487,17 +445,17 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
         {
             if (!this.setClauses.isEmpty())
             {
-                sql += " (";
+                sql += " (" + System.lineSeparator();
 
                 for (SetClause<InsertStatement> set : this.setClauses)
                 {
-                    sql += set.toString(this.prepared) + ", ";
+                    sql += set.toString(this.prepared) + ", " + System.lineSeparator();
                 }
 
                 sql = sql.substring(0,
-                                    sql.length() - 2);
+                                    sql.length() - 4);
 
-                sql += ") VALUES (";
+                sql += ") " + System.lineSeparator() + "VALUES " + System.lineSeparator() + "(";
 
                 if (this.prepared)
                 {
@@ -505,11 +463,11 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
                     {
                         if (set.getValue() instanceof SqlFunction)
                         {
-                            sql += set.getStringValue() + ", ";
+                            sql += set.getStringValue() + ", " + System.lineSeparator();
                         }
                         else
                         {
-                            sql += "?, ";
+                            sql += "?, " + System.lineSeparator();
                         }
                     }
                 }
@@ -517,12 +475,12 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
                 {
                     for (SetClause<InsertStatement> set : this.setClauses)
                     {
-                        sql += set.getStringValue() + ", ";
+                        sql += set.getStringValue() + ", " + System.lineSeparator();
                     }
                 }
 
                 sql = sql.substring(0,
-                                    sql.length() - 2);
+                                    sql.length() - 4);
 
                 sql += ")";
             }
@@ -531,16 +489,16 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
         {
             if (this.columns != null && this.columns.length > 0)
             {
-                sql += "(";
+                sql += "(" + System.lineSeparator();
 
                 for (Object col : this.columns)
                 {
-                    sql += col.toString() + ", ";
+                    sql += col.toString() + ", " + System.lineSeparator();
                 }
 
-                sql = sql.substring(0, sql.length() - 2);
+                sql = sql.substring(0, sql.length() - 4);
 
-                sql += ")";
+                sql += ")" + System.lineSeparator();
             }
             sql += " " + this.dataSelect.toString();
         }
