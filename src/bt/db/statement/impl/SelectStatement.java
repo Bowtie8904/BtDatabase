@@ -980,7 +980,6 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
     {
         startExecutionTime();
         String sql = toString();
-        System.out.println(sql);
         SqlResultSet result = null;
 
         try (PreparedStatement statement = this.db.getConnection()
