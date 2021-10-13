@@ -149,6 +149,10 @@ public class CreateViewStatement extends CreateStatement<CreateViewStatement, Cr
                     }
                 }
             }
+            else
+            {
+                result = handleFail(new SqlExecutionException(e.getMessage(), sql, e));
+            }
         }
 
         return result;
