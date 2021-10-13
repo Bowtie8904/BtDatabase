@@ -1,12 +1,7 @@
 package bt.db.statement;
 
 import bt.db.DatabaseAccess;
-import bt.db.statement.impl.CreateFunctionStatement;
-import bt.db.statement.impl.CreateIndexStatement;
-import bt.db.statement.impl.CreateProcedureStatement;
-import bt.db.statement.impl.CreateTableStatement;
-import bt.db.statement.impl.CreateTemporaryTableStatement;
-import bt.db.statement.impl.CreateTriggerStatement;
+import bt.db.statement.impl.*;
 
 /**
  * Class offering methods to create different CREATE statements.
@@ -18,8 +13,7 @@ public class Create extends SqlStatement<Create>
     /**
      * Creates a new instance.
      *
-     * @param db
-     *            The database that should be used to execute the created statement.
+     * @param db The database that should be used to execute the created statement.
      */
     public Create(DatabaseAccess db)
     {
@@ -30,8 +24,7 @@ public class Create extends SqlStatement<Create>
     /**
      * Creates a create trigger statementwith the given name.
      *
-     * @param name
-     *            The name of the trigger that should be created.
+     * @param name The name of the trigger that should be created.
      * @return The created {@link CreateTriggerStatement}.
      */
     public CreateTriggerStatement trigger(String name)
@@ -47,8 +40,7 @@ public class Create extends SqlStatement<Create>
      * The table will be dropped when the connection to the database is closed.
      * </p>
      *
-     * @param name
-     *            The name of the table that should be created.
+     * @param name The name of the table that should be created.
      * @return The created {@link CreateTemporaryTableStatement}.
      */
     public CreateTemporaryTableStatement temporaryTable(String name)
@@ -60,8 +52,7 @@ public class Create extends SqlStatement<Create>
     /**
      * Creates a create table statement for the table with the given name.
      *
-     * @param name
-     *            The name of the table that should be created.
+     * @param name The name of the table that should be created.
      * @return The created {@link CreateTableStatement}.
      */
     public CreateTableStatement table(String name)
@@ -73,8 +64,7 @@ public class Create extends SqlStatement<Create>
     /**
      * Creates a create procedure statement with the given name.
      *
-     * @param name
-     *            The name of the procedure that should be created.
+     * @param name The name of the procedure that should be created.
      * @return The created {@link CreateProcedureStatement}.
      */
     public CreateProcedureStatement procedure(String name)
@@ -86,19 +76,24 @@ public class Create extends SqlStatement<Create>
     /**
      * Creates a create function statement with the given name.
      *
-     * @param name
-     *            The name of the procedure that should be created.
+     * @param name The name of the procedure that should be created.
      * @return The created {@link CreateFunctionStatement}.
      */
     public CreateFunctionStatement function(String name)
     {
         return new CreateFunctionStatement(this.db,
-                                            name);
+                                           name);
     }
 
     public CreateIndexStatement index(String name)
     {
         return new CreateIndexStatement(this.db,
                                         name);
+    }
+
+    public CreateViewStatement view(String name)
+    {
+        return new CreateViewStatement(this.db,
+                                       name);
     }
 }
