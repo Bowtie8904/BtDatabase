@@ -1,10 +1,6 @@
 package bt.db.func;
 
-import bt.db.func.impl.ConcatenateFunction;
-import bt.db.func.impl.LeftPadFunction;
-import bt.db.func.impl.ModFunction;
-import bt.db.func.impl.NullValueFunction;
-import bt.db.func.impl.RightPadFunction;
+import bt.db.func.impl.*;
 import bt.db.statement.clause.ColumnEntry;
 
 /**
@@ -17,10 +13,8 @@ public final class Sql
     /**
      * Creates a ColumnEntry instance of a table.column combination.
      *
-     * @param table
-     *            The name of the table.
-     * @param column
-     *            The name of the column.
+     * @param table  The name of the table.
+     * @param column The name of the column.
      * @return The ColumnEntry instance.
      */
     public static ColumnEntry column(String table, String column)
@@ -32,8 +26,7 @@ public final class Sql
     /**
      * Creates a ColumnEntry instance of a given column.
      *
-     * @param column
-     *            The name of the column.
+     * @param column The name of the column.
      * @return The ColumnEntry instance.
      */
     public static ColumnEntry column(String column)
@@ -56,8 +49,7 @@ public final class Sql
     /**
      * Concatenates the toString() representations of the given objects.
      *
-     * @param elements
-     *            The objects to concatenate.
+     * @param elements The objects to concatenate.
      * @return The function whichs toString method will return a valid sql representation of this concatenation.
      */
     public static ConcatenateFunction concat(Object... elements)
@@ -69,8 +61,7 @@ public final class Sql
      * AVG is an aggregate function that evaluates the average of an expression over a set of rows. AVG is allowed only
      * on expressions that evaluate to numeric data types.
      *
-     * @param value
-     *            The value to use as parameter for this function.
+     * @param value The value to use as parameter for this function.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction avg(Object value)
@@ -99,8 +90,7 @@ public final class Sql
      * This will create the COUNT function with the given column as parameter.
      * </p>
      *
-     * @param value
-     *            The value to use as parameter for this function.
+     * @param value The value to use as parameter for this function.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction count(Object value)
@@ -113,8 +103,7 @@ public final class Sql
      * on expressions that evaluate to built-in data types (including CHAR, VARCHAR, DATE, TIME, CHAR FOR BIT DATA,
      * etc.).
      *
-     * @param value
-     *            The value to use as parameter for this function.
+     * @param value The value to use as parameter for this function.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction max(Object value)
@@ -126,8 +115,7 @@ public final class Sql
      * MIN is an aggregate function that evaluates the minimum of an expression over a set of rows. MIN is allowed only
      * on expressions that evaluate to built-in data types (including CHAR, VARCHAR, DATE, TIME, etc.).
      *
-     * @param value
-     *            The value to use as parameter for this function.
+     * @param value The value to use as parameter for this function.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction min(Object value)
@@ -139,8 +127,7 @@ public final class Sql
      * SUM is an aggregate function that evaluates the sum of the expression over a set of rows. SUM is allowed only on
      * expressions that evaluate to numeric data types.
      *
-     * @param value
-     *            The value to use.
+     * @param value The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction sum(Object value)
@@ -155,8 +142,7 @@ public final class Sql
      * The given value will be used.
      * </p>
      *
-     * @param value
-     *            The value to use.
+     * @param value The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction abs(Object value)
@@ -190,8 +176,7 @@ public final class Sql
      * The CEIL or CEILING function rounds the specified number up, and returns the smallest number that is greater than
      * or equal to the specified number.
      *
-     * @param value
-     *            The value to use.
+     * @param value The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction ceil(Object value)
@@ -211,13 +196,17 @@ public final class Sql
      * value.
      * </p>
      *
-     * @param value
-     *            The value to use.
+     * @param value The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction date(Object value)
     {
         return new SqlFunction("date", value);
+    }
+
+    public static SqlFunction toDate(Object value)
+    {
+        return new SqlFunction("toDate", value);
     }
 
     /**
@@ -229,8 +218,7 @@ public final class Sql
      * can be null; if the argument is null, the result is the null value.
      * </p>
      *
-     * @param value
-     *            The value to use.
+     * @param value The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction time(Object value)
@@ -247,8 +235,7 @@ public final class Sql
      * argument can be null, the result can be null; if the argument is null, the result is the null value.
      * </p>
      *
-     * @param value
-     *            The value to use.
+     * @param value The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction day(Object value)
@@ -265,8 +252,7 @@ public final class Sql
      * argument can be null, the result can be null; if the argument is null, the result is the null value.
      * </p>
      *
-     * @param value
-     *            The value to use.
+     * @param value The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction hour(Object value)
@@ -283,8 +269,7 @@ public final class Sql
      * argument can be null, the result can be null; if the argument is null, the result is the null value.
      * </p>
      *
-     * @param value
-     *            The value to use.
+     * @param value The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction minute(Object value)
@@ -301,8 +286,7 @@ public final class Sql
      * argument can be null, the result can be null. If the argument is null, the result is 0.
      * </p>
      *
-     * @param value
-     *            The value to use.
+     * @param value The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction second(Object value)
@@ -319,8 +303,7 @@ public final class Sql
      * the argument is null, the result is the null value.
      * </p>
      *
-     * @param value
-     *            The value to use.
+     * @param value The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction year(Object value)
@@ -337,8 +320,7 @@ public final class Sql
      * argument can be null, the result can be null; if the argument is null, the result is the null value.
      * </p>
      *
-     * @param value
-     *            The value to use.
+     * @param value The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction month(Object value)
@@ -350,8 +332,7 @@ public final class Sql
      * The FLOOR function rounds the specified number down, and returns the largest number that is less than or equal to
      * the specified number.
      *
-     * @param value
-     *            The value to use.
+     * @param value The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction floor(Object value)
@@ -363,8 +344,7 @@ public final class Sql
      * The LCASE or LOWER function takes a character expression as a parameter and returns a string in which all
      * alphabetical characters have been converted to lowercase.
      *
-     * @param value
-     *            The column to use.
+     * @param value The column to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction lower(Object value)
@@ -376,8 +356,7 @@ public final class Sql
      * The UCASE or UPPER function takes a character expression as a parameter and returns a string in which all
      * alphabetical characters have been converted to uppercase.
      *
-     * @param value
-     *            The column to use.
+     * @param value The column to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction upper(Object value)
@@ -389,8 +368,7 @@ public final class Sql
      * The LENGTH function is applied to either a character string expression or a bit string expression and returns the
      * number of characters in the result.
      *
-     * @param value
-     *            The value to use.
+     * @param value The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction length(Object value)
@@ -401,8 +379,7 @@ public final class Sql
     /**
      * The LTRIM function removes blanks from the beginning of a character string expression.
      *
-     * @param value
-     *            The value to use.
+     * @param value The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction leftTrim(Object value)
@@ -413,8 +390,7 @@ public final class Sql
     /**
      * The RTRIM function removes blanks from the end of a character string expression.
      *
-     * @param value
-     *            The value to use.
+     * @param value The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction rightTrim(Object value)
@@ -436,10 +412,8 @@ public final class Sql
      * The MOD function returns the remainder (modulus) of argument 1 divided by argument 2. The result is negative only
      * if argument 1 is negative.
      *
-     * @param value1
-     *            The first value to use.
-     * @param value2
-     *            The second value to use.
+     * @param value1 The first value to use.
+     * @param value2 The second value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static ModFunction mod(Object value1, Object value2)
@@ -450,8 +424,7 @@ public final class Sql
     /**
      * Converts the given decimal value to hexadecimal.
      *
-     * @param value
-     *            The value to use.
+     * @param value The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction decimalToHex(Object value)
@@ -462,8 +435,7 @@ public final class Sql
     /**
      * Converts the given decimal value to octal.
      *
-     * @param value
-     *            The value to use.
+     * @param value The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction decimalToOctal(Object value)
@@ -474,8 +446,7 @@ public final class Sql
     /**
      * Converts the given decimal value to binary.
      *
-     * @param value
-     *            The value to use.
+     * @param value The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction decimalToBinary(Object value)
@@ -486,8 +457,7 @@ public final class Sql
     /**
      * Converts the given hexadecimal value to decimal.
      *
-     * @param value
-     *            The value to use.
+     * @param value The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction hexToDecimal(Object value)
@@ -498,8 +468,7 @@ public final class Sql
     /**
      * Converts the given hexadecimal value to octal.
      *
-     * @param value
-     *            The value to use.
+     * @param value The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction hexToOctal(Object value)
@@ -510,8 +479,7 @@ public final class Sql
     /**
      * Converts the given hexadecimal value to binary.
      *
-     * @param value
-     *            The value to use.
+     * @param value The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction hexToBinary(Object value)
@@ -522,8 +490,7 @@ public final class Sql
     /**
      * Converts the given binary value to decimal.
      *
-     * @param value
-     *            The value to use.
+     * @param value The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction binaryToDecimal(Object value)
@@ -534,8 +501,7 @@ public final class Sql
     /**
      * Converts the given binary value to octal.
      *
-     * @param value
-     *            The value to use.
+     * @param value The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction binaryToOctal(Object value)
@@ -546,8 +512,7 @@ public final class Sql
     /**
      * Converts the given binary value to hexadecimal.
      *
-     * @param value
-     *            The value to use.
+     * @param value The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction binaryToHex(Object value)
@@ -558,8 +523,7 @@ public final class Sql
     /**
      * Converts the given octal value to decimal.
      *
-     * @param value
-     *            The value to use.
+     * @param value The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction octalToDecimal(Object value)
@@ -570,8 +534,7 @@ public final class Sql
     /**
      * Converts the given octal value to binary.
      *
-     * @param value
-     *            The value to use.
+     * @param value The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction octalToBinary(Object value)
@@ -582,8 +545,7 @@ public final class Sql
     /**
      * Converts the given octal value to hexadecimal.
      *
-     * @param value
-     *            The value to use.
+     * @param value The value to use.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction octalToHex(Object value)
@@ -594,12 +556,9 @@ public final class Sql
     /**
      * Pads the given String value on the left side with the given padding String until the given length is reached.
      *
-     * @param value
-     *            The value to use.
-     * @param length
-     *            The length of the resulting String.
-     * @param The
-     *            character that is used for padding.
+     * @param value  The value to use.
+     * @param length The length of the resulting String.
+     * @param The    character that is used for padding.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static LeftPadFunction lpad(Object value, int length, String pad)
@@ -610,12 +569,9 @@ public final class Sql
     /**
      * Pads the given String value on the right side with the given padding String until the given length is reached.
      *
-     * @param value
-     *            The value to use.
-     * @param length
-     *            The length of the resulting String.
-     * @param The
-     *            character that is used for padding.
+     * @param value  The value to use.
+     * @param length The length of the resulting String.
+     * @param The    character that is used for padding.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static RightPadFunction rpad(Object value, int length, String pad)
@@ -631,12 +587,9 @@ public final class Sql
      * The result is null only if all the arguments are null.
      * </p>
      *
-     * @param value1
-     *            The first value to check.
-     * @param value2
-     *            The second value to check.
-     * @param elements
-     *            Additional values.
+     * @param value1   The first value to check.
+     * @param value2   The second value to check.
+     * @param elements Additional values.
      * @return The function whichs toString method will return a valid sql representation of this action.
      */
     public static NullValueFunction nvl(Object value1, Object value2, Object... elements)
@@ -647,10 +600,8 @@ public final class Sql
     /**
      * Adds the given number of days to the value.
      *
-     * @param value
-     *            The value to use.
-     * @param length
-     *            The number of days to add.
+     * @param value  The value to use.
+     * @param length The number of days to add.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction addDays(Object value, int days)
@@ -663,10 +614,8 @@ public final class Sql
     /**
      * Adds the given number of hours to the value.
      *
-     * @param value
-     *            The value to use.
-     * @param length
-     *            The number of hours to add.
+     * @param value  The value to use.
+     * @param length The number of hours to add.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction addHours(Object value, int hours)
@@ -679,10 +628,8 @@ public final class Sql
     /**
      * Adds the given number of minutes to the value.
      *
-     * @param value
-     *            The value to use.
-     * @param length
-     *            The number of minutes to add.
+     * @param value  The value to use.
+     * @param length The number of minutes to add.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction addMinutes(Object value, int mins)
@@ -695,10 +642,8 @@ public final class Sql
     /**
      * Adds the given number of days to the value.
      *
-     * @param value
-     *            The value to use.
-     * @param length
-     *            The number of days to add.
+     * @param value  The value to use.
+     * @param length The number of days to add.
      * @return The function whichs toString will return a valid sql representation of this action.
      */
     public static SqlFunction addSeconds(Object value, int secs)

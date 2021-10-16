@@ -1535,6 +1535,20 @@ public abstract class DatabaseAccess implements Killable
                            })
                 .commit()
                 .execute();
+
+        create().function("toDate")
+                .call(DateUtils.class, "toDate", long.class)
+                .returnNullOnNull()
+                .onAlreadyExists((s, e) ->
+                                 {
+                                     return 0;
+                                 })
+                .onSuccess((s, i) ->
+                           {
+                               System.out.println("Created function " + s.getName() + ".");
+                           })
+                .commit()
+                .execute();
     }
 
     /**
