@@ -3,11 +3,15 @@ package bt.db.server;
 import bt.async.Data;
 import bt.console.output.styled.Style;
 import bt.db.DatabaseAccess;
+import bt.db.exc.SqlClientException;
 import bt.db.func.Sql;
+import bt.db.listener.evnt.DatabaseChangeEvent;
+import bt.db.listener.evnt.DeleteEvent;
+import bt.db.listener.evnt.InsertEvent;
+import bt.db.listener.evnt.UpdateEvent;
 import bt.db.statement.result.SqlResultSet;
 import bt.remote.socket.Server;
 import bt.remote.socket.ServerClient;
-import bt.remote.socket.data.DataProcessor;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +23,7 @@ import java.sql.Statement;
 /**
  * @author &#8904
  */
-public class QueryServer extends Server implements DataProcessor
+public class QueryServer extends Server
 {
     private DatabaseAccess db;
 
@@ -36,19 +40,15 @@ public class QueryServer extends Server implements DataProcessor
     @Override
     protected ServerClient createClient(Socket socket) throws IOException
     {
-        ServerClient client = super.createClient(socket);
-        client.setDataProcessor(this);
+        QueryClient client = new QueryClient(socket, this.db);
+        client.setDataProcessor(data -> process(data, client));
 
         System.out.println("New QueryServer connection established to " + client.getHost() + ":" + client.getPort());
 
         return client;
     }
 
-    /**
-     * @see bt.remote.socket.data.DataProcessor#process(bt.async.Data)
-     */
-    @Override
-    public Object process(Data incoming)
+    public Object process(Data incoming, QueryClient client)
     {
         Object ret = null;
 
@@ -71,6 +71,49 @@ public class QueryServer extends Server implements DataProcessor
                 File backup = new File("./backup/" + System.currentTimeMillis());
                 this.db.backup(backup);
                 ret = Style.apply("Created backup under " + backup.getAbsolutePath(), "lime");
+            }
+            else if (incoming.get().toString().trim().toLowerCase().startsWith("listen"))
+            {
+                String[] parts = incoming.get().toString().toLowerCase().split(" ");
+
+                if (parts.length < 3)
+                {
+                    ret = Style.apply("Format: listen <insert | delete | update> <tablename>", "red", "bold");
+                }
+                else
+                {
+                    String type = parts[1];
+                    String tabelName = parts[2];
+                    Class<? extends DatabaseChangeEvent> eventType = null;
+
+                    switch (type)
+                    {
+                        case "insert":
+                            eventType = InsertEvent.class;
+                            break;
+                        case "update":
+                            eventType = UpdateEvent.class;
+                            break;
+                        case "delete":
+                            eventType = DeleteEvent.class;
+                            break;
+                        default:
+                            ret = Style.apply("Format: listen <insert | delete | update> <tablename>", "red", "bold");
+                    }
+
+                    if (eventType != null)
+                    {
+                        try
+                        {
+                            client.listenToTrigger(eventType, tabelName);
+                            ret = Style.apply("Started listening for " + type + " triggers on table " + tabelName + ".", "lime");
+                        }
+                        catch (SqlClientException e)
+                        {
+                            ret = e;
+                        }
+                    }
+                }
             }
             else if (incoming.get().toString().trim().toLowerCase().startsWith("info"))
             {
