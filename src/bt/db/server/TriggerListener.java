@@ -26,6 +26,7 @@ public class TriggerListener<T extends DatabaseChangeEvent>
     {
         try
         {
+            event.setSourceDatabase(null);
             this.client.send(event);
         }
         catch (IOException e)
