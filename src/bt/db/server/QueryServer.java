@@ -10,6 +10,7 @@ import bt.db.listener.evnt.DeleteEvent;
 import bt.db.listener.evnt.InsertEvent;
 import bt.db.listener.evnt.UpdateEvent;
 import bt.db.statement.result.SqlResultSet;
+import bt.log.Log;
 import bt.remote.socket.Server;
 import bt.remote.socket.ServerClient;
 
@@ -29,6 +30,7 @@ public class QueryServer extends Server
 
     /**
      * @param port
+     *
      * @throws IOException
      */
     public QueryServer(DatabaseAccess db, int port) throws IOException
@@ -43,7 +45,7 @@ public class QueryServer extends Server
         QueryClient client = new QueryClient(socket, this.db);
         client.setDataProcessor(data -> process(data, client));
 
-        System.out.println("New QueryServer connection established to " + client.getHost() + ":" + client.getPort());
+        Log.debug("New QueryServer connection established to " + client.getHost() + ":" + client.getPort());
 
         return client;
     }
@@ -52,7 +54,7 @@ public class QueryServer extends Server
     {
         Object ret = null;
 
-        System.out.println("Received '" + incoming.get() + "'.");
+        Log.debug("Received '" + incoming.get() + "'.");
 
         if (incoming.get() instanceof String)
         {
@@ -189,7 +191,7 @@ public class QueryServer extends Server
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
+            Log.error("Failed to execute Sql", e);
             ret = e;
         }
 

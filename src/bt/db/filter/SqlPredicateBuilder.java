@@ -2,6 +2,7 @@ package bt.db.filter;
 
 import bt.db.filter.parse.WhereClauseParser;
 import bt.db.statement.clause.condition.ConditionalClause;
+import bt.log.Log;
 import net.sf.jsqlparser.JSQLParserException;
 
 import java.lang.reflect.Constructor;
@@ -17,7 +18,9 @@ public class SqlPredicateBuilder
      * Creates a default {@link ClassFieldSqlPredicate} by parsing the given SQL select statement.
      *
      * @param searchCondition The condition part of an SQL where condition. This String should contain the text that comes after the where keyword in a select.
+     *
      * @return The created predicate.
+     *
      * @throws JSQLParserException If the given SQL could not be parsed correctly.
      */
     public static Predicate<Object> buildPredicate(String searchCondition) throws JSQLParserException
@@ -28,7 +31,7 @@ public class SqlPredicateBuilder
         }
         catch (InstantiationException | InvocationTargetException | NoSuchMethodException e)
         {
-            e.printStackTrace();
+            Log.error("Failed to build predicate", e);
         }
 
         return null;
@@ -42,7 +45,9 @@ public class SqlPredicateBuilder
      * @param searchCondition The condition part of an SQL where condition. This String should contain the text that comes after the where keyword in a select.
      * @param <T>
      * @param <K>
+     *
      * @return The created predicate.
+     *
      * @throws InstantiationException    If the given type cant be instantiated.
      * @throws NoSuchMethodException     If the given type does not implement all constructors of {@link SqlPredicate}.
      * @throws InvocationTargetException If the invoked constructor of the type throws an exception.
@@ -119,7 +124,7 @@ public class SqlPredicateBuilder
         }
         catch (IllegalAccessException e)
         {
-            e.printStackTrace();
+            Log.error("Failed to create new instance", e);
         }
 
         return instance;

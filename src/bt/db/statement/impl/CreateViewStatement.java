@@ -4,6 +4,7 @@ import bt.db.DatabaseAccess;
 import bt.db.constants.SqlState;
 import bt.db.exc.SqlExecutionException;
 import bt.db.func.Sql;
+import bt.log.Log;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -34,7 +35,7 @@ public class CreateViewStatement extends CreateStatement<CreateViewStatement, Cr
     }
 
     @Override
-    protected int executeStatement(boolean printLogs)
+    protected int executeStatement()
     {
         String sql = toString();
 
@@ -42,8 +43,7 @@ public class CreateViewStatement extends CreateStatement<CreateViewStatement, Cr
 
         try (PreparedStatement statement = this.db.getConnection().prepareStatement(sql))
         {
-            log("Executing: " + sql,
-                printLogs);
+            Log.debug("Executing: " + sql);
             statement.executeUpdate();
 
             if (this.shouldCommit)
@@ -92,14 +92,14 @@ public class CreateViewStatement extends CreateStatement<CreateViewStatement, Cr
                                                                 {
                                                                     return handleFail(new SqlExecutionException(e.getMessage(), sql, e));
                                                                 })
-                                                        .execute(printLogs);
+                                                        .execute();
                                              });
 
-                if (drop.execute(printLogs) > 0)
+                if (drop.execute() > 0)
                 {
                     try (PreparedStatement statement = this.db.getConnection().prepareStatement(sql))
                     {
-                        log("Replacing view '" + this.name + "'.", printLogs);
+                        Log.debug("Replacing view '" + this.name + "'.");
                         statement.executeUpdate();
 
                         result = 1;

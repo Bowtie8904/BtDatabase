@@ -5,6 +5,7 @@ import bt.db.constants.SqlState;
 import bt.db.exc.SqlExecutionException;
 import bt.db.func.Sql;
 import bt.db.statement.clause.TriggerAction;
+import bt.log.Log;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -49,6 +50,7 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
      * </p>
      *
      * @param action The action which should cause this trigger to be executed. Either 'insert', 'update' or 'delete'.
+     *
      * @return This instance for chaining.
      */
     public CreateTriggerStatement after(String action)
@@ -71,6 +73,7 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
      * </p>
      *
      * @param action The action which should cause this trigger to be executed. Either 'insert', 'update' or 'delete'.
+     *
      * @return This instance for chaining.
      */
     public CreateTriggerStatement before(String action)
@@ -92,6 +95,7 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
      * </p>
      *
      * @param columns The names of the columns.
+     *
      * @return This instance for chaining.
      */
     public CreateTriggerStatement of(String... columns)
@@ -104,7 +108,7 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
             }
             catch (SQLSyntaxErrorException e)
             {
-                e.printStackTrace();
+                Log.error("Sql syntax error", e);
                 return this;
             }
         }
@@ -117,6 +121,7 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
      * Sets the table that this trigger should listen on.
      *
      * @param table The name of the table.
+     *
      * @return This instance for chaining.
      */
     public CreateTriggerStatement on(String table)
@@ -137,6 +142,7 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
      * </p>
      *
      * @param alias The alias of the row.
+     *
      * @return This instance for chaining.
      */
     public CreateTriggerStatement newAs(String alias)
@@ -153,6 +159,7 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
      * </p>
      *
      * @param alias The alias of the row.
+     *
      * @return This instance for chaining.
      */
     public CreateTriggerStatement oldAs(String alias)
@@ -195,10 +202,10 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
     }
 
     /**
-     * @see bt.db.statement.SqlModifyStatement#execute(boolean)
+     * @see bt.db.statement.SqlModifyStatement#execute()
      */
     @Override
-    protected int executeStatement(boolean printLogs)
+    protected int executeStatement()
     {
         String sql = toString();
 
@@ -207,8 +214,7 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
 
         try (PreparedStatement statement = this.db.getConnection().prepareStatement(sql))
         {
-            log("Executing: " + sql,
-                printLogs);
+            Log.debug("Executing: " + sql);
             statement.executeUpdate();
             endExecutionTime();
             result = 1;
@@ -255,11 +261,11 @@ public class CreateTriggerStatement extends CreateStatement<CreateTriggerStateme
                                               return 0;
                                           });
 
-                if (drop.execute(printLogs) > 0)
+                if (drop.execute() > 0)
                 {
                     try (PreparedStatement statement = this.db.getConnection().prepareStatement(sql))
                     {
-                        log("Replacing trigger '" + this.name + "'.", printLogs);
+                        Log.debug("Replacing trigger '" + this.name + "'.");
                         statement.executeUpdate();
                         endExecutionTime();
 

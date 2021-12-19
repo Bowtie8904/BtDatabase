@@ -2,6 +2,7 @@ package bt.db;
 
 import bt.db.config.DatabaseConfiguration;
 import bt.db.constants.SqlType;
+import bt.log.Log;
 
 import java.io.File;
 import java.net.URLDecoder;
@@ -77,7 +78,7 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
 
         if (success == 1)
         {
-            System.out.println("Created onInsert procedure.");
+            Log.debug("Created onInsert procedure.");
             created = true;
         }
 
@@ -103,7 +104,7 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
 
         if (success == 1)
         {
-            System.out.println("Created onDelete procedure.");
+            Log.debug("Created onDelete procedure.");
             created = true;
         }
 
@@ -129,7 +130,7 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
 
         if (success == 1)
         {
-            System.out.println("Created onUpdate procedure.");
+            Log.debug("Created onUpdate procedure.");
             created = true;
         }
 
@@ -165,12 +166,12 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
             EmbeddedDatabase.derbyHome = jarFile.getParentFile().getAbsolutePath();
             System.setProperty("derby.system.home",
                                EmbeddedDatabase.derbyHome);
-            System.out.println(String.format("Set derby home to %s.",
-                                             EmbeddedDatabase.derbyHome));
+            Log.debug(String.format("Set derby home to %s.",
+                                    EmbeddedDatabase.derbyHome));
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            Log.error("Failed to set derby home", e);
         }
     }
 
@@ -199,7 +200,7 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            Log.error("Failed to get jar path", e);
         }
         return null;
     }
@@ -214,8 +215,8 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
             try (CallableStatement statement = getConnection().prepareCall(sql))
             {
                 statement.executeUpdate();
-                System.out.println(String.format("Added %s to the database.",
-                                                 path));
+                Log.debug(String.format("Added %s to the database.",
+                                        path));
             }
             catch (SQLException e)
             {
@@ -224,8 +225,8 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
                 try (CallableStatement statement = getConnection().prepareCall(sql))
                 {
                     statement.executeUpdate();
-                    System.out.println(String.format("Replaced %s in the database.",
-                                                     path));
+                    Log.debug(String.format("Replaced %s in the database.",
+                                            path));
                 }
                 catch (SQLException e1)
                 {
@@ -237,7 +238,7 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
             try (CallableStatement statement = getConnection().prepareCall(sql))
             {
                 statement.executeUpdate();
-                System.out.println("Added classpath to the database.");
+                Log.debug("Added classpath to the database.");
             }
             catch (SQLException e1)
             {

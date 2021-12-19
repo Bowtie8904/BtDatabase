@@ -13,6 +13,7 @@ import bt.db.statement.result.SqlResultSet;
 import bt.db.statement.result.StreamableResultSet;
 import bt.db.statement.value.Preparable;
 import bt.db.statement.value.Value;
+import bt.log.Log;
 import bt.utils.Null;
 
 import java.sql.PreparedStatement;
@@ -148,7 +149,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
         this.lowerThreshhold = 1;
         this.onLessThan = (i, set) ->
         {
-            System.out.println("< " + set.getSql() + " > did not return any data.");
+            Log.debug("< " + set.getSql() + " > did not return any data.");
 
             if (set.getValues().size() > 0)
             {
@@ -159,7 +160,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
                     values += value + "\n";
                 }
 
-                System.out.println(values);
+                Log.debug(values);
             }
 
             return set;
@@ -183,6 +184,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * </p>
      *
      * @param intoObject
+     *
      * @return This instance for chaining.
      */
     public SelectStatement into(Object intoObject)
@@ -202,7 +204,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
         }
         catch (IndexOutOfBoundsException e)
         {
-            new SQLSyntaxErrorException("Specify a from clause before setting an alias.").printStackTrace();
+            Log.error("Sql syntax error", new SQLSyntaxErrorException("Specify a from clause before setting an alias."));
         }
 
         return this;
@@ -228,7 +230,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
         }
         catch (IndexOutOfBoundsException e)
         {
-            new SQLSyntaxErrorException("No from clause present, cannot get an alias.").printStackTrace();
+            Log.error("Sql syntax error", new SQLSyntaxErrorException("No from clause present, cannot get an alias."));
         }
 
         return alias;
@@ -259,7 +261,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
             }
             catch (SQLSyntaxErrorException e)
             {
-                e.printStackTrace();
+                Log.error("Sql syntax error", e);
                 return this;
             }
         }
@@ -272,6 +274,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * Defines the tables to select from.
      *
      * @param tables The tables to select from.
+     *
      * @return This instance for chaining.
      */
     public SelectStatement from(Object table)
@@ -282,7 +285,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
 
             if (select.getAlias() == null)
             {
-                new SQLSyntaxErrorException("Subselects must have an alias assigned.").printStackTrace();
+                Log.error("Sql syntax error", new SQLSyntaxErrorException("Subselects must have an alias assigned."));
             }
         }
 
@@ -295,6 +298,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * Creates a join with the given table.
      *
      * @param table The table to join with.
+     *
      * @return The created JoinClause.
      */
     public JoinClause join(String table)
@@ -312,7 +316,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
         }
         catch (IndexOutOfBoundsException e)
         {
-            System.out.println("Must define at least one from clause before a join can be performed.");
+            Log.error("Must define at least one from clause before a join can be performed.", e);
         }
 
         return join;
@@ -322,6 +326,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * Creates a new where conditional clause using the given column for this statement.
      *
      * @param column The column to use in this condition.
+     *
      * @return The created ConditionalClause.
      */
     public ConditionalClause<SelectStatement> where(String column)
@@ -339,6 +344,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      *
      * @param column The column to use in this condition.
      * @param prefix A String that will be put in front of the expression. Can be used for parenthesis.
+     *
      * @return The created ConditionalClause.
      */
     public ConditionalClause<SelectStatement> where(String prefix, String column)
@@ -357,6 +363,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * statement.
      *
      * @param column The column to use in this condition.
+     *
      * @return The created ConditionalClause.
      */
     public ConditionalClause<SelectStatement> and(String column)
@@ -383,6 +390,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      *
      * @param column The column to use in this condition.
      * @param prefix A String that will be put in front of the expression. Can be used for parenthesis.
+     *
      * @return The created ConditionalClause.
      */
     public ConditionalClause<SelectStatement> and(String prefix, String column)
@@ -409,6 +417,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * statement.
      *
      * @param column The column to use in this condition.
+     *
      * @return The created ConditionalClause.
      */
     public ConditionalClause<SelectStatement> or(String column)
@@ -435,6 +444,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      *
      * @param column The column to use in this condition.
      * @param prefix A String that will be put in front of the expression. Can be used for parenthesis.
+     *
      * @return The created ConditionalClause.
      */
     public ConditionalClause<SelectStatement> or(String prefix, String column)
@@ -461,6 +471,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * statement.
      *
      * @param column The column to use in this condition.
+     *
      * @return The created JoinConditionalClause.
      */
     public ConditionalClause<SelectStatement> andOn(String column)
@@ -480,6 +491,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * statement.
      *
      * @param column The column to use in this condition.
+     *
      * @return The created JoinConditionalClause.
      */
     public ConditionalClause<SelectStatement> orOn(String column)
@@ -499,6 +511,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * A group by expression must be before this call.
      *
      * @param column The column to use in this condition.
+     *
      * @return The created ConditionalClause.
      */
     public ConditionalClause<SelectStatement> having(String column)
@@ -511,7 +524,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
             }
             catch (SQLSyntaxErrorException e)
             {
-                e.printStackTrace();
+                Log.error("Sql syntax error", e);
                 return null;
             }
         }
@@ -528,6 +541,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * Defines the columns to order the result by.
      *
      * @param columns The columns to order by.
+     *
      * @return The created OrderByClause.
      */
     public OrderByClause orderBy(String... columns)
@@ -542,6 +556,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * Defines the column to order the result by.
      *
      * @param column The number of the column.
+     *
      * @return The created OrderByClause.
      */
     public OrderByClause orderBy(int column)
@@ -572,6 +587,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * </p>
      *
      * @param n The number of rows to return.
+     *
      * @return This instance for chaining.
      */
     public SelectStatement first(int n)
@@ -588,6 +604,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * </p>
      *
      * @param n The offest, number of rows to skip.
+     *
      * @return This instance for chaining.
      */
     public SelectStatement offset(int n)
@@ -600,6 +617,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * Defines the columns to group by.
      *
      * @param columns The columns to group by.
+     *
      * @return This instance for chaining.
      */
     public SelectStatement groupBy(String... columns)
@@ -616,6 +634,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * </p>
      *
      * @param onSuccess The function to execute.
+     *
      * @return This instance for chaining.
      */
     public SelectStatement onSuccess(BiConsumer<SelectStatement, SqlResultSet> onSuccess)
@@ -630,6 +649,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      *
      * @param lowerThreshhold The threshhold to check.
      * @param statement       The statement to execute.
+     *
      * @return This instance for chaining.
      */
     public SelectStatement onLessThan(int lowerThreshhold, SelectStatement statement)
@@ -648,6 +668,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      *
      * @param lowerThreshhold The threshhold to check.
      * @param statement       The statement to execute.
+     *
      * @return This instance for chaining.
      */
     public SelectStatement onLessThan(int lowerThreshhold, SqlModifyStatement statement)
@@ -672,6 +693,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      *
      * @param lowerThreshhold The threshhold to check.
      * @param onLessThan      The BiFunction to execute.
+     *
      * @return This instance for chaining.
      */
     public SelectStatement onLessThan(int lowerThreshhold, BiFunction<Integer, SqlResultSet, SqlResultSet> onLessThan)
@@ -687,6 +709,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      *
      * @param higherThreshhold The threshhold to check.
      * @param statement        The statement to execute.
+     *
      * @return This instance for chaining.
      */
     public SelectStatement onMoreThan(int higherThreshhold, SelectStatement statement)
@@ -705,6 +728,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      *
      * @param higherThreshhold The threshhold to check.
      * @param statement        The statement to execute.
+     *
      * @return This instance for chaining.
      */
     public SelectStatement onMoreThan(int higherThreshhold, SqlModifyStatement statement)
@@ -729,6 +753,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      *
      * @param higherThreshhold The threshhold to check.
      * @param onLessThan       The BiFunction to execute.
+     *
      * @return This instance for chaining.
      */
     public SelectStatement onMoreThan(int higherThreshhold, BiFunction<Integer, SqlResultSet, SqlResultSet> onMoreThan)
@@ -757,6 +782,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * during the execution of the original select.
      *
      * @param onFail The SelectStatement to execute instead.
+     *
      * @return This instance for chaining.
      */
     public SelectStatement onFail(SelectStatement onFail)
@@ -779,6 +805,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * </p>
      *
      * @param onFail The BiFunction to execute.
+     *
      * @return This instance for chaining.
      */
     public SelectStatement onFail(BiFunction<SelectStatement, SqlExecutionException, SqlResultSet> onFail)
@@ -826,6 +853,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * </p>
      *
      * @param select The select to append to this one.
+     *
      * @return This instance for chaining.
      */
     public SelectStatement unionAll(SelectStatement select)
@@ -847,6 +875,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * </p>
      *
      * @param select The select to append to this one.
+     *
      * @return This instance for chaining.
      */
     public SelectStatement union(SelectStatement select)
@@ -868,6 +897,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * </p>
      *
      * @param select The select to append to this one.
+     *
      * @return This instance for chaining.
      */
     public SelectStatement intersectAll(SelectStatement select)
@@ -889,6 +919,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * </p>
      *
      * @param select The select to append to this one.
+     *
      * @return This instance for chaining.
      */
     public SelectStatement intersect(SelectStatement select)
@@ -910,6 +941,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * </p>
      *
      * @param select The select to append to this one.
+     *
      * @return This instance for chaining.
      */
     public SelectStatement exceptAll(SelectStatement select)
@@ -932,6 +964,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
      * </p>
      *
      * @param select The select to append to this one.
+     *
      * @return This instance for chaining.
      */
     public SelectStatement except(SelectStatement select)
@@ -960,23 +993,11 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
 
     /**
      * Executes the select and returns the resultset. Depending on the number of rows returned, the defined onLessThan
-     * or onMoreThan might be executed.
+     * or onMoreThan might be executed. If there is an error during this execution, the onFail function is called.
      *
      * @return The result.
      */
     public SqlResultSet execute()
-    {
-        return execute(false);
-    }
-
-    /**
-     * Executes the select and returns the resultset. Depending on the number of rows returned, the defined onLessThan
-     * or onMoreThan might be executed. If there is an error during this execution, the onFail function is called.
-     *
-     * @param printLogs true if information such as the full statement and paramaters should be printed.
-     * @return The result.
-     */
-    public SqlResultSet execute(boolean printLogs)
     {
         startExecutionTime();
         String sql = toString();
@@ -987,8 +1008,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
                                                                     ResultSet.TYPE_SCROLL_INSENSITIVE,
                                                                     ResultSet.CONCUR_READ_ONLY))
         {
-            log("Executing: " + sql,
-                printLogs);
+            Log.debug("Executing: " + sql);
 
             List<String> valueList = new ArrayList<>();
 
@@ -1000,8 +1020,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
 
                 if (!values.isEmpty())
                 {
-                    log("With values:",
-                        printLogs);
+                    Log.debug("With values:");
                 }
 
                 Value val = null;
@@ -1009,7 +1028,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
                 for (int j = 0; j < values.size(); j++)
                 {
                     val = values.get(j);
-                    log("p" + (j + 1) + " [" + val.getType().toString() + "] = " + val.getValue(), printLogs);
+                    Log.debug("p" + (j + 1) + " [" + val.getType().toString() + "] = " + val.getValue());
                 }
             }
 
@@ -1054,8 +1073,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
                 }
             }
 
-            log("Returned rows: " + result.size(),
-                printLogs);
+            Log.debug("Returned rows: " + result.size());
 
             Null.checkConsume(this.onSuccess, result, (r) -> this.onSuccess.accept(this, r));
 
@@ -1088,11 +1106,6 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
 
     public StreamableResultSet executeAsStream()
     {
-        return executeAsStream(false);
-    }
-
-    public StreamableResultSet executeAsStream(boolean printLogs)
-    {
         startExecutionTime();
         String sql = toString();
         StreamableResultSet result = null;
@@ -1103,7 +1116,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
                                                  .prepareStatement(sql,
                                                                    ResultSet.TYPE_SCROLL_INSENSITIVE,
                                                                    ResultSet.CONCUR_READ_ONLY);
-            log("Executing: " + sql, printLogs);
+            Log.debug("Executing: " + sql);
 
             List<String> valueList = new ArrayList<>();
 
@@ -1115,7 +1128,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
 
                 if (!values.isEmpty())
                 {
-                    log("With values:", printLogs);
+                    Log.debug("With values:");
                 }
 
                 Value val = null;
@@ -1123,7 +1136,7 @@ public class SelectStatement extends SqlStatement<SelectStatement> implements Pr
                 for (int j = 0; j < values.size(); j++)
                 {
                     val = values.get(j);
-                    log("p" + (j + 1) + " [" + val.getType().toString() + "] = " + val.getValue(), printLogs);
+                    Log.debug("p" + (j + 1) + " [" + val.getType().toString() + "] = " + val.getValue());
                 }
             }
 

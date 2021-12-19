@@ -1,15 +1,16 @@
 package bt.db.statement.impl;
 
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-
 import bt.db.DatabaseAccess;
 import bt.db.exc.SqlExecutionException;
 import bt.db.func.Sql;
 import bt.db.statement.clause.IndexColumnClause;
+import bt.log.Log;
 import bt.utils.Null;
+
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A statement to define an SQL index.
@@ -35,9 +36,9 @@ public class CreateIndexStatement extends CreateStatement<CreateIndexStatement, 
     public CreateIndexStatement on(String table)
     {
         this.tables = new String[]
-        {
-          table
-        };
+                {
+                        table
+                };
         return this;
     }
 
@@ -55,10 +56,10 @@ public class CreateIndexStatement extends CreateStatement<CreateIndexStatement, 
     }
 
     /**
-     * @see bt.db.statement.SqlModifyStatement#executeStatement(boolean)
+     * @see bt.db.statement.SqlModifyStatement#executeStatement()
      */
     @Override
-    protected int executeStatement(boolean printLogs)
+    protected int executeStatement()
     {
         String sql = toString();
 
@@ -66,8 +67,7 @@ public class CreateIndexStatement extends CreateStatement<CreateIndexStatement, 
 
         try (Statement statement = this.db.getConnection().createStatement())
         {
-            log("Executing: " + sql,
-                printLogs);
+            Log.debug("Executing: " + sql);
             statement.execute(sql);
             endExecutionTime();
             result = 1;
@@ -80,18 +80,18 @@ public class CreateIndexStatement extends CreateStatement<CreateIndexStatement, 
                        .set("object_name", this.name.toUpperCase())
                        .set("object_ddl", sql + ";")
                        .onDuplicateKey((s, e2) ->
-                       {
-                           return this.db.update(DatabaseAccess.OBJECT_DATA_TABLE)
-                                         .set("instanceID", this.db.getInstanceID())
-                                         .set("object_name", this.name.toUpperCase())
-                                         .set("object_ddl", sql + ";")
-                                         .where(Sql.upper("object_name").toString()).equal(this.name.toUpperCase())
-                                         .onFail((st, ex) ->
-                                         {
-                                             return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));
-                                         })
-                                         .execute();
-                       })
+                                       {
+                                           return this.db.update(DatabaseAccess.OBJECT_DATA_TABLE)
+                                                         .set("instanceID", this.db.getInstanceID())
+                                                         .set("object_name", this.name.toUpperCase())
+                                                         .set("object_ddl", sql + ";")
+                                                         .where(Sql.upper("object_name").toString()).equal(this.name.toUpperCase())
+                                                         .onFail((st, ex) ->
+                                                                 {
+                                                                     return handleFail(new SqlExecutionException(ex.getMessage(), sql, ex));
+                                                                 })
+                                                         .execute();
+                                       })
                        .execute();
             }
 

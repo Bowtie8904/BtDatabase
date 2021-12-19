@@ -1,19 +1,15 @@
 package bt.db.statement.clause;
 
-import java.sql.Blob;
-import java.sql.Clob;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.util.function.Supplier;
-
 import bt.db.constants.SqlType;
 import bt.db.constants.SqlValue;
 import bt.db.func.SqlFunction;
 import bt.db.statement.SqlModifyStatement;
 import bt.db.statement.impl.InsertStatement;
 import bt.db.statement.impl.UpdateStatement;
+import bt.log.Log;
+
+import java.sql.*;
+import java.util.function.Supplier;
 
 /**
  * Holds data for SET caluses used in insert and update statements.
@@ -22,19 +18,29 @@ import bt.db.statement.impl.UpdateStatement;
  */
 public class SetClause<T extends SqlModifyStatement>
 {
-    /** The sql type of the used value. */
+    /**
+     * The sql type of the used value.
+     */
     private SqlType sqlValueType;
 
-    /** The name of the column that is used in this clause. */
+    /**
+     * The name of the column that is used in this clause.
+     */
     private String column;
 
-    /** The value for the column. */
+    /**
+     * The value for the column.
+     */
     private Object value;
 
-    /** A suplier that is used to retrieve the value when this clause is prepared for execution. */
+    /**
+     * A suplier that is used to retrieve the value when this clause is prepared for execution.
+     */
     private Supplier<?> valueSupplier;
 
-    /** The statement that created this clause. */
+    /**
+     * The statement that created this clause.
+     */
     private T statement;
 
     public SetClause(T statement, String column, Object value, SqlType type)
@@ -56,10 +62,9 @@ public class SetClause<T extends SqlModifyStatement>
     /**
      * Prepares the values for execution.
      *
-     * @param statement
-     *            The statement which should be prepared with this set clause.
-     * @param parameterIndex
-     *            The index of the parameter in the given statement that should be prepared.
+     * @param statement      The statement which should be prepared with this set clause.
+     * @param parameterIndex The index of the parameter in the given statement that should be prepared.
+     *
      * @return A String representation of the prepared value.
      */
     public String prepareValue(PreparedStatement statement, int parameterIndex)
@@ -127,7 +132,7 @@ public class SetClause<T extends SqlModifyStatement>
                             strValue = ((Date)this.value).toString();
                         }
                         else if (SqlValue.CURRENT_DATE.equals(this.value)
-                                 || SqlValue.SYSDATE.equals(this.value))
+                                || SqlValue.SYSDATE.equals(this.value))
                         {
                             var date = new Date(new java.util.Date().getTime());
                             statement.setDate(parameterIndex,
@@ -156,7 +161,7 @@ public class SetClause<T extends SqlModifyStatement>
                             strValue = ((Time)this.value).toString();
                         }
                         else if (SqlValue.CURRENT_TIME.equals(this.value)
-                                 || SqlValue.SYSTIME.equals(this.value))
+                                || SqlValue.SYSTIME.equals(this.value))
                         {
                             var time = new Time(new java.util.Date().getTime());
                             statement.setTime(parameterIndex,
@@ -185,7 +190,7 @@ public class SetClause<T extends SqlModifyStatement>
                             strValue = ((Timestamp)this.value).toString();
                         }
                         else if (SqlValue.CURRENT_TIMESTAMP.equals(this.value)
-                                 || SqlValue.SYSTIMESTAMP.equals(this.value))
+                                || SqlValue.SYSTIMESTAMP.equals(this.value))
                         {
                             var timestamp = new Timestamp(new java.util.Date().getTime());
                             statement.setTimestamp(parameterIndex,
@@ -218,7 +223,7 @@ public class SetClause<T extends SqlModifyStatement>
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            Log.error("Failed to prepare value " + parameterIndex, e);
         }
 
         return strValue;
@@ -251,9 +256,8 @@ public class SetClause<T extends SqlModifyStatement>
     /**
      * Returns the String representing this set clause.
      *
-     * @param prepared
-     *            Indicates whether values should be treated for prepared statements or inserted as plain text. true =
-     *            use prepared statement, false = insert plain.
+     * @param prepared Indicates whether values should be treated for prepared statements or inserted as plain text. true =
+     *                 use prepared statement, false = insert plain.
      */
     public String toString(boolean prepared)
     {
@@ -372,7 +376,7 @@ public class SetClause<T extends SqlModifyStatement>
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            Log.error("Failed to get String value", e);
         }
 
         return strValue;

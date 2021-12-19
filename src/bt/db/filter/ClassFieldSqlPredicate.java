@@ -1,6 +1,7 @@
 package bt.db.filter;
 
 import bt.db.filter.parse.SqlPredicateColumn;
+import bt.log.Log;
 import bt.reflect.field.Fields;
 
 import java.lang.reflect.Field;
@@ -85,7 +86,7 @@ public class ClassFieldSqlPredicate extends SqlPredicate<Object>
                 }
                 catch (IllegalAccessException e)
                 {
-                    e.printStackTrace();
+                    Log.error("Failed to get field value", e);
                 }
             }
         }

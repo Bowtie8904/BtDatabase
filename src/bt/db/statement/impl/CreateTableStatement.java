@@ -14,6 +14,7 @@ import bt.db.statement.clause.Column;
 import bt.db.statement.clause.ColumnEntry;
 import bt.db.statement.clause.foreign.ForeignKey;
 import bt.db.statement.clause.foreign.TableForeignKey;
+import bt.log.Log;
 import bt.utils.StringID;
 
 import java.sql.PreparedStatement;
@@ -98,6 +99,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
      *
      * @param name The name of the column.
      * @param type The {@link SqlType type} of the column.
+     *
      * @return The created column.
      */
     public CreateTableStatement column(Column column)
@@ -121,6 +123,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
      * </p>
      *
      * @param select
+     *
      * @return
      */
     public CreateTableStatement as(SelectStatement select)
@@ -143,6 +146,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
      * </p>
      *
      * @param table
+     *
      * @return
      */
     public CreateTableStatement asCopyOf(String table)
@@ -171,6 +175,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
      * </p>
      *
      * @param copyData
+     *
      * @return
      */
     public CreateTableStatement withData(boolean copyData)
@@ -183,6 +188,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
      * Indictaes whether the default triggers (insert, update, delete) should be created.
      *
      * @param defaultTriggers
+     *
      * @return
      */
     public CreateTableStatement createDefaultTriggers(boolean defaultTriggers)
@@ -199,6 +205,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
      * </p>
      *
      * @param defaultTrigger
+     *
      * @return
      */
     public CreateTableStatement createDefaultDeleteTrigger(boolean defaultTrigger)
@@ -215,6 +222,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
      * </p>
      *
      * @param defaultTrigger
+     *
      * @return
      */
     public CreateTableStatement createDefaultInsertTrigger(boolean defaultTrigger)
@@ -231,6 +239,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
      * </p>
      *
      * @param defaultTrigger
+     *
      * @return
      */
     public CreateTableStatement createDefaultUpdateTrigger(boolean defaultTrigger)
@@ -243,6 +252,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
      * Adds a table foreign key.
      *
      * @param foreignKey the foreign key.
+     *
      * @return This instance for chaining.
      */
     public CreateTableStatement foreignKey(TableForeignKey foreignKey)
@@ -269,7 +279,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
         return this;
     }
 
-    private void createTriggers(boolean printLogs)
+    private void createTriggers()
     {
         if (this.db instanceof EmbeddedDatabase)
         {
@@ -288,7 +298,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                              new ColumnEntry("oldRow",
                                              this.identity))
                        .replace()
-                       .execute(printLogs);
+                       .execute();
             }
 
             if (this.createDefaultInsertTrigger)
@@ -306,7 +316,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                              new ColumnEntry("newRow",
                                              this.identity))
                        .replace()
-                       .execute(printLogs);
+                       .execute();
             }
 
             if (this.createDefaultUpdateTrigger)
@@ -324,7 +334,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                              new ColumnEntry("newRow",
                                              this.identity))
                        .replace()
-                       .execute(printLogs);
+                       .execute();
             }
         }
         else if (this.db instanceof RemoteDatabase)
@@ -343,7 +353,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                                        + this.identity
                                        + ")")
                        .replace()
-                       .execute(printLogs);
+                       .execute();
             }
 
             if (this.createDefaultInsertTrigger)
@@ -360,7 +370,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                                        + this.identity
                                        + ")")
                        .replace()
-                       .execute(printLogs);
+                       .execute();
             }
 
             if (this.createDefaultUpdateTrigger)
@@ -377,16 +387,16 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                                        + this.identity
                                        + ")")
                        .replace()
-                       .execute(printLogs);
+                       .execute();
             }
         }
     }
 
     /**
-     * @see bt.db.statement.SqlModifyStatement#execute(boolean)
+     * @see bt.db.statement.SqlModifyStatement#execute()
      */
     @Override
-    protected int executeStatement(boolean printLogs)
+    protected int executeStatement()
     {
         String sql = toString();
 
@@ -394,13 +404,12 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
 
         try (PreparedStatement statement = this.db.getConnection().prepareStatement(sql))
         {
-            log("Executing: " + sql,
-                printLogs);
+            Log.debug("Executing: " + sql);
             statement.executeUpdate();
 
             if (this.createDefaultTriggers)
             {
-                createTriggers(printLogs);
+                createTriggers();
             }
 
             for (var col : this.tableColumns)
@@ -433,13 +442,13 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                         index.column(col.getName()).asc();
                     }
 
-                    index.execute(printLogs);
+                    index.execute();
                 }
             }
 
             if (this.asCopySelect != null && this.copyData)
             {
-                this.db.insert().into(this.name).from(this.asCopySelect).execute(printLogs);
+                this.db.insert().into(this.name).from(this.asCopySelect).execute();
             }
 
             result = 1;
@@ -484,6 +493,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
             {
                 this.db.commit();
             }
+
             endExecutionTime();
 
             handleSuccess(result);
@@ -506,7 +516,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                                                                 {
                                                                     return handleFail(new SqlExecutionException(e.getMessage(), sql, e));
                                                                 })
-                                                        .execute(printLogs);
+                                                        .execute();
 
                                                  this.db.delete().from(DatabaseAccess.OBJECT_DATA_TABLE)
                                                         .where(Sql.upper("object_name").toString()).equal(this.name)
@@ -514,26 +524,26 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
                                                                 {
                                                                     return handleFail(new SqlExecutionException(e.getMessage(), sql, e));
                                                                 })
-                                                        .execute(printLogs);
+                                                        .execute();
                                              });
 
-                if (drop.execute(printLogs) > 0)
+                if (drop.execute() > 0)
                 {
                     try (PreparedStatement statement = this.db.getConnection().prepareStatement(sql))
                     {
-                        log("Replacing table '" + this.name + "'.", printLogs);
+                        Log.debug("Replacing table '" + this.name + "'.");
                         statement.executeUpdate();
 
                         result = 1;
 
                         if (this.createDefaultTriggers)
                         {
-                            createTriggers(printLogs);
+                            createTriggers();
                         }
 
                         if (this.asCopySelect != null && this.copyData)
                         {
-                            this.db.insert().into(this.name).from(this.asCopySelect).execute(printLogs);
+                            this.db.insert().into(this.name).from(this.asCopySelect).execute();
                         }
 
                         endExecutionTime();

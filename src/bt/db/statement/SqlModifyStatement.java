@@ -1,5 +1,12 @@
 package bt.db.statement;
 
+import bt.db.DatabaseAccess;
+import bt.db.constants.SqlState;
+import bt.db.exc.SqlExecutionException;
+import bt.db.statement.clause.SetClause;
+import bt.log.Log;
+import bt.utils.Null;
+
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,12 +15,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
-import bt.db.DatabaseAccess;
-import bt.db.constants.SqlState;
-import bt.db.exc.SqlExecutionException;
-import bt.db.statement.clause.SetClause;
-import bt.utils.Null;
-
 /**
  * Base class for data modifying statements (statement, update, delete, ...).
  *
@@ -21,19 +22,29 @@ import bt.utils.Null;
  */
 public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends SqlStatement> extends SqlStatement<K>
 {
-    /** A list containing all used set clauses for statement and update statements. */
+    /**
+     * A list containing all used set clauses for statement and update statements.
+     */
     protected List<SetClause<T>> setClauses;
 
-    /** A defined method that is called if the statement execution finishes successfully. */
+    /**
+     * A defined method that is called if the statement execution finishes successfully.
+     */
     protected BiConsumer<T, Integer> onSuccess;
 
-    /** A defined function that is called if the statement execution fails for any reason. */
+    /**
+     * A defined function that is called if the statement execution fails for any reason.
+     */
     protected BiFunction<T, SqlExecutionException, Integer> onFail;
 
-    /** A defined function that is called if the statement execution fails due to a foreign key violation. */
+    /**
+     * A defined function that is called if the statement execution fails due to a foreign key violation.
+     */
     protected BiFunction<T, SqlExecutionException, Integer> onForeignKeyFail;
 
-    /** A defined function that is called if the statement execution fails due to a check constraint violation. */
+    /**
+     * A defined function that is called if the statement execution fails due to a check constraint violation.
+     */
     protected BiFunction<T, SqlExecutionException, Integer> onCheckFail;
 
     /**
@@ -42,10 +53,14 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
      */
     protected BiFunction<T, SqlExecutionException, Integer> onDuplicateKey;
 
-    /** A defined function that is called if the number of affected rows is lower than {@link #lowerThreshhold}. */
+    /**
+     * A defined function that is called if the number of affected rows is lower than {@link #lowerThreshhold}.
+     */
     protected BiFunction<Integer, T, Integer> onLessThan;
 
-    /** A defined function that is called if the number of affected rows is higher than {@link #higherThreshhold}. */
+    /**
+     * A defined function that is called if the number of affected rows is higher than {@link #higherThreshhold}.
+     */
     protected BiFunction<Integer, T, Integer> onMoreThan;
 
     /**
@@ -56,20 +71,25 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
 
     protected Map<String, BiFunction<T, SqlExecutionException, Integer>> errorHandlers;
 
-    /** The threshhold indicating whether {@link #onLessThan} should be executed. */
+    /**
+     * The threshhold indicating whether {@link #onLessThan} should be executed.
+     */
     protected int lowerThreshhold;
 
-    /** The threshhold indicating whether {@link #onMoreThan} should be executed. */
+    /**
+     * The threshhold indicating whether {@link #onMoreThan} should be executed.
+     */
     protected int higherThreshhold;
 
-    /** Indicates whether the transaction should automatically be commited after the execution of this statement. */
+    /**
+     * Indicates whether the transaction should automatically be commited after the execution of this statement.
+     */
     protected boolean shouldCommit;
 
     /**
      * Creates a new instance.
      *
-     * @param db
-     *            The database that should be used for the statement.
+     * @param db The database that should be used for the statement.
      */
     public SqlModifyStatement(DatabaseAccess db)
     {
@@ -97,7 +117,7 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
 
     private int defaultFail(T statement, SqlExecutionException e)
     {
-        System.out.println(statement.toString());
+        Log.error(statement.toString());
         this.db.dispatchException(e);
         return -1;
     }
@@ -105,8 +125,7 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
     /**
      * Adds a set clause to this statement.
      *
-     * @param set
-     *            The value setting clause.
+     * @param set The value setting clause.
      */
     protected void addSetClause(SetClause<T> set)
     {
@@ -148,8 +167,8 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
      * rows.
      * </p>
      *
-     * @param onSuccess
-     *            The function to execute.
+     * @param onSuccess The function to execute.
+     *
      * @return This instance for chaining.
      */
     public T onSuccess(BiConsumer<T, Integer> onSuccess)
@@ -166,8 +185,8 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
      * The return value of the given statements execute method will be returned by this instances {@link #execute()}.
      * </p>
      *
-     * @param statement
-     *            The statement to execute.
+     * @param statement The statement to execute.
+     *
      * @return This instance for chaining.
      */
     public T onCheckViolation(SqlModifyStatement statement)
@@ -188,8 +207,8 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
      * {@link #execute()}.
      * </p>
      *
-     * @param onCheckViolation
-     *            The function to execute.
+     * @param onCheckViolation The function to execute.
+     *
      * @return This instance for chaining.
      */
     public T onCheckViolation(BiFunction<T, SqlExecutionException, Integer> onCheckViolation)
@@ -206,8 +225,8 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
      * The return value of the given statements execute method will be returned by this instances {@link #execute()}.
      * </p>
      *
-     * @param statement
-     *            The statement to execute.
+     * @param statement The statement to execute.
+     *
      * @return This instance for chaining.
      */
     public T onForeignKeyViolation(SqlModifyStatement statement)
@@ -228,8 +247,8 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
      * {@link #execute()}.
      * </p>
      *
-     * @param onForeignKeyViolation
-     *            The function to execute.
+     * @param onForeignKeyViolation The function to execute.
+     *
      * @return This instance for chaining.
      */
     public T onForeignKeyViolation(BiFunction<T, SqlExecutionException, Integer> onForeignKeyViolation)
@@ -246,8 +265,8 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
      * The return value of the given statements execute method will be returned by this instances {@link #execute()}.
      * </p>
      *
-     * @param statement
-     *            The statement to execute.
+     * @param statement The statement to execute.
+     *
      * @return This instance for chaining.
      */
     public T onDuplicateKey(SqlModifyStatement statement)
@@ -269,8 +288,8 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
      * {@link #execute()}.
      * </p>
      *
-     * @param onDuplicate
-     *            The function to execute.
+     * @param onDuplicate The function to execute.
+     *
      * @return This instance for chaining.
      */
     public T onDuplicateKey(BiFunction<T, SqlExecutionException, Integer> onDuplicate)
@@ -292,8 +311,8 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
      * The return value of the given statements execute method will be returned by this instances {@link #execute()}.
      * </p>
      *
-     * @param onFail
-     *            The SqlModifyStatement to execute instead.
+     * @param onFail The SqlModifyStatement to execute instead.
+     *
      * @return This instance for chaining.
      */
     public T onFail(SqlModifyStatement onFail)
@@ -320,8 +339,8 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
      * (onDuplicateKey, onCheckViolation, ...).
      * </p>
      *
-     * @param onFail
-     *            The BiFunction to execute.
+     * @param onFail The BiFunction to execute.
+     *
      * @return This instance for chaining.
      */
     public T onFail(BiFunction<T, SqlExecutionException, Integer> onFail)
@@ -338,10 +357,9 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
      * The return value of the given statements execute method will be returned by this instances {@link #execute()}.
      * </p>
      *
-     * @param lowerThreshhold
-     *            The threshhold to check.
-     * @param statement
-     *            The statement to execute.
+     * @param lowerThreshhold The threshhold to check.
+     * @param statement       The statement to execute.
+     *
      * @return This instance for chaining.
      */
     public T onLessThan(int lowerThreshhold, SqlModifyStatement statement)
@@ -363,10 +381,9 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
      * the original statement. The return value (Integer) will be returned by this instances {@link #execute()}.
      * </p>
      *
-     * @param lowerThreshhold
-     *            The threshhold to check.
-     * @param onLessThan
-     *            The BiFunction to execute.
+     * @param lowerThreshhold The threshhold to check.
+     * @param onLessThan      The BiFunction to execute.
+     *
      * @return This instance for chaining.
      */
     public T onLessThan(int lowerThreshhold, BiFunction<Integer, T, Integer> onLessThan)
@@ -384,10 +401,9 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
      * The return value of the given statements execute method will be returned by this instances {@link #execute()}.
      * </p>
      *
-     * @param higherThreshhold
-     *            The threshhold to check.
-     * @param statement
-     *            The statement to execute.
+     * @param higherThreshhold The threshhold to check.
+     * @param statement        The statement to execute.
+     *
      * @return This instance for chaining.
      */
     public T onMoreThan(int higherThreshhold, SqlModifyStatement statement)
@@ -409,10 +425,9 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
      * the original statement. The return value (Integer) will be returned by this instances {@link #execute()}.
      * </p>
      *
-     * @param higherThreshhold
-     *            The threshhold to check.
-     * @param onLessThan
-     *            The BiFunction to execute.
+     * @param higherThreshhold The threshhold to check.
+     * @param onLessThan       The BiFunction to execute.
+     *
      * @return This instance for chaining.
      */
     public T onMoreThan(int higherThreshhold,
@@ -441,7 +456,7 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
             result = this.onForeignKeyFail.apply((T)this, e);
         }
         else if (this.onAlreadyExists != null &&
-                 (e.getSQLState().equals(SqlState.ALREADY_EXISTS.toString()) || e.getSQLState().equals(SqlState.ALREADY_EXISTS_IN.toString())))
+                (e.getSQLState().equals(SqlState.ALREADY_EXISTS.toString()) || e.getSQLState().equals(SqlState.ALREADY_EXISTS_IN.toString())))
         {
             result = this.onAlreadyExists.apply((T)this, e);
         }
@@ -502,25 +517,14 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
     /**
      * Executes the built statement.
      *
+     * @param printLogs true if information about the statement should be printed out.
+     *
      * @return The return value of {@link PreparedStatement#executeUpdate()}.
      */
     public int execute()
     {
-        return execute(false);
-    }
-
-    /**
-     * Executes the built statement.
-     *
-     * @param printLogs
-     *            true if information about the statement should be printed out.
-     *
-     * @return The return value of {@link PreparedStatement#executeUpdate()}.
-     */
-    public int execute(boolean printLogs)
-    {
         startExecutionTime();
-        int result = executeStatement(printLogs);
+        int result = executeStatement();
         endExecutionTime();
         return result;
     }
@@ -528,9 +532,9 @@ public abstract class SqlModifyStatement<T extends SqlModifyStatement, K extends
     /**
      * Executes the built statement.
      *
-     * @param printLogs
-     *            true if information about the statement should be printed out.
+     * @param printLogs true if information about the statement should be printed out.
+     *
      * @return The return value of {@link PreparedStatement#executeUpdate()}.
      */
-    protected abstract int executeStatement(boolean printLogs);
+    protected abstract int executeStatement();
 }

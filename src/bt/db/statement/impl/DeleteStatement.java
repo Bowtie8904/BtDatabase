@@ -6,6 +6,7 @@ import bt.db.statement.SqlModifyStatement;
 import bt.db.statement.clause.condition.ConditionalClause;
 import bt.db.statement.value.Preparable;
 import bt.db.statement.value.Value;
+import bt.log.Log;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -34,6 +35,7 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
      * Defines the table to delete from.
      *
      * @param table The table name.
+     *
      * @return This instance for chaining.
      */
     public DeleteStatement from(String table)
@@ -59,6 +61,7 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
      * Creates a new where conditional clause using the given column for this statement.
      *
      * @param column The column to use in this condition.
+     *
      * @return The created ConditionalClause.
      */
     public ConditionalClause<DeleteStatement> where(String column)
@@ -75,6 +78,7 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
      * statement.
      *
      * @param column The column to use in this condition.
+     *
      * @return The created ConditionalClause.
      */
     public ConditionalClause<DeleteStatement> and(String column)
@@ -91,6 +95,7 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
      * statement.
      *
      * @param column The column to use in this condition.
+     *
      * @return The created ConditionalClause.
      */
     public ConditionalClause<DeleteStatement> or(String column)
@@ -103,10 +108,10 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
     }
 
     /**
-     * @see bt.db.statement.SqlModifyStatement#execute(boolean)
+     * @see bt.db.statement.SqlModifyStatement#execute()
      */
     @Override
-    protected int executeStatement(boolean printLogs)
+    protected int executeStatement()
     {
         String sql = toString();
 
@@ -114,8 +119,7 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
 
         try (PreparedStatement statement = this.db.getConnection().prepareStatement(sql))
         {
-            log("Executing: " + sql,
-                printLogs);
+            Log.debug("Executing: " + sql);
 
             if (this.prepared)
             {
@@ -124,8 +128,7 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
 
                 if (!values.isEmpty())
                 {
-                    log("With values:",
-                        printLogs);
+                    Log.debug("With values:");
                 }
 
                 Value val = null;
@@ -133,14 +136,13 @@ public class DeleteStatement extends SqlModifyStatement<DeleteStatement, DeleteS
                 for (int i = 0; i < values.size(); i++)
                 {
                     val = values.get(i);
-                    log("p" + (i + 1) + " = " + val.getValue() + " [" + val.getType().toString() + "]", printLogs);
+                    Log.debug("p" + (i + 1) + " = " + val.getValue() + " [" + val.getType().toString() + "]");
                 }
             }
 
             result = statement.executeUpdate();
             endExecutionTime();
-            log("Affected rows: " + result,
-                printLogs);
+            Log.debug("Affected rows: " + result);
 
             if (this.shouldCommit)
             {

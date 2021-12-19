@@ -1,11 +1,12 @@
 package bt.db.statement.impl;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
 import bt.db.DatabaseAccess;
 import bt.db.exc.SqlExecutionException;
 import bt.db.statement.SqlModifyStatement;
+import bt.log.Log;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 /**
  * Base class for all different DROP statements.
@@ -16,14 +17,15 @@ public class DropStatement extends SqlModifyStatement<DropStatement, DropStateme
 {
     private String keyword;
 
-    /** The name that is used in this drop statement. This would be the name of the table, trigger, ... */
+    /**
+     * The name that is used in this drop statement. This would be the name of the table, trigger, ...
+     */
     private String name;
 
     /**
      * Creates a new instance.
      *
-     * @param db
-     *            The database that should be used for the statement.
+     * @param db The database that should be used for the statement.
      */
     public DropStatement(DatabaseAccess db)
     {
@@ -43,8 +45,8 @@ public class DropStatement extends SqlModifyStatement<DropStatement, DropStateme
     /**
      * Indictaes that this statement should drop a table with the given name.
      *
-     * @param name
-     *            The name of the table.
+     * @param name The name of the table.
+     *
      * @return This instance for chaining.
      */
     public DropStatement table(String name)
@@ -57,8 +59,8 @@ public class DropStatement extends SqlModifyStatement<DropStatement, DropStateme
     /**
      * Indictaes that this statement should drop a procedure with the given name.
      *
-     * @param name
-     *            The name of the procedure.
+     * @param name The name of the procedure.
+     *
      * @return This instance for chaining.
      */
     public DropStatement procedure(String name)
@@ -71,8 +73,8 @@ public class DropStatement extends SqlModifyStatement<DropStatement, DropStateme
     /**
      * Indictaes that this statement should drop a function with the given name.
      *
-     * @param name
-     *            The name of the function.
+     * @param name The name of the function.
+     *
      * @return This instance for chaining.
      */
     public DropStatement function(String name)
@@ -85,8 +87,8 @@ public class DropStatement extends SqlModifyStatement<DropStatement, DropStateme
     /**
      * Indictaes that this statement should drop an index with the given name.
      *
-     * @param name
-     *            The name of the index.
+     * @param name The name of the index.
+     *
      * @return This instance for chaining.
      */
     public DropStatement index(String name)
@@ -99,8 +101,8 @@ public class DropStatement extends SqlModifyStatement<DropStatement, DropStateme
     /**
      * Indictaes that this statement should drop a role with the given name.
      *
-     * @param name
-     *            The name of the role.
+     * @param name The name of the role.
+     *
      * @return This instance for chaining.
      */
     public DropStatement role(String name)
@@ -113,8 +115,8 @@ public class DropStatement extends SqlModifyStatement<DropStatement, DropStateme
     /**
      * Indictaes that this statement should drop a schema with the given name.
      *
-     * @param name
-     *            The name of the schema.
+     * @param name The name of the schema.
+     *
      * @return This instance for chaining.
      */
     public DropStatement schema(String name)
@@ -127,8 +129,8 @@ public class DropStatement extends SqlModifyStatement<DropStatement, DropStateme
     /**
      * Indictaes that this statement should drop a sequence with the given name.
      *
-     * @param name
-     *            The name of the sequence.
+     * @param name The name of the sequence.
+     *
      * @return This instance for chaining.
      */
     public DropStatement sequence(String name)
@@ -141,8 +143,8 @@ public class DropStatement extends SqlModifyStatement<DropStatement, DropStateme
     /**
      * Indictaes that this statement should drop a synonym with the given name.
      *
-     * @param name
-     *            The name of the synonym.
+     * @param name The name of the synonym.
+     *
      * @return This instance for chaining.
      */
     public DropStatement synonym(String name)
@@ -155,8 +157,8 @@ public class DropStatement extends SqlModifyStatement<DropStatement, DropStateme
     /**
      * Indictaes that this statement should drop a trigger with the given name.
      *
-     * @param name
-     *            The name of the trigger.
+     * @param name The name of the trigger.
+     *
      * @return This instance for chaining.
      */
     public DropStatement trigger(String name)
@@ -169,8 +171,8 @@ public class DropStatement extends SqlModifyStatement<DropStatement, DropStateme
     /**
      * Indictaes that this statement should drop a type with the given name.
      *
-     * @param name
-     *            The name of the type.
+     * @param name The name of the type.
+     *
      * @return This instance for chaining.
      */
     public DropStatement type(String name)
@@ -183,8 +185,8 @@ public class DropStatement extends SqlModifyStatement<DropStatement, DropStateme
     /**
      * Indictaes that this statement should drop a view with the given name.
      *
-     * @param name
-     *            The name of the view.
+     * @param name The name of the view.
+     *
      * @return This instance for chaining.
      */
     public DropStatement view(String name)
@@ -198,7 +200,7 @@ public class DropStatement extends SqlModifyStatement<DropStatement, DropStateme
      * @see bt.db.statement.SqlModifyStatement#execute(boolean)
      */
     @Override
-    protected int executeStatement(boolean printLogs)
+    protected int executeStatement()
     {
         String sql = toString();
 
@@ -206,8 +208,7 @@ public class DropStatement extends SqlModifyStatement<DropStatement, DropStateme
 
         try (PreparedStatement statement = this.db.getConnection().prepareStatement(sql))
         {
-            log("Executing: " + sql,
-                printLogs);
+            Log.debug("Executing: " + sql);
             statement.executeUpdate();
             endExecutionTime();
             result = 1;

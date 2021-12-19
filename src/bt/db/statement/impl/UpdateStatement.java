@@ -9,6 +9,7 @@ import bt.db.statement.clause.SetClause;
 import bt.db.statement.clause.condition.ConditionalClause;
 import bt.db.statement.value.Preparable;
 import bt.db.statement.value.Value;
+import bt.log.Log;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -56,6 +57,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      * Creates a new where conditional clause using the given column for this statement.
      *
      * @param column The column to use in this condition.
+     *
      * @return The created ConditionalClause.
      */
     public ConditionalClause<UpdateStatement> where(String column)
@@ -72,6 +74,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      *
      * @param column The column to use in this condition.
      * @param prefix A String that will be put in front of the expression. Can be used for parenthesis.
+     *
      * @return The created ConditionalClause.
      */
     public ConditionalClause<UpdateStatement> where(String prefix, String column)
@@ -89,6 +92,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      * statement.
      *
      * @param column The column to use in this condition.
+     *
      * @return The created ConditionalClause.
      */
     public ConditionalClause<UpdateStatement> and(String column)
@@ -106,6 +110,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      *
      * @param column The column to use in this condition.
      * @param prefix A String that will be put in front of the expression. Can be used for parenthesis.
+     *
      * @return The created ConditionalClause.
      */
     public ConditionalClause<UpdateStatement> and(String prefix, String column)
@@ -125,6 +130,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      * statement.
      *
      * @param column The column to use in this condition.
+     *
      * @return The created ConditionalClause.
      */
     public ConditionalClause<UpdateStatement> or(String column)
@@ -142,6 +148,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      *
      * @param column The column to use in this condition.
      * @param prefix A String that will be put in front of the expression. Can be used for parenthesis.
+     *
      * @return The created ConditionalClause.
      */
     public ConditionalClause<UpdateStatement> or(String prefix, String column)
@@ -161,6 +168,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      *
      * @param column  The column whichs value should be updated.
      * @param sqlType The sql value type of the column. This uses standard {@link Types}.
+     *
      * @return This instance for chaining.
      */
     public UpdateStatement setNull(String column, SqlType sqlType)
@@ -176,6 +184,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      * @param column  The column whichs value should be updated.
      * @param value   The value to update with
      * @param sqlType The type of the column.
+     *
      * @return This instance for chaining.
      */
     public UpdateStatement set(String column, Object value, SqlType sqlType)
@@ -193,6 +202,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      *
      * @param column The column whichs value should be updated.
      * @param value  The value to update with.
+     *
      * @return This instance for chaining.
      */
     public UpdateStatement set(String column, SqlFunction value)
@@ -207,6 +217,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      *
      * @param column        The column whichs value should be set.
      * @param valueSupplier The supplier that offers a value for the given column.
+     *
      * @return This instance for chaining.
      */
     public UpdateStatement set(String column, SqlType sqlType, Supplier<?> valueSupplier)
@@ -224,6 +235,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      *
      * @param column The column whichs value should be updated.
      * @param value  The value to update with
+     *
      * @return This instance for chaining.
      */
     public UpdateStatement set(String column, int value)
@@ -238,6 +250,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      *
      * @param column The column whichs value should be updated.
      * @param value  The value to update with
+     *
      * @return This instance for chaining.
      */
     public UpdateStatement set(String column, long value)
@@ -252,6 +265,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      *
      * @param column The column whichs value should be updated.
      * @param value  The value to update with
+     *
      * @return This instance for chaining.
      */
     public UpdateStatement set(String column, double value)
@@ -266,6 +280,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      *
      * @param column The column whichs value should be updated.
      * @param value  The value to update with
+     *
      * @return This instance for chaining.
      */
     public UpdateStatement set(String column, float value)
@@ -280,6 +295,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      *
      * @param column The column whichs value should be updated.
      * @param value  The value to update with
+     *
      * @return This instance for chaining.
      */
     public UpdateStatement set(String column, boolean value)
@@ -294,6 +310,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      *
      * @param column The column whichs value should be updated.
      * @param value  The value to update with
+     *
      * @return This instance for chaining.
      */
     public UpdateStatement set(String column, String value)
@@ -307,16 +324,16 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
      * Executes the built statement. Depending on the number of rows affected, the defined onLessThan or onMoreThan
      * might be executed. If there is an error during this execution, the onFail function is called.
      *
-     * @see bt.db.statement.SqlModifyStatement#execute(boolean)
+     * @see bt.db.statement.SqlModifyStatement#execute()
      */
     @Override
-    protected int executeStatement(boolean printLogs)
+    protected int executeStatement()
     {
         String sql = toString();
 
         if (this.setClauses.isEmpty())
         {
-            System.out.println("Can't execute update statement without any values. Please define at least one column value.");
+            Log.error("Can't execute update statement without any values. Please define at least one column value.");
             return -1;
         }
 
@@ -324,8 +341,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
 
         try (PreparedStatement statement = this.db.getConnection().prepareStatement(sql))
         {
-            log("Executing: " + sql,
-                printLogs);
+            Log.debug("Executing: " + sql);
 
             if (this.prepared)
             {
@@ -333,15 +349,14 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
 
                 if (!reducedList.isEmpty())
                 {
-                    log("With values:",
-                        printLogs);
+                    Log.debug("With values:");
                 }
                 int i = 0;
 
                 for (; i < reducedList.size(); i++)
                 {
                     SetClause<UpdateStatement> set = reducedList.get(i);
-                    log("p" + (i + 1) + " = " + set.prepareValue(statement, i + 1), printLogs);
+                    Log.debug("p" + (i + 1) + " = " + set.prepareValue(statement, i + 1));
                 }
 
                 List<Value> values = getValues();
@@ -349,14 +364,13 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
 
                 for (Value val : values)
                 {
-                    log("p" + (i + 1) + " = " + val.getValue(), printLogs);
+                    Log.debug("p" + (i + 1) + " = " + val.getValue());
                 }
             }
 
             result = statement.executeUpdate();
             endExecutionTime();
-            log("Affected rows: " + result,
-                printLogs);
+            Log.debug("Affected rows: " + result);
 
             if (this.shouldCommit)
             {

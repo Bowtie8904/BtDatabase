@@ -4,6 +4,7 @@ import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
 import bt.db.exc.SqlExecutionException;
 import bt.db.statement.clause.Column;
+import bt.log.Log;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -52,6 +53,7 @@ public class CreateTemporaryTableStatement extends CreateStatement<CreateTempora
      *
      * @param name The name of the column.
      * @param type The {@link SqlType type} of the column.
+     *
      * @return The created column.
      */
     public CreateTemporaryTableStatement column(Column column)
@@ -75,6 +77,7 @@ public class CreateTemporaryTableStatement extends CreateStatement<CreateTempora
      * </p>
      *
      * @param select
+     *
      * @return
      */
     public CreateTemporaryTableStatement as(SelectStatement select)
@@ -96,6 +99,7 @@ public class CreateTemporaryTableStatement extends CreateStatement<CreateTempora
      * </p>
      *
      * @param table
+     *
      * @return
      */
     public CreateTemporaryTableStatement asCopyOf(String table)
@@ -123,6 +127,7 @@ public class CreateTemporaryTableStatement extends CreateStatement<CreateTempora
      * </p>
      *
      * @param copyData
+     *
      * @return
      */
     public CreateTemporaryTableStatement withData(boolean copyData)
@@ -149,10 +154,10 @@ public class CreateTemporaryTableStatement extends CreateStatement<CreateTempora
     }
 
     /**
-     * @see bt.db.statement.SqlModifyStatement#execute(boolean)
+     * @see bt.db.statement.SqlModifyStatement#execute()
      */
     @Override
-    protected int executeStatement(boolean printLogs)
+    protected int executeStatement()
     {
         String sql = toString();
 
@@ -160,13 +165,12 @@ public class CreateTemporaryTableStatement extends CreateStatement<CreateTempora
 
         try (PreparedStatement statement = this.db.getConnection().prepareStatement(sql))
         {
-            log("Executing: " + sql,
-                printLogs);
+            Log.debug("Executing: " + sql);
             result = statement.executeUpdate();
 
             if (this.asCopySelect != null && this.copyData)
             {
-                this.db.insert().into("SESSION." + this.name).from(this.asCopySelect).execute(printLogs);
+                this.db.insert().into("SESSION." + this.name).from(this.asCopySelect).execute();
             }
 
             endExecutionTime();

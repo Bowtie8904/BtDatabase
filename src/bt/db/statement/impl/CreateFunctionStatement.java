@@ -5,6 +5,7 @@ import bt.db.constants.SqlState;
 import bt.db.constants.SqlType;
 import bt.db.exc.SqlExecutionException;
 import bt.db.func.Sql;
+import bt.log.Log;
 import bt.utils.Null;
 
 import java.lang.reflect.Method;
@@ -43,6 +44,7 @@ public class CreateFunctionStatement extends CreateStatement<CreateFunctionState
      * Defines the public static java method that is called.
      *
      * @param method The method that should be called.
+     *
      * @return This instance for chaining.
      */
     public CreateFunctionStatement call(Method method)
@@ -72,6 +74,7 @@ public class CreateFunctionStatement extends CreateStatement<CreateFunctionState
      * @param cls            The class that contains the method.
      * @param methodName     The case-sensitive name of the method.
      * @param parameterTypes The parameter types in the correct order.
+     *
      * @return This instance for chaining.
      */
     public CreateFunctionStatement call(Class<?> cls, String methodName, Class<?>... parameterTypes)
@@ -83,7 +86,7 @@ public class CreateFunctionStatement extends CreateStatement<CreateFunctionState
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            Log.error("COuld not find method", e);
             return this;
         }
 
@@ -102,10 +105,10 @@ public class CreateFunctionStatement extends CreateStatement<CreateFunctionState
     }
 
     /**
-     * @see bt.db.statement.SqlModifyStatement#executeStatement(boolean)
+     * @see bt.db.statement.SqlModifyStatement#executeStatement()
      */
     @Override
-    protected int executeStatement(boolean printLogs)
+    protected int executeStatement()
     {
         String sql = toString();
 
@@ -113,8 +116,7 @@ public class CreateFunctionStatement extends CreateStatement<CreateFunctionState
 
         try (Statement statement = this.db.getConnection().createStatement())
         {
-            log("Executing: " + sql,
-                printLogs);
+            Log.debug("Executing: " + sql);
             statement.execute(sql);
             endExecutionTime();
             result = 1;
@@ -153,7 +155,7 @@ public class CreateFunctionStatement extends CreateStatement<CreateFunctionState
         {
             if ((e.getSQLState().equals(SqlState.ALREADY_EXISTS.toString()) || e.getSQLState().equals(SqlState.ALREADY_EXISTS_IN.toString())) && this.replace)
             {
-                log("Replacing function '" + this.name + "'.", printLogs);
+                Log.debug("Replacing function '" + this.name + "'.");
 
                 DropStatement drop = this.db.drop()
                                             .function(this.name)
@@ -163,7 +165,7 @@ public class CreateFunctionStatement extends CreateStatement<CreateFunctionState
                                                         return 0;
                                                     });
 
-                if (drop.execute(printLogs) > 0)
+                if (drop.execute() > 0)
                 {
                     try (PreparedStatement statement = this.db.getConnection().prepareStatement(sql))
                     {

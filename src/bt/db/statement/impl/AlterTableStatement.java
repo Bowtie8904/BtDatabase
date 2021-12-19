@@ -1,15 +1,16 @@
 package bt.db.statement.impl;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
 import bt.db.DatabaseAccess;
 import bt.db.constants.SqlType;
 import bt.db.constants.SqlValue;
 import bt.db.exc.SqlExecutionException;
 import bt.db.statement.clause.Column;
 import bt.db.statement.result.SqlResult;
+import bt.log.Log;
 import bt.utils.Null;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 /**
  * Represents an SQL alter statement which can be extended through method chaining.
@@ -24,10 +25,8 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
     /**
      * Creates a new instance.
      *
-     * @param db
-     *            The database that should be used for the statement.
-     * @param name
-     *            The name of the table that should be altered.
+     * @param db   The database that should be used for the statement.
+     * @param name The name of the table that should be altered.
      */
     public AlterTableStatement(DatabaseAccess db, String name)
     {
@@ -39,10 +38,9 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
     /**
      * Adds a new column in this table which has the given name and the given sql type.
      *
-     * @param name
-     *            The name of the column.
-     * @param type
-     *            The {@link SqlType type} of the column.
+     * @param name The name of the column.
+     * @param type The {@link SqlType type} of the column.
+     *
      * @return The created column.
      */
     public AlterTableStatement column(Column column)
@@ -56,6 +54,7 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
      * Indicates whether this objects DDL should be saved in 'BT_TABLE_DATA'.
      *
      * @param saveTableData
+     *
      * @return
      */
     @Override
@@ -66,10 +65,10 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
     }
 
     /**
-     * @see bt.db.statement.SqlModifyStatement#execute(boolean)
+     * @see bt.db.statement.SqlModifyStatement#execute()
      */
     @Override
-    protected int executeStatement(boolean printLogs)
+    protected int executeStatement()
     {
         String sql = toString();
 
@@ -77,8 +76,7 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
 
         try (PreparedStatement statement = this.db.getConnection().prepareStatement(sql))
         {
-            log("Executing: " + sql,
-                printLogs);
+            Log.debug("Executing: " + sql);
             statement.executeUpdate();
             endExecutionTime();
             result = 1;
@@ -137,7 +135,7 @@ public class AlterTableStatement extends CreateStatement<AlterTableStatement, Al
 
         if (this.newColumn != null)
         {
-            sql += " ADD COLUMN " + this.newColumn.toString();
+            sql += " ADD COLUMN " + this.newColumn;
         }
 
         return sql;

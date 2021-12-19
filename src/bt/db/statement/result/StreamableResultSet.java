@@ -1,6 +1,6 @@
 package bt.db.statement.result;
 
-import bt.log.Logger;
+import bt.log.Log;
 import bt.types.UncheckedCloseable;
 
 import java.sql.ResultSet;
@@ -55,7 +55,7 @@ public class StreamableResultSet extends AbstractSpliterator<ResultSet> implemen
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
+            Log.error("Failed to advance ResultSet", e);
         }
 
         return advanced;
@@ -90,22 +90,6 @@ public class StreamableResultSet extends AbstractSpliterator<ResultSet> implemen
     public StreamableResultSet print()
     {
         getPrintableResultSet().print();
-        return this;
-    }
-
-    /**
-     * Prints a formatted table of the result.
-     *
-     * <p>
-     * <b>NOTE</b> that this operation invalidates the stream meaning that it can not be traversed again.
-     * </p>
-     *
-     * @param log
-     * @return
-     */
-    public StreamableResultSet print(Logger log)
-    {
-        getPrintableResultSet().print(log);
         return this;
     }
 }

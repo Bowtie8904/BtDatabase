@@ -5,6 +5,7 @@ import bt.db.constants.SqlState;
 import bt.db.constants.SqlType;
 import bt.db.exc.SqlExecutionException;
 import bt.db.func.Sql;
+import bt.log.Log;
 import bt.utils.Null;
 
 import java.sql.PreparedStatement;
@@ -46,6 +47,7 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
      *
      * @param name The name of the parameter.
      * @param type The {@link SqlType} of the parameter.
+     *
      * @return This instance for chaining.
      */
     public CreateProcedureStatement parameter(String name, SqlType type)
@@ -62,6 +64,7 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
      * Sets the sizes of the last added parameter.
      *
      * @param sizes
+     *
      * @return This instance for chining.
      */
     public CreateProcedureStatement size(int... sizes)
@@ -92,6 +95,7 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
      * Sets the java method that should be called by this procedure.
      *
      * @param javaMethod The full method name (class name + methodname).
+     *
      * @return This instance for chaining.
      */
     public CreateProcedureStatement call(String javaMethod)
@@ -101,10 +105,10 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
     }
 
     /**
-     * @see bt.db.statement.SqlModifyStatement#execute(boolean)
+     * @see bt.db.statement.SqlModifyStatement#execute()
      */
     @Override
-    protected int executeStatement(boolean printLogs)
+    protected int executeStatement()
     {
         String sql = toString();
 
@@ -113,8 +117,7 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
 
         try (Statement statement = this.db.getConnection().createStatement())
         {
-            log("Executing: " + sql,
-                printLogs);
+            Log.debug("Executing: " + sql);
             statement.execute(sql);
             endExecutionTime();
             result = 1;
@@ -153,7 +156,7 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
         {
             if ((e.getSQLState().equals(SqlState.ALREADY_EXISTS.toString()) || e.getSQLState().equals(SqlState.ALREADY_EXISTS_IN.toString())) && this.replace)
             {
-                log("Replacing procedure '" + this.name + "'.", printLogs);
+                Log.debug("Replacing procedure '" + this.name + "'.");
 
                 DropStatement drop = this.db.drop()
                                             .procedure(this.name)
@@ -163,7 +166,7 @@ public class CreateProcedureStatement extends CreateStatement<CreateProcedureSta
                                                         return 0;
                                                     });
 
-                if (drop.execute(printLogs) > 0)
+                if (drop.execute() > 0)
                 {
                     try (PreparedStatement statement = this.db.getConnection().prepareStatement(sql))
                     {

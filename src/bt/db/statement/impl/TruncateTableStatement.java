@@ -1,11 +1,12 @@
 package bt.db.statement.impl;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
 import bt.db.DatabaseAccess;
 import bt.db.exc.SqlExecutionException;
 import bt.db.statement.SqlModifyStatement;
+import bt.log.Log;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 /**
  * Represents an SQL truncate table statement which can be extended through method chaining.
@@ -22,16 +23,16 @@ public class TruncateTableStatement extends SqlModifyStatement<TruncateTableStat
         super(db);
         this.statementKeyword = "TRUNCATE TABLE";
         this.tables = new String[]
-        {
-          table
-        };
+                {
+                        table
+                };
     }
 
     /**
-     * @see bt.db.statement.SqlModifyStatement#execute(boolean)
+     * @see bt.db.statement.SqlModifyStatement#execute()
      */
     @Override
-    protected int executeStatement(boolean printLogs)
+    protected int executeStatement()
     {
         String sql = toString();
 
@@ -39,8 +40,7 @@ public class TruncateTableStatement extends SqlModifyStatement<TruncateTableStat
 
         try (PreparedStatement statement = this.db.getConnection().prepareStatement(sql))
         {
-            log("Executing: " + sql,
-                printLogs);
+            Log.debug("Executing: " + sql);
 
             result = statement.executeUpdate();
             endExecutionTime();

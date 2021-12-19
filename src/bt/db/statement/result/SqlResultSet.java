@@ -3,8 +3,9 @@ package bt.db.statement.result;
 import bt.console.output.table.ConsoleTable;
 import bt.console.output.table.render.Alignment;
 import bt.db.constants.SqlType;
-import bt.log.Logger;
+import bt.log.Log;
 import bt.reflect.classes.Classes;
+import bt.utils.Exceptions;
 
 import java.io.Serializable;
 import java.sql.ResultSet;
@@ -78,7 +79,7 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
+            Log.error("Failed to parse ResultSet", e);
         }
     }
 
@@ -174,6 +175,7 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
      * Gets the result at the given index.
      *
      * @param index The index of the desired result.
+     *
      * @return The requested result.
      */
     public SqlResult get(int index)
@@ -195,7 +197,9 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
      * Parses the given ResultSet.
      *
      * @param set The ResultSet whichs values should be
+     *
      * @return
+     *
      * @throws SQLException
      */
     public SqlResultSet parse(ResultSet set) throws SQLException
@@ -358,28 +362,12 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
 
             for (String name : clobResults)
             {
-                try
-                {
-                    result.put(name,
-                               set.getClob(name));
-                }
-                catch (Exception e)
-                {
-
-                }
+                Exceptions.ignoreThrow(() -> result.put(name, set.getClob(name)));
             }
 
             for (String name : blobResults)
             {
-                try
-                {
-                    result.put(name,
-                               set.getBlob(name));
-                }
-                catch (Exception e)
-                {
-
-                }
+                Exceptions.ignoreThrow(() -> result.put(name, set.getBlob(name)));
             }
 
             for (String name : objectResults)
@@ -408,6 +396,7 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
      *
      * @param mapFunction
      * @param <T>
+     *
      * @return The list of function results.
      */
     public <T> List<T> map(Function<SqlResult, T> mapFunction)
@@ -438,6 +427,7 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
      *
      * @param mappingClass
      * @param <T>
+     *
      * @return A list containing all created instances.
      */
     public <T> List<T> map(Class<T> mappingClass)
@@ -458,7 +448,7 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
                 }
                 catch (IllegalAccessException e)
                 {
-                    e.printStackTrace();
+                    Log.error("Failed to apply value to mapping object", e);
                 }
             }
             else
@@ -475,13 +465,7 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
      */
     public SqlResultSet print()
     {
-        System.out.println(this);
-        return this;
-    }
-
-    public SqlResultSet print(Logger log)
-    {
-        log.print("\n" + this);
+        Log.info(toString());
         return this;
     }
 

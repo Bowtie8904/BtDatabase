@@ -18,18 +18,6 @@
                     <verbose>true</verbose>
                 </configuration>
             </plugin>
-            <plugin>  <!-- Create sources.jar -->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
     <repositories>
@@ -42,17 +30,12 @@
         <dependency>
             <groupId>com.github.Bowtie8904</groupId>
             <artifactId>BtCommons</artifactId>
-            <version>4de7c571</version>
+            <version>a1e3c260</version>
         </dependency>
         <dependency>
             <groupId>com.github.Bowtie8904</groupId>
             <artifactId>BtRemote</artifactId>
-            <version>137d7d36</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.Bowtie8904</groupId>
-            <artifactId>BtReflection</artifactId>
-            <version>21e4fe990e</version>
+            <version>2d0f962c</version>
         </dependency>
         <dependency>
             <groupId>org.apache.derby</groupId>

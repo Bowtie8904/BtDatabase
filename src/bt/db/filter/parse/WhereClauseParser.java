@@ -1,7 +1,6 @@
 package bt.db.filter.parse;
 
 import bt.db.statement.clause.condition.ConditionalClause;
-import bt.log.Logger;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.arithmetic.*;
@@ -105,7 +104,6 @@ public class WhereClauseParser implements SelectVisitor, ExpressionVisitor
     @Override
     public void visit(SetOperationList setOpList)
     {
-        Logger.global().print(setOpList);
     }
 
     /**
@@ -114,7 +112,6 @@ public class WhereClauseParser implements SelectVisitor, ExpressionVisitor
     @Override
     public void visit(WithItem withItem)
     {
-        Logger.global().print(withItem);
     }
 
     /**
@@ -123,7 +120,6 @@ public class WhereClauseParser implements SelectVisitor, ExpressionVisitor
     @Override
     public void visit(ValuesStatement aThis)
     {
-        Logger.global().print(aThis);
     }
 
     /**

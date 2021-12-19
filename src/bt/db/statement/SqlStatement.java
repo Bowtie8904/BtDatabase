@@ -1,11 +1,10 @@
 package bt.db.statement;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import bt.db.DatabaseAccess;
 import bt.db.statement.clause.condition.ConditionalClause;
-import bt.log.Logger;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Base class for all SQL statements.
@@ -14,25 +13,39 @@ import bt.log.Logger;
  */
 public class SqlStatement<T extends SqlStatement>
 {
-    /** The database used for the statement. */
+    /**
+     * The database used for the statement.
+     */
     protected DatabaseAccess db;
 
-    /** The used keyword, i.e. insert. */
+    /**
+     * The used keyword, i.e. insert.
+     */
     protected String statementKeyword;
 
-    /** Used table names. */
+    /**
+     * Used table names.
+     */
     protected String[] tables;
 
-    /** Used column names. */
+    /**
+     * Used column names.
+     */
     protected Object[] columns;
 
-    /** All used where conditionals for this statement. */
+    /**
+     * All used where conditionals for this statement.
+     */
     protected List<ConditionalClause<T>> whereClauses;
 
-    /** All used having conditionals for this statement. */
+    /**
+     * All used having conditionals for this statement.
+     */
     protected List<ConditionalClause<T>> havingClauses;
 
-    /** Indicates whether this statement is treated like a prepared statement or not. */
+    /**
+     * Indicates whether this statement is treated like a prepared statement or not.
+     */
     protected boolean prepared = true;
 
     protected long executionTime = -1;
@@ -42,8 +55,7 @@ public class SqlStatement<T extends SqlStatement>
     /**
      * Creates a new instance.
      *
-     * @param db
-     *            The database that should be used for the statement.
+     * @param db The database that should be used for the statement.
      */
     public SqlStatement(DatabaseAccess db)
     {
@@ -57,8 +69,7 @@ public class SqlStatement<T extends SqlStatement>
     /**
      * Adds a where conditional clause to this statement.
      *
-     * @param where
-     *            The clause.
+     * @param where The clause.
      */
     public void addWhereClause(ConditionalClause<T> where)
     {
@@ -78,8 +89,7 @@ public class SqlStatement<T extends SqlStatement>
     /**
      * Adds a having conditional clause to this statement.
      *
-     * @param having
-     *            The clause.
+     * @param having The clause.
      */
     public void addHavingClause(ConditionalClause<T> having)
     {
@@ -94,33 +104,6 @@ public class SqlStatement<T extends SqlStatement>
     public List<ConditionalClause<T>> getHavingClauses()
     {
         return this.havingClauses;
-    }
-
-    /**
-     * Logs the given text to the logger instance of {@link DatabaseAccess} if shouldLog is true.
-     *
-     * @param text
-     *            The text to log.
-     * @param shouldLog
-     *            true if it should be logged, false if it shouldn't be logged.
-     */
-    protected void log(String text, boolean shouldLog)
-    {
-        if (shouldLog)
-        {
-            Logger.global().setCallerStackIndex(4);
-
-            if (text == null || text.isEmpty())
-            {
-                System.out.println();
-            }
-            else
-            {
-                System.out.println(text);
-            }
-
-            Logger.global().setCallerStackIndex(3);
-        }
     }
 
     /**
@@ -140,8 +123,7 @@ public class SqlStatement<T extends SqlStatement>
     /**
      * Sets the {@link DatabseAccess} instance which should be used to execute this statement.
      *
-     * @param db
-     *            The database that should be used for the statement.
+     * @param db The database that should be used for the statement.
      */
     public void setDatabase(DatabaseAccess db)
     {

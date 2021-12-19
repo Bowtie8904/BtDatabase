@@ -1,5 +1,17 @@
 package bt.db.store;
 
+import bt.db.DatabaseAccess;
+import bt.db.constants.SqlType;
+import bt.db.exc.SqlEntryException;
+import bt.db.statement.impl.InsertStatement;
+import bt.db.statement.impl.UpdateStatement;
+import bt.db.statement.result.SqlResult;
+import bt.db.statement.result.SqlResultSet;
+import bt.db.store.anot.*;
+import bt.log.Log;
+import bt.reflect.field.Fields;
+import bt.types.SimpleTripple;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -8,21 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import bt.db.DatabaseAccess;
-import bt.db.constants.SqlType;
-import bt.db.exc.SqlEntryException;
-import bt.db.statement.impl.InsertStatement;
-import bt.db.statement.impl.UpdateStatement;
-import bt.db.statement.result.SqlResult;
-import bt.db.statement.result.SqlResultSet;
-import bt.db.store.anot.Column;
-import bt.db.store.anot.Identity;
-import bt.db.store.anot.NoPersist;
-import bt.db.store.anot.SqlEntryField;
-import bt.db.store.anot.Table;
-import bt.reflect.field.Fields;
-import bt.types.SimpleTripple;
 
 /**
  * Offers an interface and static methods to persist and initialize objects who make use of the {@link Column},
@@ -61,12 +58,10 @@ public interface SqlEntry
      * </ul>
      * </p>
      *
-     * @param db
-     *            The database to use to retrieve the column values.
-     * @param cls
-     *            The class to create an instance of.
-     * @param id
-     *            The id to look for in the database.
+     * @param db  The database to use to retrieve the column values.
+     * @param cls The class to create an instance of.
+     * @param id  The id to look for in the database.
+     *
      * @return The instance or null if the database does not contain an entry with the given id.
      */
     public static <T> T init(DatabaseAccess db, Class<T> cls, long id)
@@ -80,14 +75,13 @@ public interface SqlEntry
             entry = construct.newInstance();
         }
         catch (InstantiationException | IllegalAccessException
-               | InvocationTargetException | SecurityException e1)
+                | InvocationTargetException | SecurityException e1)
         {
-            e1.printStackTrace();
+            throw new SqlEntryException("Failed to create new instance", e1);
         }
         catch (NoSuchMethodException noEx)
         {
-            throw new SqlEntryException(
-                                        "Class must implement a constructor without arguments.");
+            throw new SqlEntryException("Class must implement a constructor without arguments.", noEx);
         }
 
         if (entry != null)
@@ -105,29 +99,27 @@ public interface SqlEntry
                     {
                         if (field.getType() != Long.TYPE)
                         {
-                            throw new SqlEntryException(
-                                                        "Identity field must of type long.");
+                            throw new SqlEntryException("Identity field must of type long.");
                         }
                         else
                         {
                             field.setAccessible(true);
                             try
                             {
-                                field.set(entry,
-                                          id);
+                                field.set(entry, id);
                                 break;
                             }
                             catch (IllegalArgumentException | IllegalAccessException e)
                             {
-                                e.printStackTrace();
+                                throw new SqlEntryException("Failed to set value during initialization", e);
                             }
                         }
                     }
                 }
             }
 
-            entry = init(db,
-                         entry);
+            entry = SqlEntry.init(db,
+                                  entry);
         }
 
         return entry;
@@ -149,17 +141,16 @@ public interface SqlEntry
      * </ul>
      * </p>
      *
-     * @param db
-     *            The database to use to retrieve the column values.
-     * @param cls
-     *            The class to create instances of.
+     * @param db  The database to use to retrieve the column values.
+     * @param cls The class to create instances of.
+     *
      * @return A list filled with one instance for each row contained in the defined table.
      */
     public static <T> List<T> init(DatabaseAccess db, Class<T> cls)
     {
-        return init(db,
-                    cls,
-                    null);
+        return SqlEntry.init(db,
+                             cls,
+                             null);
     }
 
     /**
@@ -177,12 +168,10 @@ public interface SqlEntry
      * </ul>
      * </p>
      *
-     * @param db
-     *            The database to use to retrieve the column values.
-     * @param cls
-     *            The class to create instances of.
-     * @param ids
-     *            A list of IDs which match the identities of the instances that should be initialized.
+     * @param db  The database to use to retrieve the column values.
+     * @param cls The class to create instances of.
+     * @param ids A list of IDs which match the identities of the instances that should be initialized.
+     *
      * @return A list filled with one instance for each row contained in the defined table.
      */
     public static <T> List<T> init(DatabaseAccess db, Class<T> cls, List<Long> ids)
@@ -224,7 +213,7 @@ public interface SqlEntry
                 if (field.getType() != Long.TYPE)
                 {
                     throw new SqlEntryException(
-                                                "Identity field must of type long.");
+                            "Identity field must of type long.");
                 }
 
                 Column col = field.getAnnotation(Column.class);
@@ -244,7 +233,7 @@ public interface SqlEntry
                     else
                     {
                         throw new SqlEntryException(
-                                                    "Class needs either a global table annotation or a table annotation on every persistance field.");
+                                "Class needs either a global table annotation or a table annotation on every persistance field.");
                     }
                 }
             }
@@ -253,7 +242,7 @@ public interface SqlEntry
         if (idField == null)
         {
             throw new SqlEntryException(
-                                        "Class requires a valid identity field of type long.");
+                    "Class requires a valid identity field of type long.");
         }
 
         Map<Long, T> entries = new HashMap<>();
@@ -281,14 +270,14 @@ public interface SqlEntry
                 entry = construct.newInstance();
             }
             catch (InstantiationException | IllegalAccessException
-                   | InvocationTargetException | SecurityException e1)
+                    | InvocationTargetException | SecurityException e1)
             {
-                e1.printStackTrace();
+                throw new SqlEntryException("Failed to create new instance", e1);
             }
             catch (NoSuchMethodException noEx)
             {
                 throw new SqlEntryException(
-                                            "Class must implement a constructor without arguments.");
+                        "Class must implement a constructor without arguments.", noEx);
             }
 
             if (entry != null)
@@ -331,9 +320,9 @@ public interface SqlEntry
 
                         if (sqlEntryField != null)
                         {
-                            Object value = init(db,
-                                                field.getType(),
-                                                id);
+                            Object value = SqlEntry.init(db,
+                                                         field.getType(),
+                                                         id);
 
                             field.setAccessible(true);
                             try
@@ -343,7 +332,7 @@ public interface SqlEntry
                             }
                             catch (IllegalAccessException e)
                             {
-                                e.printStackTrace();
+                                throw new SqlEntryException("Failed to set value", e);
                             }
                             continue;
                         }
@@ -364,7 +353,7 @@ public interface SqlEntry
                         else
                         {
                             throw new SqlEntryException(
-                                                        "Class needs either a global table annotation or a table annotation on every persistance field.");
+                                    "Class needs either a global table annotation or a table annotation on every persistance field.");
                         }
 
                         if (col != null && tableName != null && tableName.equalsIgnoreCase(table))
@@ -381,7 +370,7 @@ public interface SqlEntry
                             }
                             catch (IllegalAccessException e)
                             {
-                                e.printStackTrace();
+                                throw new SqlEntryException("Failed to set value", e);
                             }
                         }
                     }
@@ -410,10 +399,9 @@ public interface SqlEntry
      * </ul>
      * </p>
      *
-     * @param db
-     *            The database to use to retrieve the column values.
-     * @param entry
-     *            The instance to initialize.
+     * @param db    The database to use to retrieve the column values.
+     * @param entry The instance to initialize.
+     *
      * @return The initialized instance or null if the database did not contain data for the set identity.
      */
     public static <T> T init(DatabaseAccess db, T entry)
@@ -465,7 +453,7 @@ public interface SqlEntry
                     }
                     catch (IllegalAccessException e)
                     {
-                        e.printStackTrace();
+                        throw new SqlEntryException("Failed to get field value", e);
                     }
 
                     if (id == null)
@@ -473,24 +461,24 @@ public interface SqlEntry
                         if (value == null)
                         {
                             throw new SqlEntryException(
-                                                        "Identity field can't be null.");
+                                    "Identity field can't be null.");
                         }
                         else if (field.getType() != Long.TYPE)
                         {
                             throw new SqlEntryException(
-                                                        "Identity field must of type long.");
+                                    "Identity field must of type long.");
                         }
                         else
                         {
                             id = new SimpleTripple<>(name,
-                                                                          type,
-                                                                          (long)value);
+                                                     type,
+                                                     (long)value);
                         }
                     }
                     else
                     {
                         throw new SqlEntryException(
-                                                    "Multiple annotated Identity fields can't be initialized.");
+                                "Multiple annotated Identity fields can't be initialized.");
                     }
                 }
             }
@@ -499,14 +487,14 @@ public interface SqlEntry
         if (id == null)
         {
             throw new SqlEntryException(
-                                        "Class without Identity annotation can't be automatically initialized.");
+                    "Class without Identity annotation can't be automatically initialized.");
         }
 
         for (Field field : sqlEntryFields)
         {
-            Object value = init(db,
-                                field.getType(),
-                                id.getSecondValue().longValue());
+            Object value = SqlEntry.init(db,
+                                         field.getType(),
+                                         id.getSecondValue().longValue());
 
             field.setAccessible(true);
             try
@@ -516,7 +504,7 @@ public interface SqlEntry
             }
             catch (IllegalAccessException e)
             {
-                e.printStackTrace();
+                throw new SqlEntryException("Failed to set value", e);
             }
         }
 
@@ -536,8 +524,8 @@ public interface SqlEntry
             if (set.size() > 1)
             {
                 throw new SqlEntryException(
-                                            "Multiple results for identity = " + id.getSecondValue().longValue()
-                                            + ". Identity field must be unique for automated initialization.");
+                        "Multiple results for identity = " + id.getSecondValue().longValue()
+                                + ". Identity field must be unique for automated initialization.");
             }
 
             if (set.size() != 0)
@@ -572,7 +560,7 @@ public interface SqlEntry
                     if (usedTable == null)
                     {
                         throw new SqlEntryException(
-                                                    "Class needs either a global table annotation or a table annotation on every persistance field.");
+                                "Class needs either a global table annotation or a table annotation on every persistance field.");
                     }
 
                     if (col != null && ident == null && usedTable.equalsIgnoreCase(table))
@@ -589,7 +577,7 @@ public interface SqlEntry
                         }
                         catch (IllegalAccessException e)
                         {
-                            e.printStackTrace();
+                            throw new SqlEntryException("Failed to set value", e);
                         }
                     }
                 }
@@ -619,10 +607,8 @@ public interface SqlEntry
      * </ul>
      * </p>
      *
-     * @param db
-     *            The database to use for persisting.
-     * @param entry
-     *            The instance to persist.
+     * @param db    The database to use for persisting.
+     * @param entry The instance to persist.
      */
     public static <T> void persist(DatabaseAccess db, T entry)
     {
@@ -659,7 +645,7 @@ public interface SqlEntry
             }
             catch (IllegalAccessException e)
             {
-                e.printStackTrace();
+                throw new SqlEntryException("Failed to get value", e);
             }
 
             if (pers == null && sqlEntryField != null && value != null)
@@ -698,8 +684,8 @@ public interface SqlEntry
                 else if (hasGlobalTable)
                 {
                     List<SimpleTripple<String, SqlType, Object>> values = tableValues
-                                                                                     .get(globalTable.value()
-                                                                                                     .toUpperCase());
+                            .get(globalTable.value()
+                                            .toUpperCase());
 
                     values.add(new SimpleTripple(name,
                                                  type,
@@ -709,7 +695,7 @@ public interface SqlEntry
                 else
                 {
                     throw new SqlEntryException(
-                                                "Class needs either a global table annotation or a table annotation on every persistance field.");
+                            "Class needs either a global table annotation or a table annotation on every persistance field.");
                 }
 
             }
@@ -721,23 +707,23 @@ public interface SqlEntry
                     if (value == null)
                     {
                         throw new SqlEntryException(
-                                                    "Identity field can't be null.");
+                                "Identity field can't be null.");
                     }
                     else if (field.getType() != Long.TYPE)
                     {
                         throw new SqlEntryException(
-                                                    "Identity field must of type long.");
+                                "Identity field must of type long.");
                     }
                     else
                     {
                         id = new SimpleEntry<>(name,
-                                                           (long)value);
+                                               (long)value);
                     }
                 }
                 else
                 {
                     throw new SqlEntryException(
-                                                "Multiple annotated Identity fields can't be persisted.");
+                            "Multiple annotated Identity fields can't be persisted.");
                 }
             }
         }
@@ -745,7 +731,7 @@ public interface SqlEntry
         if (!hasValues)
         {
             throw new SqlEntryException(
-                                        "Class needs to have at least one non identity value to persist.");
+                    "Class needs to have at least one non identity value to persist.");
         }
 
         for (String tableName : tableValues.keySet())
@@ -776,7 +762,7 @@ public interface SqlEntry
             if (id == null)
             {
                 throw new SqlEntryException(
-                                            "Class without Identity annotation can't be automatically persisted.");
+                        "Class without Identity annotation can't be automatically persisted.");
             }
 
             insert.set(id.getKey(),
@@ -788,18 +774,18 @@ public interface SqlEntry
 
             insert.commit();
             insert.onFail((select, e) ->
-            {
-                e.printStackTrace();
-                db.rollback();
-                return -1;
-            });
+                          {
+                              Log.error("Failed to persist entry", e);
+                              db.rollback();
+                              return -1;
+                          });
 
             update.commit();
             update.onFail((select, e) ->
-            {
-                db.rollback();
-                return -1;
-            });
+                          {
+                              db.rollback();
+                              return -1;
+                          });
 
             update.where(id.getKey()).equal(id.getValue().longValue());
 
@@ -812,10 +798,10 @@ public interface SqlEntry
               .onMoreThan(0,
                           update)
               .onFail((select, e) ->
-              {
-                  db.rollback();
-                  return null;
-              })
+                      {
+                          db.rollback();
+                          return null;
+                      })
               .execute();
         }
 
@@ -827,8 +813,8 @@ public interface SqlEntry
             }
             else
             {
-                persist(db,
-                        obj);
+                SqlEntry.persist(db,
+                                 obj);
             }
         }
     }

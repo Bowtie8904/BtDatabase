@@ -1,8 +1,5 @@
 package bt.db;
 
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
 import bt.db.config.DatabaseConfiguration;
 import bt.db.constants.Generated;
 import bt.db.constants.SqlType;
@@ -10,8 +7,12 @@ import bt.db.constants.SqlValue;
 import bt.db.statement.clause.Column;
 import bt.db.statement.result.SqlResult;
 import bt.db.statement.result.SqlResultSet;
+import bt.log.Log;
 import bt.scheduler.Threads;
 import bt.utils.Null;
+
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A class which creates and keeps a connection to a remote database.
@@ -35,15 +36,14 @@ public abstract class RemoteDatabase extends DatabaseAccess
      */
     protected RemoteDatabase()
     {
-        this(DEFAULT_LOCAL_DB,
+        this(DatabaseAccess.DEFAULT_LOCAL_DB,
              3000);
     }
 
     /**
      * Creates a new instance which uses the given connection string and a trigger check interval of 3 seconds.
      *
-     * @param dbURL
-     *            The DB connection string.
+     * @param dbURL The DB connection string.
      */
     protected RemoteDatabase(String dbURL)
     {
@@ -54,10 +54,8 @@ public abstract class RemoteDatabase extends DatabaseAccess
     /**
      * Creates a new instance which uses the given connection string and a given trigger check interval.
      *
-     * @param dbURL
-     *            The DB connection string.
-     * @param triggerCheckInterval
-     *            The trigger check interval in milliseconds.
+     * @param dbURL                The DB connection string.
+     * @param triggerCheckInterval The trigger check interval in milliseconds.
      */
     protected RemoteDatabase(String dbURL, long triggerCheckInterval)
     {
@@ -101,7 +99,7 @@ public abstract class RemoteDatabase extends DatabaseAccess
                               .column(new Column("triggerType", SqlType.VARCHAR).size(30))
                               .column(new Column("idRow", SqlType.LONG))
                               .column(new Column("insertTime", SqlType.TIMESTAMP)
-                              .defaultValue(SqlValue.CURRENT_TIMESTAMP))
+                                              .defaultValue(SqlValue.CURRENT_TIMESTAMP))
                               .createDefaultTriggers(false)
                               .commit()
                               .execute();
@@ -117,7 +115,7 @@ public abstract class RemoteDatabase extends DatabaseAccess
 
         if (success * success2 == 1)
         {
-            System.out.println("Created trigger tables.");
+            Log.debug("Created trigger tables.");
         }
     }
 
@@ -147,14 +145,14 @@ public abstract class RemoteDatabase extends DatabaseAccess
 
         this.triggerCheck = Threads.get()
                                    .scheduleAtFixedRateDaemon(
-                                                              () ->
-                                                              {
-                                                                  checkTriggers();
-                                                              },
-                                                              this.triggerCheckInterval,
-                                                              this.triggerCheckInterval,
-                                                              TimeUnit.MILLISECONDS,
-                                                              "DATABASE_TRIGGER_CHECK");
+                                           () ->
+                                           {
+                                               checkTriggers();
+                                           },
+                                           this.triggerCheckInterval,
+                                           this.triggerCheckInterval,
+                                           TimeUnit.MILLISECONDS,
+                                           "DATABASE_TRIGGER_CHECK");
     }
 
     private void checkTriggers()
@@ -162,23 +160,23 @@ public abstract class RemoteDatabase extends DatabaseAccess
         try
         {
             SqlResultSet set = select()
-                                       .from("recent_triggers")
-                                       .where("ID")
-                                       .notIn(select("trigger_id")
-                                                                  .from("handled_triggers")
-                                                                  .where("db_id")
-                                                                  .equal(getInstanceID())
-                                                                  .unprepared())
-                                       .onLessThan(1,
-                                                   (num, res) ->
-                                                   {
-                                                       return res;
-                                                   })
-                                       .execute();
+                    .from("recent_triggers")
+                    .where("ID")
+                    .notIn(select("trigger_id")
+                                   .from("handled_triggers")
+                                   .where("db_id")
+                                   .equal(getInstanceID())
+                                   .unprepared())
+                    .onLessThan(1,
+                                (num, res) ->
+                                {
+                                    return res;
+                                })
+                    .execute();
 
             long[] ids = new long[set.size()];
 
-            for (int i = 0; i < set.size(); i ++ )
+            for (int i = 0; i < set.size(); i++)
             {
                 SqlResult result = set.get(i);
                 ids[i] = result.getLong("ID");
@@ -190,22 +188,22 @@ public abstract class RemoteDatabase extends DatabaseAccess
                 switch (triggerType.toUpperCase())
                 {
                     case "INSERT":
-                        onInsert(getInstanceID(),
-                                 table,
-                                 idFieldName,
-                                 rowId);
+                        DatabaseAccess.onInsert(getInstanceID(),
+                                                table,
+                                                idFieldName,
+                                                rowId);
                         break;
                     case "UPDATE":
-                        onUpdate(getInstanceID(),
-                                 table,
-                                 idFieldName,
-                                 rowId);
+                        DatabaseAccess.onUpdate(getInstanceID(),
+                                                table,
+                                                idFieldName,
+                                                rowId);
                         break;
                     case "DELETE":
-                        onDelete(getInstanceID(),
-                                 table,
-                                 idFieldName,
-                                 rowId);
+                        DatabaseAccess.onDelete(getInstanceID(),
+                                                table,
+                                                idFieldName,
+                                                rowId);
                         break;
                 }
             }
@@ -222,7 +220,7 @@ public abstract class RemoteDatabase extends DatabaseAccess
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            Log.error("Failed to check triggers", e);
         }
     }
 }

@@ -2,6 +2,7 @@ package bt.db.server;
 
 import bt.db.DatabaseAccess;
 import bt.db.listener.evnt.DatabaseChangeEvent;
+import bt.log.Log;
 import bt.remote.socket.ServerClient;
 
 import java.io.IOException;
@@ -31,7 +32,7 @@ public class TriggerListener<T extends DatabaseChangeEvent>
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            Log.error("Failed to send event", e);
         }
     }
 
