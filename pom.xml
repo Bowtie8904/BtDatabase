@@ -29,13 +29,8 @@
     <dependencies>
         <dependency>
             <groupId>com.github.Bowtie8904</groupId>
-            <artifactId>BtCommons</artifactId>
-            <version>a1e3c260</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.Bowtie8904</groupId>
             <artifactId>BtRemote</artifactId>
-            <version>2d0f962c</version>
+            <version>a6643a06</version>
         </dependency>
         <dependency>
             <groupId>org.apache.derby</groupId>
