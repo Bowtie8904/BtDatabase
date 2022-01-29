@@ -296,68 +296,106 @@ public class SqlResultSet implements Iterable<SqlResult>, Serializable
 
             for (String name : stringResults)
             {
-                result.put(name,
-                           set.getString(name));
+                result.put(name, set.getString(name));
             }
 
             for (String name : byteResults)
             {
-                result.put(name,
-                           set.getByte(name));
+                Byte val = set.getByte(name);
+
+                if (set.wasNull())
+                {
+                    val = null;
+                }
+
+                result.put(name, val);
             }
 
             for (String name : shortResults)
             {
-                result.put(name,
-                           set.getShort(name));
+                Short val = set.getShort(name);
+
+                if (set.wasNull())
+                {
+                    val = null;
+                }
+
+                result.put(name, val);
             }
 
             for (String name : intResults)
             {
-                result.put(name,
-                           set.getInt(name));
+                Integer val = set.getInt(name);
+
+                if (set.wasNull())
+                {
+                    val = null;
+                }
+
+                result.put(name, val);
             }
 
             for (String name : longResults)
             {
-                result.put(name,
-                           set.getLong(name));
+                Long val = set.getLong(name);
+
+                if (set.wasNull())
+                {
+                    val = null;
+                }
+
+                result.put(name, val);
             }
 
             for (String name : floatResults)
             {
-                result.put(name,
-                           set.getFloat(name));
+                Float val = set.getFloat(name);
+
+                if (set.wasNull())
+                {
+                    val = null;
+                }
+
+                result.put(name, val);
             }
 
             for (String name : doubleResults)
             {
-                result.put(name,
-                           set.getDouble(name));
+                Double val = set.getDouble(name);
+
+                if (set.wasNull())
+                {
+                    val = null;
+                }
+
+                result.put(name, val);
             }
 
             for (String name : dateResults)
             {
-                result.put(name,
-                           set.getDate(name));
+                result.put(name, set.getDate(name));
             }
 
             for (String name : timeResults)
             {
-                result.put(name,
-                           set.getTime(name));
+                result.put(name, set.getTime(name));
             }
 
             for (String name : timestampResults)
             {
-                result.put(name,
-                           set.getTimestamp(name));
+                result.put(name, set.getTimestamp(name));
             }
 
             for (String name : booleanResults)
             {
-                result.put(name,
-                           set.getBoolean(name));
+                Boolean val = set.getBoolean(name);
+
+                if (set.wasNull())
+                {
+                    val = null;
+                }
+
+                result.put(name, val);
             }
 
             for (String name : clobResults)

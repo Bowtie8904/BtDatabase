@@ -3,6 +3,7 @@ package bt.db.statement.result;
 import bt.db.constants.SqlType;
 import bt.db.statement.impl.InsertStatement;
 import bt.db.store.anot.Column;
+import bt.log.Log;
 import bt.reflect.field.Fields;
 
 import java.io.Serializable;
@@ -70,6 +71,8 @@ public class SqlResult implements Iterable<Object>, Serializable
      */
     public void applyValues(Object obj) throws IllegalArgumentException, IllegalAccessException
     {
+        Log.entry(obj);
+
         for (Field field : Fields.getAllFields(obj.getClass()))
         {
             String fieldName = field.getName().toUpperCase();
@@ -89,6 +92,8 @@ public class SqlResult implements Iterable<Object>, Serializable
                 field.set(obj, value);
             }
         }
+
+        Log.exit(obj);
     }
 
     /**
