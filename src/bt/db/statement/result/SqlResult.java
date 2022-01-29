@@ -64,6 +64,7 @@ public class SqlResult implements Iterable<Object>, Serializable
      * If the annotation is present the name value of it will be used over the name of the actual field.
      *
      * @param obj The object to apply the values to.
+     *
      * @throws IllegalAccessException
      * @throws IllegalArgumentException
      */
@@ -299,7 +300,7 @@ public class SqlResult implements Iterable<Object>, Serializable
      * @param name  The mapped name of the value.
      * @param value The value to be mapped.
      */
-    public void put(String name, byte value)
+    public void put(String name, Byte value)
     {
         name = name.toUpperCase();
         this.byteResults.put(name,
@@ -318,7 +319,7 @@ public class SqlResult implements Iterable<Object>, Serializable
      * @param name  The mapped name of the value.
      * @param value The value to be mapped.
      */
-    public void put(String name, short value)
+    public void put(String name, Short value)
     {
         name = name.toUpperCase();
         this.shortResults.put(name,
@@ -337,7 +338,7 @@ public class SqlResult implements Iterable<Object>, Serializable
      * @param name  The mapped name of the value.
      * @param value The value to be mapped.
      */
-    public void put(String name, int value)
+    public void put(String name, Integer value)
     {
         name = name.toUpperCase();
         this.intResults.put(name,
@@ -356,7 +357,7 @@ public class SqlResult implements Iterable<Object>, Serializable
      * @param name  The mapped name of the value.
      * @param value The value to be mapped.
      */
-    public void put(String name, long value)
+    public void put(String name, Long value)
     {
         name = name.toUpperCase();
         this.longResults.put(name,
@@ -375,7 +376,7 @@ public class SqlResult implements Iterable<Object>, Serializable
      * @param name  The mapped name of the value.
      * @param value The value to be mapped.
      */
-    public void put(String name, double value)
+    public void put(String name, Double value)
     {
         name = name.toUpperCase();
         this.doubleResults.put(name,
@@ -394,7 +395,7 @@ public class SqlResult implements Iterable<Object>, Serializable
      * @param name  The mapped name of the value.
      * @param value The value to be mapped.
      */
-    public void put(String name, float value)
+    public void put(String name, Float value)
     {
         name = name.toUpperCase();
         this.floatResults.put(name,
@@ -432,7 +433,7 @@ public class SqlResult implements Iterable<Object>, Serializable
      * @param name  The mapped name of the value.
      * @param value The value to be mapped.
      */
-    public void put(String name, boolean value)
+    public void put(String name, Boolean value)
     {
         name = name.toUpperCase();
         this.booleanResults.put(name,
@@ -445,6 +446,7 @@ public class SqlResult implements Iterable<Object>, Serializable
      * Gets the value mapped to the given name.
      *
      * @param name The name of the value to get.
+     *
      * @return The value or null if no value of this type was mapped to the given name.
      */
     public String getString(String name)
@@ -457,9 +459,10 @@ public class SqlResult implements Iterable<Object>, Serializable
      * Gets the value mapped to the given name.
      *
      * @param name The name of the value to get.
+     *
      * @return The value or 0 if no value of this type was mapped to the given name.
      */
-    public byte getByte(String name)
+    public Byte getByte(String name)
     {
         name = name.toUpperCase();
         return this.byteResults.get(name);
@@ -469,9 +472,10 @@ public class SqlResult implements Iterable<Object>, Serializable
      * Gets the value mapped to the given name.
      *
      * @param name The name of the value to get.
+     *
      * @return The value or 0 if no value of this type was mapped to the given name.
      */
-    public short getShort(String name)
+    public Short getShort(String name)
     {
         name = name.toUpperCase();
         return this.shortResults.get(name);
@@ -481,9 +485,10 @@ public class SqlResult implements Iterable<Object>, Serializable
      * Gets the value mapped to the given name.
      *
      * @param name The name of the value to get.
+     *
      * @return The value or 0 if no value of this type was mapped to the given name.
      */
-    public int getInt(String name)
+    public Integer getInt(String name)
     {
         name = name.toUpperCase();
         return this.intResults.get(name);
@@ -493,9 +498,10 @@ public class SqlResult implements Iterable<Object>, Serializable
      * Gets the value mapped to the given name.
      *
      * @param name The name of the value to get.
+     *
      * @return The value or 0 if no value of this type was mapped to the given name.
      */
-    public long getLong(String name)
+    public Long getLong(String name)
     {
         name = name.toUpperCase();
         return this.longResults.get(name);
@@ -505,9 +511,10 @@ public class SqlResult implements Iterable<Object>, Serializable
      * Gets the value mapped to the given name.
      *
      * @param name The name of the value to get.
+     *
      * @return The value or 0 if no value of this type was mapped to the given name.
      */
-    public double getDouble(String name)
+    public Double getDouble(String name)
     {
         name = name.toUpperCase();
         return this.doubleResults.get(name);
@@ -517,9 +524,10 @@ public class SqlResult implements Iterable<Object>, Serializable
      * Gets the value mapped to the given name.
      *
      * @param name The name of the value to get.
+     *
      * @return The value or 0 if no value of this type was mapped to the given name.
      */
-    public float getFloat(String name)
+    public Float getFloat(String name)
     {
         name = name.toUpperCase();
         return this.floatResults.get(name);
@@ -529,6 +537,7 @@ public class SqlResult implements Iterable<Object>, Serializable
      * Gets the value mapped to the given name.
      *
      * @param name The name of the value to get.
+     *
      * @return The value or null if no value of this type was mapped to the given name.
      */
     public Date getDate(String name)
@@ -541,6 +550,7 @@ public class SqlResult implements Iterable<Object>, Serializable
      * Gets the value mapped to the given name.
      *
      * @param name The name of the value to get.
+     *
      * @return The value or null if no value of this type was mapped to the given name.
      */
     public Time getTime(String name)
@@ -553,6 +563,7 @@ public class SqlResult implements Iterable<Object>, Serializable
      * Gets the value mapped to the given name.
      *
      * @param name The name of the value to get.
+     *
      * @return The value or null if no value of this type was mapped to the given name.
      */
     public Timestamp getTimestamp(String name)
@@ -565,6 +576,7 @@ public class SqlResult implements Iterable<Object>, Serializable
      * Gets the value mapped to the given name.
      *
      * @param name The name of the value to get.
+     *
      * @return The value or null if no value of this type was mapped to the given name.
      */
     public Clob getClob(String name)
@@ -577,6 +589,7 @@ public class SqlResult implements Iterable<Object>, Serializable
      * Gets the value mapped to the given name.
      *
      * @param name The name of the value to get.
+     *
      * @return The value or null if no value of this type was mapped to the given name.
      */
     public Blob getBlob(String name)
@@ -589,9 +602,10 @@ public class SqlResult implements Iterable<Object>, Serializable
      * Gets the value mapped to the given name.
      *
      * @param name The name of the value to get.
+     *
      * @return The value or false if no value of this type was mapped to the given name.
      */
-    public boolean getBoolean(String name)
+    public Boolean getBoolean(String name)
     {
         name = name.toUpperCase();
         return this.booleanResults.get(name);
@@ -601,6 +615,7 @@ public class SqlResult implements Iterable<Object>, Serializable
      * Gets the value mapped to the given name.
      *
      * @param name The name of the value to get.
+     *
      * @return The value or null if no value was mapped to the given name.
      */
     public Object get(String name)
@@ -662,6 +677,7 @@ public class SqlResult implements Iterable<Object>, Serializable
      *
      * @param table          The table to insert into.
      * @param excludeColumns An array containing the names of columns that should not be added via the created insert string.
+     *
      * @return The created insert statement string.
      */
     public String export(String table, String[] excludeColumns)
