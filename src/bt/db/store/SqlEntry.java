@@ -625,6 +625,7 @@ public interface SqlEntry
         }
 
         boolean hasValues = false;
+        boolean persistId = true;
 
         SimpleEntry<String, Long> id = null;
 
@@ -702,6 +703,8 @@ public interface SqlEntry
 
             if (ident != null)
             {
+                persistId = pers == null;
+
                 if (id == null)
                 {
                     if (value == null)
@@ -765,12 +768,15 @@ public interface SqlEntry
                         "Class without Identity annotation can't be automatically persisted.");
             }
 
-            insert.set(id.getKey(),
-                       id.getValue(),
-                       SqlType.LONG);
-            update.set(id.getKey(),
-                       id.getValue(),
-                       SqlType.LONG);
+            if (persistId)
+            {
+                insert.set(id.getKey(),
+                           id.getValue(),
+                           SqlType.LONG);
+                update.set(id.getKey(),
+                           id.getValue(),
+                           SqlType.LONG);
+            }
 
             insert.commit();
             insert.onFail((select, e) ->
