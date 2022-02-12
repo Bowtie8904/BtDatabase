@@ -1,7 +1,7 @@
 package bt.db.statement.impl;
 
 import bt.db.DatabaseAccess;
-import bt.db.EmbeddedDatabase;
+import bt.db.DerbyDatabase;
 import bt.db.RemoteDatabase;
 import bt.db.constants.Generated;
 import bt.db.constants.Index;
@@ -281,7 +281,7 @@ public class CreateTableStatement extends CreateStatement<CreateTableStatement, 
 
     private void createTriggers()
     {
-        if (this.db instanceof EmbeddedDatabase)
+        if (this.db instanceof DerbyDatabase)
         {
             if (this.createDefaultDeleteTrigger)
             {

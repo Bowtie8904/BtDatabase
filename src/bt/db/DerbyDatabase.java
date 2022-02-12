@@ -15,7 +15,7 @@ import java.sql.SQLException;
  *
  * @author &#8904
  */
-public abstract class EmbeddedDatabase extends DatabaseAccess
+public abstract class DerbyDatabase extends DatabaseAccess
 {
     /**
      * The set derby home path.
@@ -25,7 +25,7 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
     /**
      * Creates a new instance which uses the default local db connection string.
      */
-    public EmbeddedDatabase()
+    public DerbyDatabase()
     {
         this(DatabaseAccess.DEFAULT_LOCAL_DB);
     }
@@ -35,14 +35,14 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
      *
      * @param dbURL The DB connection string.
      */
-    public EmbeddedDatabase(String dbURL)
+    public DerbyDatabase(String dbURL)
     {
         super(dbURL);
         setDerbyHome();
         addJarToDerby();
         setup();
         setProperty("derby_home",
-                    EmbeddedDatabase.derbyHome);
+                    DerbyDatabase.derbyHome);
         createTables();
     }
 
@@ -51,7 +51,7 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
      *
      * @param configuration
      */
-    protected EmbeddedDatabase(DatabaseConfiguration configuration)
+    protected DerbyDatabase(DatabaseConfiguration configuration)
     {
         this(configuration.toString());
     }
@@ -163,11 +163,11 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
                                                 "UTF-8");
                 jarFile = new File(jarFilePath);
             }
-            EmbeddedDatabase.derbyHome = jarFile.getParentFile().getAbsolutePath();
+            DerbyDatabase.derbyHome = jarFile.getParentFile().getAbsolutePath();
             System.setProperty("derby.system.home",
-                               EmbeddedDatabase.derbyHome);
+                               DerbyDatabase.derbyHome);
             Log.debug(String.format("Set derby home to %s.",
-                                    EmbeddedDatabase.derbyHome));
+                                    DerbyDatabase.derbyHome));
         }
         catch (Exception e)
         {
@@ -257,6 +257,6 @@ public abstract class EmbeddedDatabase extends DatabaseAccess
      */
     public static String getDerbyHome()
     {
-        return EmbeddedDatabase.derbyHome;
+        return DerbyDatabase.derbyHome;
     }
 }
