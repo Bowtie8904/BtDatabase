@@ -414,7 +414,7 @@ public class UpdateStatement extends SqlModifyStatement<UpdateStatement, UpdateS
             }
 
             sql = sql.substring(0,
-                                sql.length() - 4);
+                                sql.length() - (System.lineSeparator().length() + 2));
         }
 
         for (ConditionalClause<UpdateStatement> where : this.whereClauses)

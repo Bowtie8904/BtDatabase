@@ -143,6 +143,7 @@ public class Column
      * </p>
      *
      * @param text The comment.
+     *
      * @return This instance for chaining.
      */
     public Column comment(String text)
@@ -235,7 +236,7 @@ public class Column
 
         if (!defaultComment.isBlank())
         {
-            defaultComment = defaultComment.substring(0, defaultComment.length() - 4);
+            defaultComment = defaultComment.substring(0, defaultComment.length() - (System.lineSeparator().length() + 2));
         }
 
         return defaultComment;
@@ -249,6 +250,7 @@ public class Column
      * </p>
      *
      * @param values The sizes. For VARCHAR only one size can be given.
+     *
      * @return This instance for chaining.
      */
     public Column size(int... values)
@@ -290,6 +292,7 @@ public class Column
      * Sets the generation type for columns whichs value does not have to be explicitely inserted.
      *
      * @param generated
+     *
      * @return
      */
     public GenerationClause generated(Generated generated)
@@ -310,6 +313,7 @@ public class Column
      * Creates an index for this column upon creation by using the given index parameters.
      *
      * @param params
+     *
      * @return
      */
     public Column index(Index... params)
@@ -392,6 +396,7 @@ public class Column
      * </p>
      *
      * @param n The number by which the identity value should be incremented each insert.
+     *
      * @return This instance for chaining.
      */
     public Column autoIncrement(int n)
@@ -415,6 +420,7 @@ public class Column
      * Sets the default value of this column.
      *
      * @param defaultValue The value that should be used if nothing else is specified.
+     *
      * @return This instance for chaining.
      */
     public Column defaultValue(Object defaultValue)

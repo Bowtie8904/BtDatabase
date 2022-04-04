@@ -226,7 +226,7 @@ public class CreateTemporaryTableStatement extends CreateStatement<CreateTempora
             sql += col.toString() + ", " + System.lineSeparator();
         }
 
-        sql = sql.substring(0, sql.length() - 4) + System.lineSeparator();
+        sql = sql.substring(0, sql.length() - (System.lineSeparator().length() + 2)) + System.lineSeparator();
         sql += ")";
 
         if (this.preserve)

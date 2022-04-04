@@ -471,7 +471,7 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
                 }
 
                 sql = sql.substring(0,
-                                    sql.length() - 4);
+                                    sql.length() - (System.lineSeparator().length() + 2));
 
                 sql += ") " + System.lineSeparator() + "VALUES " + System.lineSeparator() + "(";
 
@@ -498,7 +498,7 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
                 }
 
                 sql = sql.substring(0,
-                                    sql.length() - 4);
+                                    sql.length() - (System.lineSeparator().length() + 2));
 
                 sql += ")";
             }
@@ -514,7 +514,7 @@ public class InsertStatement extends SqlModifyStatement<InsertStatement, InsertS
                     sql += col.toString() + ", " + System.lineSeparator();
                 }
 
-                sql = sql.substring(0, sql.length() - 4);
+                sql = sql.substring(0, sql.length() - (System.lineSeparator().length() + 2));
 
                 sql += ")" + System.lineSeparator();
             }
